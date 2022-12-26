@@ -178,7 +178,7 @@ class FitsOrganizer
   end
 
   def fits_files
-    Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].map { |it| Astrophoto.new(it) }
+    Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].uniq.map { |it| Astrophoto.new(it) }
   end
 
   # Organizes dark files by ISO, BIN, CCD-TEMP, EXPOSURE, and MONTH to facilitate the creation of
@@ -370,13 +370,13 @@ class FitsOrganizer
 
     is_dry_run = is_dry_run?
 
-    files = Dir['*.cr2', '*.CR2']
+    files = Dir['*.cr2', '*.CR2'].uniq
     if files.none? { |cr2| cr2.start_with?('IMG_') }
       cli.choose do |menu|
         menu.prompt = "Files (#{files.size}) are already named, e.g. #{files.first&.split(File::SEPARATOR)&.last}. What do?"
         menu.choice('Skip') { return }
         menu.choice('Proceed with rename (this cannot be undone) and continue') do
-          rename_to_img(files, is_dry_run)
+          # rename_to_img(files, is_dry_run)
         end
         menu.choice('Only rename back to IMG_****.cr2') do
           rename_to_img(files, is_dry_run)
@@ -391,7 +391,7 @@ class FitsOrganizer
     #
     # system "exiftool '-filename<#{file_format}' -d %Y%m%d-%H%M%S -r -ext cr2 ." unless is_dry_run
 
-    Dir['*.cr2', '*.CR2'].each do |cr2|
+    Dir['*.cr2', '*.CR2'].uniq.each do |cr2|
       exif = MiniExiftool.new(cr2)
       exif["SequenceNumber"] = exif.filename.split("_").last.split(".").first.to_i if exif["SequenceNumber"] == 0
       exif["Artist"] = "Joshua Kovach"
