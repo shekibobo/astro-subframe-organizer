@@ -20,6 +20,7 @@
 require 'fileutils'
 require 'date_core'
 require 'highline'
+require 'mini_exiftool'
 
 # Add your telescopes here. You will be prompted to choose one of them when organizing flats and lights.
 class Telescope
@@ -384,21 +385,23 @@ class FitsOrganizer
       end
     end
 
-    file_format = %(#{type}_#{target}_${ExposureTime;tr/\\\//-/}.0s_Bin1_ISO${iso;}_${DateTimeOriginal}_${CameraTemperature;}_%f.%e)
-                  .gsub('__', '_')
 
-    system "exiftool '-filename<#{file_format}' -d %Y%m%d-%H%M%S -r -ext cr2 ." unless is_dry_run
+    # file_format = %(#{type}_#{target}_${ExposureTime;tr/\\\//-/}.0s_Bin1_ISO${iso;}_${DateTimeOriginal}_${CameraTemperature;}_%f.%e)
+    #               .gsub('__', '_')
+    #
+    # system "exiftool '-filename<#{file_format}' -d %Y%m%d-%H%M%S -r -ext cr2 ." unless is_dry_run
 
     Dir['*.cr2', '*.CR2'].each do |cr2|
-      exp_time = cr2.match(/_(\d+\.?\d?)(-\d+)?(\.0)+s_/)&.then do |m|
-        top = m.captures[0].to_f
-        bottom = [-m.captures[1].to_i, 1].max
-        if top < 1.0
-          top *= 1000
-          bottom *= 1000
-        end
-        Rational(top.to_i, bottom.to_i)
-      end
+      exif = MiniExiftool.new(cr2)
+      exif["SequenceNumber"] = exif.filename.split("_").last.split(".").first.to_i if exif["SequenceNumber"] == 0
+      exif["Artist"] = "Joshua Kovach"
+      exif.save
+      exif.reload
+
+      data = exif.to_hash
+
+      exp_time = data["ExposureTime"]
+
       exp_unit = 's'
       if exp_time < 1.0
         exp_time *= 1000
@@ -411,10 +414,12 @@ class FitsOrganizer
 
       exp_time_str = format("%.1f%s", exp_time, exp_unit)
 
-      target_file = cr2
-                    .gsub(/\d+ C/) { |temp| temp.gsub(' ', '.0') }
-                    .gsub('IMG_', '')
-                    .gsub(/_(\d+\.?\d?)(-\d+)?(\.0)+s_/, "_#{exp_time_str}_")
+      created_at = data["DateTimeOriginal"].strftime("%Y%m%d-%H%M%S")
+      ccd_temp = "%.1fC" % data["CameraTemperature"].to_f
+      seq_num = data["SequenceNumber"].to_s.rjust(4, "0")
+
+      target_file = "#{type}_#{target}_#{exp_time_str}_Bin1_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
+
       FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
     end
   end
