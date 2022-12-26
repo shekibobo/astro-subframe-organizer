@@ -47,7 +47,7 @@ end
 # In that case, you will need to change the order or add more properties in the initialize method so
 # that your data is properly parsed. You will also likely want to change your `target_dir` for each
 # type so that it organizes your data properly.
-class FitsFile
+class Astrophoto
   attr_accessor :type, :exposure, :bin, :iso, :created_at, :ccd_temp, :image_index, :path, :filename, :telescope,
                 :filter, :target, :dark_flat, :mosaic_pane
 
@@ -177,12 +177,12 @@ class FitsOrganizer
   end
 
   def fits_files
-    Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].map { |it| FitsFile.new(it) }
+    Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].map { |it| Astrophoto.new(it) }
   end
 
   # Organizes dark files by ISO, BIN, CCD-TEMP, EXPOSURE, and MONTH to facilitate the creation of
   # master darks that may have varying temperatures. This organization can be changed by updating
-  # FitsFile#target_dir for the DARK type.
+  # Astrophoto#target_dir for the DARK type.
   #
   # If the file has an exposure of less than 10 seconds, you will be asked if it is a flat dark.
   # If so, it will be organized into a folder that will match your corresponding flat files so that
@@ -194,7 +194,7 @@ class FitsOrganizer
   # With this, you can run WBPP with just bias and darks using the grouping keywords CCD-TEMP, ISO, EXP,
   # and MONTH (optional).
   def organize_darks
-    dark_files = fits_files.filter { |it| it.type == FitsFile::DARK }.sort_by { |it| it.path }
+    dark_files = fits_files.filter { |it| it.type == Astrophoto::DARK }.sort_by { |it| it.path }
     puts "Preparing to move #{dark_files.size} DARK files..."
 
     is_dry_run = is_dry_run?
@@ -219,7 +219,7 @@ class FitsOrganizer
   end
 
   def organize_biases
-    bias_files = fits_files.filter { |it| it.type == FitsFile::BIAS }.sort_by { |it| it.path }
+    bias_files = fits_files.filter { |it| it.type == Astrophoto::BIAS }.sort_by { |it| it.path }
     puts "Preparing to move #{bias_files.size} BIAS files..."
 
     is_dry_run = is_dry_run?
@@ -237,7 +237,7 @@ class FitsOrganizer
   end
 
   # Organizes flat files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
-  # properties, update FitsFile#target_dir for the FLAT type. The TELESCOPE and FILTER keywords are
+  # properties, update Astrophoto#target_dir for the FLAT type. The TELESCOPE and FILTER keywords are
   # for matching LIGHTS which will have the same keywords set when organized using this script.
   #
   # You can run WBPP with just your biases, flat darks, and flats using the grouping keywords
@@ -248,7 +248,7 @@ class FitsOrganizer
   # before using that master flat in a WBPP integration run, since exposure time should not be considered
   # when grouping flats to lights.
   def organize_flats
-    flat_files = fits_files.filter { |it| it.type == FitsFile::FLAT }.sort_by { |it| it.path }
+    flat_files = fits_files.filter { |it| it.type == Astrophoto::FLAT }.sort_by { |it| it.path }
     puts "Preparing to move #{flat_files.size} FLAT files..."
 
     is_dry_run = is_dry_run?
@@ -277,7 +277,7 @@ class FitsOrganizer
   end
 
   # Organizes light files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
-  # properties, update FitsFile#target_dir for the LIGHT type. The TELESCOPE and FILTER keywords are
+  # properties, update Astrophoto#target_dir for the LIGHT type. The TELESCOPE and FILTER keywords are
   # for matching LIGHTS which will have the same keywords set when organized using this script.
   #
   # CCD-TEMP is ignored in the group naming because each individual fits file contains that information
@@ -289,7 +289,7 @@ class FitsOrganizer
   # If you are running WBPP on multiple targets using this data, e.g. for a mosaic, you should make sure
   # to use LIGHT as a post-processing keyword and register files using `auto by LIGHT`.
   def organize_lights
-    light_files = fits_files.filter { |it| it.type == FitsFile::LIGHT }.sort_by { |it| it.path }
+    light_files = fits_files.filter { |it| it.type == Astrophoto::LIGHT }.sort_by { |it| it.path }
     puts "Preparing to move #{light_files.size} LIGHT files..."
 
     is_dry_run = is_dry_run?
@@ -360,12 +360,12 @@ class FitsOrganizer
   def rename_from_exif
     type = cli.choose do |menu|
       menu.prompt = 'What is the file type?'
-      FitsFile::TYPES.each do |t|
+      Astrophoto::TYPES.each do |t|
         menu.choice(t)
       end
     end
 
-    target = cli.ask('What is the target name?') if type == FitsFile::LIGHT
+    target = cli.ask('What is the target name?') if type == Astrophoto::LIGHT
 
     is_dry_run = is_dry_run?
 
