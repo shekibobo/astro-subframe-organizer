@@ -36,6 +36,7 @@ end
 class Filter
   ALL = [
     BAADER_MOON = 'BaaderMoon',
+    NBZ = "NBZ",
     NONE = 'NoFilter'
   ]
 end
