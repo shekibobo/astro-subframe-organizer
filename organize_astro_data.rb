@@ -60,6 +60,8 @@ class Astrophoto
     BIAS = 'Bias'
   ]
 
+  DT_FORMAT = '%Y%m%d-%H%M%S'
+
   def initialize(path)
     self.path = path
     self.filename = path.split('/').last
@@ -77,7 +79,7 @@ class Astrophoto
     self.exposure = parts.shift
     self.bin = parts.shift.gsub('Bin', '')
     self.iso = parts.shift.gsub('ISO', '')
-    self.created_at = DateTime.strptime(parts.shift, '%Y%m%d-%H%M%S')
+    self.created_at = DateTime.strptime(parts.shift, DT_FORMAT)
     self.ccd_temp = parts.shift
     self.image_index = parts.shift
   end
@@ -415,7 +417,7 @@ class FitsOrganizer
 
       exp_time_str = format("%.1f%s", exp_time, exp_unit)
 
-      created_at = data["DateTimeOriginal"].strftime("%Y%m%d-%H%M%S")
+      created_at = data["DateTimeOriginal"].strftime(DT_FORMAT)
       ccd_temp = "%.1fC" % data["CameraTemperature"].to_f
       seq_num = data["SequenceNumber"].to_s.rjust(4, "0")
 
