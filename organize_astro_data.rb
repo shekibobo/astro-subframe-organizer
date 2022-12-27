@@ -388,12 +388,6 @@ class FitsOrganizer
       end
     end
 
-
-    # file_format = %(#{type}_#{target}_${ExposureTime;tr/\\\//-/}.0s_Bin1_ISO${iso;}_${DateTimeOriginal}_${CameraTemperature;}_%f.%e)
-    #               .gsub('__', '_')
-    #
-    # system "exiftool '-filename<#{file_format}' -d %Y%m%d-%H%M%S -r -ext cr2 ." unless is_dry_run
-
     Dir['*.cr2', '*.CR2'].uniq.each do |cr2|
       exif = MiniExiftool.new(cr2)
       exif["SequenceNumber"] = exif.filename.split("_").last.split(".").first.to_i if exif["SequenceNumber"] == 0
