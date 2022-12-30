@@ -28,7 +28,7 @@ class Telescope
     REDCAT51 = 'RedCat51',
     Z130 = 'ZhumellZ130',
     AD8 = 'AperturaAD8',
-    DS90 = 'MeadeDS90'
+    DS90 = 'MeadeDS90',
   ]
 end
 
@@ -37,7 +37,14 @@ class Filter
   ALL = [
     BAADER_MOON = 'BaaderMoon',
     NBZ = "NBZ",
-    NONE = 'NoFilter'
+    NONE = 'NoFilter',
+  ]
+end
+
+class Camera
+  ALL = [
+    T7 = "T7",
+    183MC = "183MC",
   ]
 end
 
@@ -50,7 +57,7 @@ end
 # that your data is properly parsed. You will also likely want to change your `target_dir` for each
 # type so that it organizes your data properly.
 class Astrophoto
-  attr_accessor :type, :exposure, :bin, :iso, :created_at, :ccd_temp, :image_index, :path, :filename, :telescope,
+  attr_accessor :type, :exposure, :bin, :camera, :gain, :iso, :created_at, :ccd_temp, :image_index, :path, :filename, :telescope,
                 :filter, :target, :dark_flat, :mosaic_pane
 
   TYPES = [
@@ -77,8 +84,14 @@ class Astrophoto
     self.dark_flat = path.include?('DarkFlat')
 
     self.exposure = parts.shift
-    self.bin = parts.shift.gsub('Bin', '')
-    self.iso = parts.shift.gsub('ISO', '')
+
+    self.camera = parts.shift if Camera.ALL.include?(parts.first)
+    self.camera = Camera.T7 if self.camera == nil
+
+    self.bin = parts.shift.gsub('Bin', '') if parts.first.start_with?('Bin')
+    self.iso = parts.shift.gsub('ISO', '') if parts.first.start_with?('ISO')
+    self.gain = parts.shift.gsub('gain', '') if parts.first.start_with?('gain')
+
     self.created_at = DateTime.strptime(parts.shift, DT_FORMAT)
     self.ccd_temp = parts.shift
     self.image_index = parts.shift
@@ -121,24 +134,30 @@ class Astrophoto
   # The directory structure used to group and categorize the files, which will include useful
   # grouping keywords for PixInsight's WeightedBatchPreProcessing script.
   def target_dir
+    iso_or_gain = if iso != nil
+      "ISO_#{iso}"
+    elsif gain != nil
+      "GAIN_#{gain}"
+    end
+
     case type
     when DARK
       if dark_flat?
-        "DarkFlat_FLATSET_#{flatset_id}_ISO_#{iso}_EXP_#{exposure}_Bin_#{bin}"
+        "DarkFlat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}"
       else
-        "Dark_ISO_#{iso}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_MONTH_#{month}"
+        "Dark_ISO_#{iso}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_MONTH_#{month}_CAMERA_#{camera}"
       end
     when FLAT
-      "Flat_FLATSET_#{flatset_id}_ISO_#{iso}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}"
+      "Flat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
     when LIGHT
       pane_id = "_PANE_#{mosaic_pane}" if mosaic_pane
       if filename.downcase.end_with?(".fit")
-        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_ISO_#{iso}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}"
+        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
       elsif filename.downcase.end_with?(".cr2")
-        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_ISO_#{iso}_EXP_#{exposure}_Bin_#{bin}_CCD-TEMP_#{ccd_temp.gsub("0C", "")}_TELESCOPE_#{telescope}_FILTER_#{filter}"
+        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CCD-TEMP_#{ccd_temp.gsub("0C", "")}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
       end
     when BIAS
-      "Bias_ISO_#{iso}_EXP_#{exposure}_Bin_#{bin}_MONTH_#{month}"
+      "Bias_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_MONTH_#{month}_CAMERA_#{camera}"
     end
   end
 
