@@ -41,10 +41,11 @@ class Filter
   ]
 end
 
+# Add your cameras here. If there is no camera chosen, it will prompt you to choose one.
 class Camera
   ALL = [
-    T7 = "T7",
-    183MC = "183MC",
+    CANON_T7 = "T7",
+    ASI183MC = "183MC",
   ]
 end
 
@@ -73,28 +74,43 @@ class Astrophoto
     self.path = path
     self.filename = path.split('/').last
     parts = filename.gsub('.fit', '').gsub('.cr2', '').split('_')
+    puts "PARTS: #{parts}"
     self.type = parts.shift
+    puts "TYPE: #{type}"
 
     self.target = parts.shift if type == LIGHT
+    puts "TARGET: #{target}"
     self.mosaic_pane = parts.shift if parts.first.match(/\A\d+-\d+\z/)
+    puts "PANE: #{mosaic_pane}"
 
     # If the file is already organized somewhere, get the information from its path.
     self.telescope = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first
+    puts "TELESCOPE: #{telescope}"
     self.filter = path.match(%r{FILTER_([^_/]+).*})&.captures&.first
+    puts "FILTER: #{filter}"
     self.dark_flat = path.include?('DarkFlat')
+    puts "DarkFlat?: #{dark_flat}"
 
     self.exposure = parts.shift
-
-    self.camera = parts.shift if Camera.ALL.include?(parts.first)
-    self.camera = Camera.T7 if self.camera == nil
+    puts "EXP: #{exposure}"
 
     self.bin = parts.shift.gsub('Bin', '') if parts.first.start_with?('Bin')
+    puts "BIN: #{bin}"
+
+    self.camera = parts.shift if Camera::ALL.include?(parts.first)
+    puts "CAMERA: #{camera}"
+
     self.iso = parts.shift.gsub('ISO', '') if parts.first.start_with?('ISO')
+    puts "ISO: #{iso}"
     self.gain = parts.shift.gsub('gain', '') if parts.first.start_with?('gain')
+    puts "GAIN: #{gain}"
 
     self.created_at = DateTime.strptime(parts.shift, DT_FORMAT)
+    puts "CREATED_AT: #{created_at}"
     self.ccd_temp = parts.shift
+    puts "CCD_TEMP: #{ccd_temp}"
     self.image_index = parts.shift
+    puts "IMAGE_INDEX: #{image_index}"
   end
 
   def dark_flat?
@@ -135,17 +151,17 @@ class Astrophoto
   # grouping keywords for PixInsight's WeightedBatchPreProcessing script.
   def target_dir
     iso_or_gain = if iso != nil
-      "ISO_#{iso}"
-    elsif gain != nil
-      "GAIN_#{gain}"
-    end
+                    "ISO_#{iso}"
+                  elsif gain != nil
+                    "GAIN_#{gain}"
+                  end
 
     case type
     when DARK
       if dark_flat?
         "DarkFlat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}"
       else
-        "Dark_ISO_#{iso}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_MONTH_#{month}_CAMERA_#{camera}"
+        "Dark_#{iso_or_gain}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_MONTH_#{month}_CAMERA_#{camera}"
       end
     when FLAT
       "Flat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
@@ -231,10 +247,27 @@ class FitsOrganizer
       end
 
       if darkset.all? { |it| it.maybe_flat_dark? } &&
-         cli.ask("Is this a flat dark set (size #{darkset.size})? [y/n] #{darkset.first.filename}: ").downcase == 'y'
+        cli.ask("Is this a flat dark set (size #{darkset.size})? [y/n] #{darkset.first.filename}: ").downcase == 'y'
         puts "Cool, we'll move that set to a FLATSET directory..."
 
         darkset.each { |it| it.dark_flat = true }
+      end
+
+      cameras = darkset.map { |it| it.camera }.uniq
+      camera = if cameras.empty?
+                 puts "[WARNING] Camera not detected."
+                 select_camera
+               elsif cameras.size > 1
+                 puts "[WARNING] Multiple cameras detected: #{cameras}"
+               else
+                 cameras.first
+               end
+
+      darkset.each do |file|
+        if file.camera.nil?
+          puts "Camera not detected. Using #{camera}."
+          file.camera = camera
+        end
       end
 
       darkset.each { |it| it.move(is_dry_run) }
@@ -253,6 +286,23 @@ class FitsOrganizer
       if biases.all? { |it| it.path != it.target_path }
         move = cli.ask("Do you want to move the bias set in #{biases.first.current_dir} to #{biases.first.target_dir}? [y/n] ").downcase == 'y'
         next unless move
+      end
+
+      cameras = biases.map { |it| it.camera }.uniq
+      camera = if cameras.empty?
+                 puts "[WARNING] Camera not detected."
+                 select_camera
+               elsif cameras.size > 1
+                 puts "[WARNING] Multiple cameras detected: #{cameras}"
+               else
+                 cameras.first
+               end
+
+      biases.each do |file|
+        if file.camera.nil?
+          puts "Camera not detected. Using #{camera}."
+          file.camera = camera
+        end
       end
 
       biases.each { |it| it.move(is_dry_run) }
@@ -289,10 +339,23 @@ class FitsOrganizer
       puts "For FLATSET #{flatset.first.filename}..#{flatset.last.filename}:"
       telescope = select_telescope
       filter = select_filter
+      cameras = flatset.map { |it| it.camera }.uniq
+      camera = if cameras.empty?
+                 puts "[WARNING] Camera not detected."
+                 select_camera
+               elsif cameras.size > 1
+                 puts "[WARNING] Multiple cameras detected: #{cameras}"
+               else
+                 cameras.first
+               end
 
       flatset.each do |file|
         file.telescope = telescope
         file.filter = filter
+        if file.camera.nil?
+          puts "Camera not detected. Using #{camera}."
+          file.camera = camera
+        end
       end
 
       flatset.each { |it| it.move(is_dry_run) }
@@ -329,11 +392,23 @@ class FitsOrganizer
 
       puts "For LIGHTS #{lightset.first.filename}..#{lightset.last.filename}:"
       telescope = select_telescope
-      filter = select_filter
+      cameras = lightset.map { |it| it.camera }.uniq
+      camera = if cameras.empty?
+                 puts "[WARNING] Camera not detected."
+                 select_camera
+               elsif cameras.size > 1
+                 puts "[WARNING] Multiple cameras detected: #{cameras}"
+               else
+                 cameras.first
+               end
 
       lightset.each do |file|
         file.telescope = telescope
         file.filter = filter
+        if file.camera.nil?
+          puts "Camera not detected. Using #{camera}."
+          file.camera = camera
+        end
       end
 
       lightset.each { |it| it.move(is_dry_run) }
@@ -357,6 +432,16 @@ class FitsOrganizer
         menu.choice(filter)
       end
       menu.default = Filter::BAADER_MOON
+    end
+  end
+
+  private def select_camera
+    cli.choose do |menu|
+      menu.prompt = 'What camera is used with this set?'
+      Camera::ALL.each do |camera|
+        menu.choice(camera)
+      end
+      menu.default = Camera::CANON_T7
     end
   end
 
@@ -433,8 +518,19 @@ class FitsOrganizer
       created_at = data["DateTimeOriginal"].strftime(DT_FORMAT)
       ccd_temp = "%.1fC" % data["CameraTemperature"].to_f
       seq_num = data["SequenceNumber"].to_s.rjust(4, "0")
+      cam_model = data["Model"]
+      camera = Camera::ALL.find { |it| cam_model.downcase.contains(it.downcase) }
+      if camera.nil?
+        puts "Camera #{cam_model} did not match any of the expected models."
+        camera = cli.choose do |menu|
+          menu.prompt = "Choose an identifier for this camera:"
+          cam_model.split(" ").each do |id|
+            menu.choice(id)
+          end
+        end
+      end
 
-      target_file = "#{type}_#{target}_#{exp_time_str}_Bin1_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
+      target_file = "#{type}_#{target}_#{exp_time_str}_Bin1_CAMERA_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
 
       FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
     end
