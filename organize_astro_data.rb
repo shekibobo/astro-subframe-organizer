@@ -49,6 +49,8 @@ class Camera
   ]
 end
 
+DT_FORMAT = '%Y%m%d-%H%M%S'
+
 # Class describing the properties of the file that we can determine from the filename generated
 # by the ASIAir. Depending on your camera and your filter setup, the file structure may be different.
 # This script was written for use with the ASIAir Plus version 1.9, using a Canon EOS 1500 (T7) DSLR
@@ -67,8 +69,6 @@ class Astrophoto
     LIGHT = 'Light',
     BIAS = 'Bias'
   ]
-
-  DT_FORMAT = '%Y%m%d-%H%M%S'
 
   def initialize(path)
     self.path = path
@@ -161,7 +161,7 @@ class Astrophoto
       if dark_flat?
         "DarkFlat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}"
       else
-        "Dark_#{iso_or_gain}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_MONTH_#{month}_CAMERA_#{camera}"
+        "Dark_#{iso_or_gain}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_CAMERA_#{camera}_MONTH_#{month}"
       end
     when FLAT
       "Flat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
@@ -173,7 +173,7 @@ class Astrophoto
         "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CCD-TEMP_#{ccd_temp.gsub("0C", "")}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
       end
     when BIAS
-      "Bias_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_MONTH_#{month}_CAMERA_#{camera}"
+      "Bias_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}_MONTH_#{month}"
     end
   end
 
@@ -204,6 +204,7 @@ class Astrophoto
       puts "File already exists #{target_path}. Skipping..."
     else
       FileUtils.move path, target_path, verbose: is_dry_run, noop: is_dry_run
+      print "." unless is_dry_run
     end
   end
 end
@@ -272,6 +273,7 @@ class FitsOrganizer
 
       darkset.each { |it| it.move(is_dry_run) }
     end
+    puts "Done"
   end
 
   def organize_biases
@@ -307,6 +309,7 @@ class FitsOrganizer
 
       biases.each { |it| it.move(is_dry_run) }
     end
+    puts "Done"
   end
 
   # Organizes flat files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -360,6 +363,7 @@ class FitsOrganizer
 
       flatset.each { |it| it.move(is_dry_run) }
     end
+    puts "Done"
   end
 
   # Organizes light files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -392,6 +396,7 @@ class FitsOrganizer
 
       puts "For LIGHTS #{lightset.first.filename}..#{lightset.last.filename}:"
       telescope = select_telescope
+      filter = select_filter
       cameras = lightset.map { |it| it.camera }.uniq
       camera = if cameras.empty?
                  puts "[WARNING] Camera not detected."
@@ -413,6 +418,7 @@ class FitsOrganizer
 
       lightset.each { |it| it.move(is_dry_run) }
     end
+    puts "Done"
   end
 
   private def select_telescope
@@ -519,7 +525,7 @@ class FitsOrganizer
       ccd_temp = "%.1fC" % data["CameraTemperature"].to_f
       seq_num = data["SequenceNumber"].to_s.rjust(4, "0")
       cam_model = data["Model"]
-      camera = Camera::ALL.find { |it| cam_model.downcase.contains(it.downcase) }
+      camera = Camera::ALL.find { |it| cam_model.include?(it) }
       if camera.nil?
         puts "Camera #{cam_model} did not match any of the expected models."
         camera = cli.choose do |menu|
@@ -530,10 +536,12 @@ class FitsOrganizer
         end
       end
 
-      target_file = "#{type}_#{target}_#{exp_time_str}_Bin1_CAMERA_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
+      target_file = "#{type}_#{target&.append("_")}#{exp_time_str}_Bin1_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
 
       FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
+      print "." unless is_dry_run
     end
+    puts "Done"
   end
 
   def is_dry_run?
