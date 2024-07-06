@@ -29,6 +29,7 @@ class Telescope
     Z130 = 'ZhumellZ130',
     AD8 = 'AperturaAD8',
     DS90 = 'MeadeDS90',
+    CANON_EFS_18_55 = 'CanonEFS1855',
   ]
 end
 
@@ -254,7 +255,7 @@ class FitsOrganizer
         darkset.each { |it| it.dark_flat = true }
       end
 
-      cameras = darkset.map { |it| it.camera }.uniq
+      cameras = darkset.map { |it| it.camera }.compact.uniq
       camera = if cameras.empty?
                  puts "[WARNING] Camera not detected."
                  select_camera
@@ -272,8 +273,8 @@ class FitsOrganizer
       end
 
       darkset.each { |it| it.move(is_dry_run) }
+      puts "Done\n"
     end
-    puts "Done"
   end
 
   def organize_biases
@@ -308,8 +309,8 @@ class FitsOrganizer
       end
 
       biases.each { |it| it.move(is_dry_run) }
+      puts "Done\n"
     end
-    puts "Done"
   end
 
   # Organizes flat files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -362,8 +363,8 @@ class FitsOrganizer
       end
 
       flatset.each { |it| it.move(is_dry_run) }
+      puts "Done\n"
     end
-    puts "Done"
   end
 
   # Organizes light files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -417,8 +418,8 @@ class FitsOrganizer
       end
 
       lightset.each { |it| it.move(is_dry_run) }
+      puts "Done\n"
     end
-    puts "Done"
   end
 
   private def select_telescope
@@ -536,12 +537,13 @@ class FitsOrganizer
         end
       end
 
-      target_file = "#{type}_#{target&.append("_")}#{exp_time_str}_Bin1_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
+      target_file = [type, target, exp_time_str, "Bin1", camera, "ISO#{data["ISO"]}", created_at, ccd_temp, seq_num].compact.join("_") + ".CR2"
+      # target_file = "#{type}_#{target&.append("_")}#{exp_time_str}_Bin1_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
 
       FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
       print "." unless is_dry_run
     end
-    puts "Done"
+    puts "Done\n"
   end
 
   def is_dry_run?
