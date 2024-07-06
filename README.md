@@ -161,10 +161,12 @@ $ ruby ~/astrophotography/organize_astro_data.rb
 1. Darks
 2. Flats
 3. Lights
-4. Remove empty directories
-5. Remove jpg thumbnails
-6. Rename files from EXIF data
-7. Quit
+4. Biases
+5. Remove empty directories
+6. Remove jpg thumbnails
+7. Rename files from EXIF data
+8. Quit
+What are we organizing?
 1
 Preparing to move 1564 DARK files...
 Is this a dry run? [y/n]: n
