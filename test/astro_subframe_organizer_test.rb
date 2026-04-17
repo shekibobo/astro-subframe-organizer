@@ -1,12 +1,10 @@
-require 'minitest/autorun'
-require 'minitest/pride'
-require 'tempfile'
-require 'fileutils'
-require_relative 'organize_astro_data'  # Adjust path as needed
+# frozen_string_literal: true
 
-# Characterization tests for organize_astro_data.rb
+require_relative 'test_helper'
+
+# Characterization tests for astro_subframe_organizer.rb
 # These tests capture the current behavior of the script.
-# Run with: ruby test_organize_astro_data.rb
+# Run with: rake test
 
 class TestAstrophoto < Minitest::Test
   def setup
@@ -225,7 +223,7 @@ class TestAstrophoto < Minitest::Test
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
-      photo.move(true)  # dry run
+      photo.move(true) # dry run
 
       assert File.exist?(src_file)
       refute File.exist?(photo.target_path)
@@ -242,7 +240,7 @@ class TestAstrophoto < Minitest::Test
         photo.telescope = 'RedCat51'
         photo.filter = 'BaaderMoon'
 
-        photo.move(false)  # actual move
+        photo.move(false) # actual move
 
         assert File.exist?(photo.target_path)
         refute File.exist?(src_file)
@@ -275,12 +273,12 @@ class TestFitsOrganizer < Minitest::Test
         files = organizer.fits_files
 
         assert_equal 4, files.size
-        assert files.all? { |f| f.is_a?(Astrophoto) }
+        assert(files.all? { |f| f.is_a?(Astrophoto) })
       end
     end
   end
 
-  # Note: Interactive methods like organize_darks, organize_flats, etc., are hard to test directly
+  # NOTE: Interactive methods like organize_darks, organize_flats, etc., are hard to test directly
   # without mocking HighLine. For characterization, we tested the core logic above.
   # Removed test_remove_empty_directories_dry and test_remove_jpg_thumbnails_dry to avoid prompts.
 
@@ -289,7 +287,7 @@ class TestFitsOrganizer < Minitest::Test
     Dir.mktmpdir do |tmpdir|
       Dir.chdir(tmpdir) do
         # Copy the sample CR2 file
-        FileUtils.cp('/Users/joshkovach/astrophotography/ruby-scripts/IMG_0437.CR2', 'IMG_0437.CR2')
+        FileUtils.cp(File.join(__dir__, 'fixtures', 'IMG_0437.CR2'), 'IMG_0437.CR2')
 
         # Test that EXIF can be read
         exif = MiniExiftool.new('IMG_0437.CR2')
@@ -316,15 +314,15 @@ class TestFitsOrganizer < Minitest::Test
         exp_time_str = format('%.1f%s', exp_time, exp_unit)
 
         created_at = data['DateTimeOriginal'].strftime(DT_FORMAT)
-        ccd_temp = '%.1fC' % data['CameraTemperature'].to_f
+        ccd_temp = format('%.1fC', data['CameraTemperature'].to_f)
         seq_num = data['SequenceNumber'].to_s.rjust(4, '0')
-        camera = 'T7'  # Assuming
+        camera = 'T7' # Assuming
 
         expected_name = "Light_Aurora_#{exp_time_str}_Bin1_#{camera}_ISO#{data['ISO']}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
 
         # Since the file is already renamed, the expected is the current name
         # But for test, assert that the data is read correctly
-        assert_equal 'IMG_0437.CR2', 'IMG_0437.CR2'  # Placeholder
+        assert_equal 'IMG_0437.CR2', 'IMG_0437.CR2' # Placeholder
       end
     end
   end

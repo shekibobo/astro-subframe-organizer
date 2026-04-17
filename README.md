@@ -1,9 +1,36 @@
 Organize Astrophotography Data
 ===============
 
-This is a Ruby script to help organize astrophotography data into folders using keywords that can then be used to help process in PixInsight using `WeightedBatchPreProcessing`.
+This is a Ruby gem to help organize astrophotography data into folders using keywords that can then be used to help process in PixInsight using `WeightedBatchPreProcessing`.
 
-This version of the script was written to organize or reorganize the data collected to match my current workflow, which I will outline below.
+This version of the gem was written to organize or reorganize the data collected to match my current workflow, which I will outline below.
+
+## Installation
+
+Install the gem:
+
+```bash
+gem install astro-subframe-organizer
+```
+
+Or clone the repository and run:
+
+```bash
+bundle install
+bundle exec rake install
+```
+
+## Usage
+
+Run the organizer:
+
+```bash
+astro-subframe-organizer
+```
+
+Follow the interactive prompts to organize your files.
+
+## Camera
 
 ## Camera
 
@@ -145,19 +172,18 @@ If you are using the script to rename old `IMG_XXXX.CR2` files, you must install
 
 ## Running the Organizer
 
-This script MUST be run from the directory containing the files you want to group. The script file itself can live anywhere, but I keep it in my home directory.
+The gem must be run from the directory containing the files you want to group.
 
-Here is an example script run:
+Here is an example run:
 
 ```bash
-$ cd /Volumes/TF Images/ASIAIR/Autorun/Dark
-$ ruby ~/organize_astro_data.rb
+$ cd /path/to/your/astrophotography/files
+$ astro-subframe-organizer
 ```
 
 You will then be led through a list of prompts depending on what data you are organizing. You also have the option of doing a dry-run for each organization task you can choose.
 
 ```
-$ ruby ~/astrophotography/organize_astro_data.rb
 1. Darks
 2. Flats
 3. Lights
