@@ -27,6 +27,7 @@ require 'highline'
 require 'mini_exiftool'
 
 require_relative 'astro_subframe_organizer/filename_parser'
+require_relative 'astro_subframe_organizer/file_metadata'
 
 # Add your telescopes here. You will be prompted to choose one of them when organizing flats and lights.
 class Telescope
