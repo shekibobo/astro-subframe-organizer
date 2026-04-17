@@ -5,10 +5,10 @@ require_relative '../../test_helper'
 class TestTelescope < AstroSubframeOrganizer::Test
   # Tests for Telescope class
   def test_all_telescopes
-    assert_includes AstroSubframeOrganizer::Equipment::Telescope::ALL, 'RedCat51'
-    assert_includes AstroSubframeOrganizer::Equipment::Telescope::ALL, 'ZhumellZ130'
-    assert_includes AstroSubframeOrganizer::Equipment::Telescope::ALL, 'AperturaAD8'
-    assert_includes AstroSubframeOrganizer::Equipment::Telescope::ALL, 'MeadeDS90'
-    assert_includes AstroSubframeOrganizer::Equipment::Telescope::ALL, 'CanonEFS1855'
+    assert_includes Telescope.all, 'RedCat51'
+    assert_includes Telescope.all, 'ZhumellZ130'
+    assert_includes Telescope.all, 'AperturaAD8'
+    assert_includes Telescope.all, 'MeadeDS90'
+    assert_includes Telescope.all, 'CanonEFS1855'
   end
 end

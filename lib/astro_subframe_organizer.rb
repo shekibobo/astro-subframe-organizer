@@ -3,6 +3,7 @@
 require_relative "astro_subframe_organizer/version"
 require_relative "astro_subframe_organizer/logging"
 
+require_relative "astro_subframe_organizer/config"
 require_relative "astro_subframe_organizer/equipment/camera"
 require_relative "astro_subframe_organizer/equipment/filter"
 require_relative "astro_subframe_organizer/equipment/telescope"
@@ -18,8 +19,8 @@ require_relative "astro_subframe_organizer/path_builders/flat_path_builder"
 require_relative "astro_subframe_organizer/path_builders/light_path_builder"
 require_relative "astro_subframe_organizer/path_builder"
 
-require_relative 'astro_subframe_organizer/file_metadata'
 require_relative "astro_subframe_organizer/astrophoto"
+require_relative 'astro_subframe_organizer/file_metadata'
 require_relative "astro_subframe_organizer/file_set"
 
 require_relative "astro_subframe_organizer/equipment_selector"
@@ -32,6 +33,7 @@ require 'date'
 require 'cli/ui'
 require 'highline'
 require 'mini_exiftool'
+require 'yaml'
 
 module AstroSubframeOrganizer
   class << self

@@ -29,7 +29,7 @@ class TestEquipmentSelector < AstroSubframeOrganizer::Test
 
     selected = selector.choose_telescope
 
-    assert_equal Telescope::ALL.first, selected
+    assert_equal Telescope.all.first, selected
     assert_equal 'What telescope is this set for?', cli.menu.prompt
   end
 
@@ -39,7 +39,7 @@ class TestEquipmentSelector < AstroSubframeOrganizer::Test
 
     selected = selector.choose_filter
 
-    assert_equal Filter::ALL.first, selected
+    assert_equal Filter.all.first, selected
     assert_equal 'What filter is used with this set?', cli.menu.prompt
   end
 
@@ -49,7 +49,7 @@ class TestEquipmentSelector < AstroSubframeOrganizer::Test
 
     selected = selector.choose_camera
 
-    assert_equal Camera::ALL.first, selected
+    assert_equal Camera.all.first, selected
     assert_equal 'What camera is used with this set?', cli.menu.prompt
   end
 end

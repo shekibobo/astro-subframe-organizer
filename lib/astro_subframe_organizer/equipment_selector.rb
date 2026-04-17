@@ -8,15 +8,15 @@ module AstroSubframeOrganizer
     end
 
     def choose_telescope
-      choose('What telescope is this set for?', Telescope::ALL)
+      choose('What telescope is this set for?', Telescope.all)
     end
 
     def choose_filter
-      choose('What filter is used with this set?', Filter::ALL)
+      choose('What filter is used with this set?', Filter.all)
     end
 
     def choose_camera
-      choose('What camera is used with this set?', Camera::ALL)
+      choose('What camera is used with this set?', Camera.all)
     end
 
     private

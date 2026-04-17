@@ -38,7 +38,7 @@ module AstroSubframeOrganizer
         result[:mosaic_pane] = parts.shift if parts.first&.match?(/\A\d+-\d+\z/)
         result[:exposure] = parts.shift
         result[:bin] = parts.shift.gsub('Bin', '') if parts.first&.start_with?('Bin')
-        result[:camera] = parts.shift if Equipment::Camera::ALL.include?(parts.first)
+        result[:camera] = parts.shift if Equipment::Camera.all.include?(parts.first)
         result[:iso] = parts.shift.gsub('ISO', '') if parts.first&.start_with?('ISO')
         result[:gain] = parts.shift.gsub('gain', '') if parts.first&.start_with?('gain')
         result[:created_at] = DateTime.strptime(parts.shift, DT_FORMAT)

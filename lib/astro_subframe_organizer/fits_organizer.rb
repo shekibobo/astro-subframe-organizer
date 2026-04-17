@@ -157,7 +157,7 @@ module AstroSubframeOrganizer
         ccd_temp = format('%.1fC', data['CameraTemperature'].to_f)
         seq_num = data['SequenceNumber'].to_s.rjust(4, '0')
         cam_model = data['Model']
-        camera = OrganizeAstroData::Camera.all.find { |it| cam_model.include?(it) }
+        camera = Equipment::Camera.all.find { |it| cam_model.include?(it) }
         if camera.nil?
           logger.warn "Camera #{cam_model} did not match any of the expected models."
           camera = cli.ask 'Choose an identifier for this camera:', options: cam_model.split(' ')

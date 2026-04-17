@@ -1,6 +1,53 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: astro-subframe-organizer [options]'
+
+  opts.on('--config FILE', 'Use custom config file (default: ~/.astro-subframe-organizer.yml)') do |file|
+    options[:config_file] = file
+  end
+
+  opts.on('--init', 'Create default config file at ~/.astro-subframe-organizer.yml') do
+    config_file = File.expand_path('~/.astro-subframe-organizer.yml')
+    default_config = {
+      'telescopes' => %w[
+        RedCat51
+        ZhumellZ130
+        AperturaAD8
+        MeadeDS90
+        CanonEFS1855
+      ],
+      'filters' => %w[
+        BaaderMoon
+        NBZ
+        NoFilter
+      ],
+      'cameras' => %w[
+        T7
+        183MC
+      ]
+    }
+    require 'yaml'
+    File.write(config_file, default_config.to_yaml)
+    puts 'Created default config file at ~/.astro-subframe-organizer.yml'
+    puts 'Edit this file to customize your telescopes, filters, and cameras.'
+    exit
+  end
+
+  opts.on('-h', '--help', 'Show this help') do
+    puts opts
+    exit
+  end
+end.parse!
+
 require 'astro_subframe_organizer'
+
+# Set custom config file if specified
+ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG'] = options[:config_file] if options[:config_file]
 
 AstroSubframeOrganizer.run
