@@ -7,8 +7,8 @@ class TestFilter < AstroSubframeOrganizer::Test
 
   # Tests for Filter class
   def test_all_filters
-    assert_includes Filter::ALL, 'BaaderMoon'
-    assert_includes Filter::ALL, 'NBZ'
-    assert_includes Filter::ALL, 'NoFilter'
+    assert_includes Filter.all, 'BaaderMoon'
+    assert_includes Filter.all, 'NBZ'
+    assert_includes Filter.all, 'NoFilter'
   end
 end

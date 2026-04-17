@@ -51,7 +51,7 @@ module AstroSubframeOrganizer
       self.bin = parts.shift.gsub('Bin', '') if parts.first.start_with?('Bin')
       puts "BIN: #{bin}"
 
-      self.camera = parts.shift if Equipment::Camera::ALL.include?(parts.first)
+      self.camera = parts.shift if Equipment::Camera.all.include?(parts.first)
       puts "CAMERA: #{camera}"
 
       self.iso = parts.shift.gsub('ISO', '') if parts.first.start_with?('ISO')

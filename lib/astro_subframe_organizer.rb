@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "astro_subframe_organizer/version"
+require_relative "astro_subframe_organizer/config"
 require_relative "astro_subframe_organizer/astrophoto"
 require_relative "astro_subframe_organizer/equipment/telescope"
 require_relative "astro_subframe_organizer/equipment/filter"
@@ -17,6 +18,7 @@ require 'fileutils'
 require 'date'
 require 'highline'
 require 'mini_exiftool'
+require 'yaml'
 
 module AstroSubframeOrganizer
   def self.run

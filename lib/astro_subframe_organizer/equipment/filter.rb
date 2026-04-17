@@ -4,11 +4,9 @@ module AstroSubframeOrganizer
   module Equipment
     # Add your filters here. You will be prompted to choose one of them when organizing flats and lights.
     class Filter
-      ALL = [
-        BAADER_MOON = 'BaaderMoon',
-        NBZ = 'NBZ',
-        NONE = 'NoFilter'
-      ].freeze
+      def self.all
+        Config.all_filters
+      end
     end
   end
 end
