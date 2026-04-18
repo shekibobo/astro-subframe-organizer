@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative "astro_subframe_organizer/version"
+
 # Copyright 2022 Joshua Kovach
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -18,7 +22,7 @@
 #
 
 require 'fileutils'
-require 'date_core'
+require 'date'
 require 'highline'
 require 'mini_exiftool'
 
@@ -599,13 +603,9 @@ class FitsOrganizer
   end
 end
 
-def main
-  puts "main called"
-  organizer = FitsOrganizer.new
-  organizer.organize
-end
-
-if __FILE__ == $0
-  puts "__FILE__ = #{__FILE__}, $0 = #{$0}"
-  main
+module AstroSubframeOrganizer
+  def self.run
+    organizer = FitsOrganizer.new
+    organizer.organize
+  end
 end
