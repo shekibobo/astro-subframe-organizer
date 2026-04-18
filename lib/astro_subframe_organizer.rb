@@ -3,6 +3,7 @@
 require_relative "astro_subframe_organizer/version"
 require_relative "astro_subframe_organizer/telescope"
 require_relative "astro_subframe_organizer/filter"
+require_relative "astro_subframe_organizer/camera"
 
 # Copyright 2022 Joshua Kovach
 #
@@ -27,14 +28,6 @@ require 'fileutils'
 require 'date'
 require 'highline'
 require 'mini_exiftool'
-
-# Add your cameras here. If there is no camera chosen, it will prompt you to choose one.
-class Camera
-  ALL = [
-    CANON_T7 = "T7",
-    ASI183MC = "183MC",
-  ]
-end
 
 DT_FORMAT = '%Y%m%d-%H%M%S'
 
