@@ -6,6 +6,12 @@ require_relative "astro_subframe_organizer/filter"
 require_relative "astro_subframe_organizer/camera"
 require_relative "astro_subframe_organizer/astrophoto"
 require_relative "astro_subframe_organizer/fits_organizer"
+require_relative "astro_subframe_organizer/path_builders/base_path_builder"
+require_relative "astro_subframe_organizer/path_builders/dark_path_builder"
+require_relative "astro_subframe_organizer/path_builders/flat_path_builder"
+require_relative "astro_subframe_organizer/path_builders/light_path_builder"
+require_relative "astro_subframe_organizer/path_builders/bias_path_builder"
+require_relative "astro_subframe_organizer/path_builder"
 
 # Copyright 2022 Joshua Kovach
 #

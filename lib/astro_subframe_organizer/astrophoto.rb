@@ -100,34 +100,21 @@ class Astrophoto
     created_at.strftime('%Y-%m')
   end
 
+  # The file format (:fits or :cr2) based on the filename extension.
+  def file_format
+    if filename.downcase.end_with?('.fit')
+      :fits
+    elsif filename.downcase.end_with?('.cr2')
+      :cr2
+    else
+      raise ArgumentError, "Unsupported file format for: #{filename}"
+    end
+  end
+
   # The directory structure used to group and categorize the files, which will include useful
   # grouping keywords for PixInsight's WeightedBatchPreProcessing script.
   def target_dir
-    iso_or_gain = if !iso.nil?
-                    "ISO_#{iso}"
-                  elsif !gain.nil?
-                    "GAIN_#{gain}"
-                  end
-
-    case type
-    when DARK
-      if dark_flat?
-        "DarkFlat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}"
-      else
-        "Dark_#{iso_or_gain}_EXP_#{exposure}_CCD-TEMP_#{ccd_temp}_CAMERA_#{camera}_MONTH_#{month}"
-      end
-    when FLAT
-      "Flat_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
-    when LIGHT
-      pane_id = "_PANE_#{mosaic_pane}" if mosaic_pane
-      if filename.downcase.end_with?('.fit')
-        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
-      elsif filename.downcase.end_with?('.cr2')
-        "Light_#{target}#{pane_id}_FLATSET_#{flatset_id}_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CCD-TEMP_#{ccd_temp.gsub('0C', '')}_TELESCOPE_#{telescope}_FILTER_#{filter}_CAMERA_#{camera}"
-      end
-    when BIAS
-      "Bias_#{iso_or_gain}_EXP_#{exposure}_Bin_#{bin}_CAMERA_#{camera}_MONTH_#{month}"
-    end
+    AstroSubframeOrganizer::PathBuilder.build_for(self)
   end
 
   # The full path where this file will be moved.
