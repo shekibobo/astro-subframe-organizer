@@ -2,6 +2,7 @@
 
 require_relative "astro_subframe_organizer/version"
 require_relative "astro_subframe_organizer/telescope"
+require_relative "astro_subframe_organizer/filter"
 
 # Copyright 2022 Joshua Kovach
 #
@@ -26,15 +27,6 @@ require 'fileutils'
 require 'date'
 require 'highline'
 require 'mini_exiftool'
-
-# Add your filters here. You will be prompted to choose one of them when organizing flats and lights.
-class Filter
-  ALL = [
-    BAADER_MOON = 'BaaderMoon',
-    NBZ = "NBZ",
-    NONE = 'NoFilter',
-  ]
-end
 
 # Add your cameras here. If there is no camera chosen, it will prompt you to choose one.
 class Camera
