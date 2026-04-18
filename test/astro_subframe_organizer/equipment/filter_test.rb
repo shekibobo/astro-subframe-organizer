@@ -3,8 +3,6 @@
 require_relative '../../test_helper'
 
 class TestFilter < AstroSubframeOrganizer::Test
-  include Equipment
-
   # Tests for Filter class
   def test_all_filters
     assert_includes Filter::ALL, 'BaaderMoon'

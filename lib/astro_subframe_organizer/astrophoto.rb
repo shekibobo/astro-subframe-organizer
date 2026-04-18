@@ -115,7 +115,7 @@ module AstroSubframeOrganizer
     # The directory structure used to group and categorize the files, which will include useful
     # grouping keywords for PixInsight's WeightedBatchPreProcessing script.
     def target_dir
-      AstroSubframeOrganizer::PathBuilder.build_for(self)
+      PathBuilder.build_for(self)
     end
 
     # The full path where this file will be moved.

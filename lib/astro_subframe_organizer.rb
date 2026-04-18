@@ -2,9 +2,11 @@
 
 require_relative 'astro_subframe_organizer/file_metadata'
 require_relative "astro_subframe_organizer/astrophoto"
+require_relative "astro_subframe_organizer/equipment_selector"
 require_relative "astro_subframe_organizer/equipment/camera"
 require_relative "astro_subframe_organizer/equipment/filter"
 require_relative "astro_subframe_organizer/equipment/telescope"
+require_relative "astro_subframe_organizer/file_set"
 require_relative "astro_subframe_organizer/filename_parser"
 require_relative "astro_subframe_organizer/filename_parsers/cr2_parser"
 require_relative "astro_subframe_organizer/filename_parsers/fits_parser"

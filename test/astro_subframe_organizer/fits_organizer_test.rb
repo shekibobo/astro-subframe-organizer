@@ -66,7 +66,7 @@ class TestFitsOrganizer < AstroSubframeOrganizer::Test
         end
         format('%.1f%s', exp_time, exp_unit)
 
-        data['DateTimeOriginal'].strftime(AstroSubframeOrganizer::Astrophoto::DT_FORMAT)
+        data['DateTimeOriginal'].strftime(Astrophoto::DT_FORMAT)
         format('%.1fC', data['CameraTemperature'].to_f)
         data['SequenceNumber'].to_s.rjust(4, '0') # Assuming
 

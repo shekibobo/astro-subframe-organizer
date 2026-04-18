@@ -3,8 +3,6 @@
 require_relative '../../test_helper'
 
 class TestDarkPathBuilder < AstroSubframeOrganizer::Test
-  include PathBuilders
-
   def test_builds_normal_dark_path
     photo = Astrophoto.new('/fake/Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
     builder = DarkPathBuilder.new(photo)

@@ -3,8 +3,6 @@
 require_relative '../../test_helper'
 
 class TestLightPathBuilder < AstroSubframeOrganizer::Test
-  include PathBuilders
-
   def test_builds_light_fits_path
     photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
     photo.telescope = 'RedCat51'

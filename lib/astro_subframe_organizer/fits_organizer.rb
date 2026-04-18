@@ -17,6 +17,14 @@ module AstroSubframeOrganizer
       Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].uniq.map { |it| Astrophoto.new(it) }
     end
 
+    private def file_sets_for(type)
+      FileSet.from_files(fits_files, type: type)
+    end
+
+    private def equipment_selector
+      @equipment_selector ||= EquipmentSelector.new(cli)
+    end
+
     # Organizes dark files by ISO, BIN, CCD-TEMP, EXPOSURE, and MONTH to facilitate the creation of
     # master darks that may have varying temperatures. This organization can be changed by updating
     # Astrophoto#target_dir for the DARK type.
@@ -31,79 +39,69 @@ module AstroSubframeOrganizer
     # With this, you can run WBPP with just bias and darks using the grouping keywords CCD-TEMP, ISO, EXP,
     # and MONTH (optional).
     def organize_darks
-      dark_files = fits_files.filter { |it| it.type == Astrophoto::DARK }.sort_by { |it| it.path }
-      puts "Preparing to move #{dark_files.size} DARK files..."
+      dark_sets = file_sets_for(Astrophoto::DARK)
+      puts "Preparing to move #{dark_sets.sum { |set| set.files.size }} DARK files..."
 
       is_dry_run = is_dry_run?
 
-      dark_files.slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }.each do |darkset|
-        next if darkset.all? { |it| it.already_moved? }
+      dark_sets.each do |darkset|
+        next if darkset.already_moved?
 
-        if darkset.all? { |it| it.path != it.target_path }
-          move = cli.ask("Do you want to move the darkset in #{darkset.first.current_dir} to #{darkset.first.target_dir}? [y/n] ").downcase == 'y'
+        if darkset.all_unmoved?
+          move = cli.ask("Do you want to move the darkset in #{darkset.current_dir} to #{darkset.files.first.target_dir}? [y/n] ").downcase == 'y'
           next unless move
         end
 
-        if darkset.all? { |it| it.maybe_flat_dark? } &&
-           cli.ask("Is this a flat dark set (size #{darkset.size})? [y/n] #{darkset.first.filename}: ").downcase == 'y'
+        if darkset.maybe_flat_dark? &&
+           cli.ask("Is this a flat dark set (size #{darkset.files.size})? [y/n] #{darkset.files.first.filename}: ").downcase == 'y'
           puts "Cool, we'll move that set to a FLATSET directory..."
 
-          darkset.each { |it| it.dark_flat = true }
+          darkset.mark_dark_flat!
         end
 
-        cameras = darkset.map { |it| it.camera }.compact.uniq
+        cameras = darkset.camera_candidates
         camera = if cameras.empty?
                    puts '[WARNING] Camera not detected.'
-                   select_camera
+                   equipment_selector.choose_camera
                  elsif cameras.size > 1
                    puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   equipment_selector.choose_camera
                  else
                    cameras.first
                  end
 
-        darkset.each do |file|
-          if file.camera.nil?
-            puts "Camera not detected. Using #{camera}."
-            file.camera = camera
-          end
-        end
-
+        darkset.apply_camera!(camera)
         darkset.each { |it| it.move(is_dry_run) }
         puts "Done\n"
       end
     end
 
     def organize_biases
-      bias_files = fits_files.filter { |it| it.type == Astrophoto::BIAS }.sort_by { |it| it.path }
-      puts "Preparing to move #{bias_files.size} BIAS files..."
+      bias_sets = file_sets_for(Astrophoto::BIAS)
+      puts "Preparing to move #{bias_sets.sum { |set| set.files.size }} BIAS files..."
 
       is_dry_run = is_dry_run?
 
-      bias_files.slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }.each do |biases|
-        next if biases.all? { |it| it.already_moved? }
+      bias_sets.each do |biases|
+        next if biases.already_moved?
 
-        if biases.all? { |it| it.path != it.target_path }
-          move = cli.ask("Do you want to move the bias set in #{biases.first.current_dir} to #{biases.first.target_dir}? [y/n] ").downcase == 'y'
+        if biases.all_unmoved?
+          move = cli.ask("Do you want to move the bias set in #{biases.current_dir} to #{biases.files.first.target_dir}? [y/n] ").downcase == 'y'
           next unless move
         end
 
-        cameras = biases.map { |it| it.camera }.uniq
+        cameras = biases.camera_candidates
         camera = if cameras.empty?
                    puts '[WARNING] Camera not detected.'
-                   select_camera
+                   equipment_selector.choose_camera
                  elsif cameras.size > 1
                    puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   equipment_selector.choose_camera
                  else
                    cameras.first
                  end
 
-        biases.each do |file|
-          if file.camera.nil?
-            puts "Camera not detected. Using #{camera}."
-            file.camera = camera
-          end
-        end
-
+        biases.apply_camera!(camera)
         biases.each { |it| it.move(is_dry_run) }
         puts "Done\n"
       end
@@ -121,43 +119,36 @@ module AstroSubframeOrganizer
     # before using that master flat in a WBPP integration run, since exposure time should not be considered
     # when grouping flats to lights.
     def organize_flats
-      flat_files = fits_files.filter { |it| it.type == Astrophoto::FLAT }.sort_by { |it| it.path }
-      puts "Preparing to move #{flat_files.size} FLAT files..."
+      flat_sets = file_sets_for(Astrophoto::FLAT)
+      puts "Preparing to move #{flat_sets.sum { |set| set.files.size }} FLAT files..."
 
       is_dry_run = is_dry_run?
 
-      flat_sets = flat_files.slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
-
       flat_sets.each do |flatset|
-        next if flatset.all? { |it| it.already_moved? }
+        next if flatset.already_moved?
 
-        if flatset.all? { |it| it.path != it.target_path }
-          move = cli.ask("Do you want to move the flatset in #{flatset.first.current_dir} to #{flatset.first.target_dir}? [y/n] ").downcase == 'y'
+        if flatset.all_unmoved?
+          move = cli.ask("Do you want to move the flatset in #{flatset.current_dir} to #{flatset.files.first.target_dir}? [y/n] ").downcase == 'y'
           next unless move
         end
 
-        puts "For FLATSET #{flatset.first.filename}..#{flatset.last.filename}:"
-        telescope = select_telescope
-        filter = select_filter
-        cameras = flatset.map { |it| it.camera }.uniq
+        puts "For FLATSET #{flatset.files.first.filename}..#{flatset.files.last.filename}:"
+        telescope = equipment_selector.choose_telescope
+        filter = equipment_selector.choose_filter
+        cameras = flatset.camera_candidates
         camera = if cameras.empty?
                    puts '[WARNING] Camera not detected.'
-                   select_camera
+                   equipment_selector.choose_camera
                  elsif cameras.size > 1
                    puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   equipment_selector.choose_camera
                  else
                    cameras.first
                  end
 
-        flatset.each do |file|
-          file.telescope = telescope
-          file.filter = filter
-          if file.camera.nil?
-            puts "Camera not detected. Using #{camera}."
-            file.camera = camera
-          end
-        end
-
+        flatset.apply_telescope!(telescope)
+        flatset.apply_filter!(filter)
+        flatset.apply_camera!(camera)
         flatset.each { |it| it.move(is_dry_run) }
         puts "Done\n"
       end
@@ -176,75 +167,38 @@ module AstroSubframeOrganizer
     # If you are running WBPP on multiple targets using this data, e.g. for a mosaic, you should make sure
     # to use LIGHT as a post-processing keyword and register files using `auto by LIGHT`.
     def organize_lights
-      light_files = fits_files.filter { |it| it.type == Astrophoto::LIGHT }.sort_by { |it| it.path }
-      puts "Preparing to move #{light_files.size} LIGHT files..."
+      light_sets = file_sets_for(Astrophoto::LIGHT)
+      puts "Preparing to move #{light_sets.sum { |set| set.files.size }} LIGHT files..."
 
       is_dry_run = is_dry_run?
 
-      light_sets = light_files.slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
-
       light_sets.each do |lightset|
-        next if lightset.all? { |it| it.already_moved? }
+        next if lightset.already_moved?
 
-        if lightset.all? { |it| it.path != it.target_path }
-          move = cli.ask("Do you want to move the light set in #{lightset.first.current_dir} to #{lightset.first.target_dir}? [y/n] ").downcase == 'y'
+        if lightset.all_unmoved?
+          move = cli.ask("Do you want to move the light set in #{lightset.current_dir} to #{lightset.files.first.target_dir}? [y/n] ").downcase == 'y'
           next unless move
         end
 
-        puts "For LIGHTS #{lightset.first.filename}..#{lightset.last.filename}:"
-        telescope = select_telescope
-        filter = select_filter
-        cameras = lightset.map { |it| it.camera }.uniq
+        puts "For LIGHTS #{lightset.files.first.filename}..#{lightset.files.last.filename}:"
+        telescope = equipment_selector.choose_telescope
+        filter = equipment_selector.choose_filter
+        cameras = lightset.camera_candidates
         camera = if cameras.empty?
                    puts '[WARNING] Camera not detected.'
-                   select_camera
+                   equipment_selector.choose_camera
                  elsif cameras.size > 1
                    puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   equipment_selector.choose_camera
                  else
                    cameras.first
                  end
 
-        lightset.each do |file|
-          file.telescope = telescope
-          file.filter = filter
-          if file.camera.nil?
-            puts "Camera not detected. Using #{camera}."
-            file.camera = camera
-          end
-        end
-
+        lightset.apply_telescope!(telescope)
+        lightset.apply_filter!(filter)
+        lightset.apply_camera!(camera)
         lightset.each { |it| it.move(is_dry_run) }
         puts "Done\n"
-      end
-    end
-
-    private def select_telescope
-      cli.choose do |menu|
-        menu.prompt = 'What telescope is this set for?'
-        Telescope::ALL.each do |scope|
-          menu.choice(scope)
-        end
-        menu.default = Telescope::REDCAT51
-      end
-    end
-
-    private def select_filter
-      cli.choose do |menu|
-        menu.prompt = 'What filter is used with this set?'
-        Filter::ALL.each do |filter|
-          menu.choice(filter)
-        end
-        menu.default = Filter::BAADER_MOON
-      end
-    end
-
-    private def select_camera
-      cli.choose do |menu|
-        menu.prompt = 'What camera is used with this set?'
-        Camera::ALL.each do |camera|
-          menu.choice(camera)
-        end
-        menu.default = Camera::CANON_T7
       end
     end
 
@@ -318,11 +272,11 @@ module AstroSubframeOrganizer
 
         exp_time_str = format('%.1f%s', exp_time, exp_unit)
 
-        created_at = data['DateTimeOriginal'].strftime(Astrophoto::DT_FORMAT)
+        created_at = data['DateTimeOriginal'].strftime(DT_FORMAT)
         ccd_temp = format('%.1fC', data['CameraTemperature'].to_f)
         seq_num = data['SequenceNumber'].to_s.rjust(4, '0')
         cam_model = data['Model']
-        camera = Camera::ALL.find { |it| cam_model.include?(it) }
+        camera = OrganizeAstroData::Camera.all.find { |it| cam_model.include?(it) }
         if camera.nil?
           puts "Camera #{cam_model} did not match any of the expected models."
           camera = cli.choose do |menu|
@@ -392,6 +346,11 @@ module AstroSubframeOrganizer
         end
         menu.choice('Quit')
       end
+    end
+
+    def self.run
+      organizer = FitsOrganizer.new
+      organizer.organize
     end
   end
 end

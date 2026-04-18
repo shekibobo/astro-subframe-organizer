@@ -3,8 +3,6 @@
 require_relative '../test_helper'
 
 class TestFileMetadata < AstroSubframeOrganizer::Test
-  include FilenameParsers
-
   def test_creates_from_parser_result
     path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
     parser = FitsParser.new(path)

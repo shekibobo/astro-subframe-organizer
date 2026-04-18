@@ -12,6 +12,9 @@ require_relative '../lib/astro_subframe_organizer'
 module AstroSubframeOrganizer
   class Test < Minitest::Test
     include AstroSubframeOrganizer
+    include Equipment
+    include PathBuilders
+    include FilenameParsers
 
     # Helper method to create a temporary FITS file with the given name and content
     def create_temp_fits_file(name, content = '')

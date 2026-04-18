@@ -3,8 +3,6 @@
 require_relative '../../test_helper'
 
 class TestFlatPathBuilder < AstroSubframeOrganizer::Test
-  include PathBuilders
-
   def test_builds_flat_path
     photo = Astrophoto.new('/fake/Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
     photo.telescope = 'RedCat51'
