@@ -2,8 +2,6 @@
 
 require_relative 'camera'
 
-DT_FORMAT = '%Y%m%d-%H%M%S'
-
 # Class describing the properties of the file that we can determine from the filename generated
 # by the ASIAir. Depending on your camera and your filter setup, the file structure may be different.
 # This script was written for use with the ASIAir Plus version 1.9, using a Canon EOS 1500 (T7) DSLR
@@ -13,6 +11,8 @@ DT_FORMAT = '%Y%m%d-%H%M%S'
 # that your data is properly parsed. You will also likely want to change your `target_dir` for each
 # type so that it organizes your data properly.
 class Astrophoto
+  DT_FORMAT = '%Y%m%d-%H%M%S'
+
   attr_accessor :type, :exposure, :bin, :camera, :gain, :iso, :created_at, :ccd_temp, :image_index, :path, :filename, :telescope,
                 :filter, :target, :dark_flat, :mosaic_pane
 
