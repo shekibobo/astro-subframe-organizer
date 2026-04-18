@@ -599,5 +599,13 @@ class FitsOrganizer
   end
 end
 
-organizer = FitsOrganizer.new
-organizer.organize
+def main
+  puts "main called"
+  organizer = FitsOrganizer.new
+  organizer.organize
+end
+
+if __FILE__ == $0
+  puts "__FILE__ = #{__FILE__}, $0 = #{$0}"
+  main
+end
