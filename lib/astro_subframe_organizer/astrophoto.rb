@@ -14,14 +14,28 @@ module AstroSubframeOrganizer
   class Astrophoto
     DT_FORMAT = '%Y%m%d-%H%M%S'
 
-    attr_accessor :type, :exposure, :bin, :camera, :gain, :iso, :created_at, :ccd_temp, :image_index, :path, :filename, :telescope,
-                  :filter, :target, :dark_flat, :mosaic_pane
+    attr_accessor :type,
+                  :exposure,
+                  :bin,
+                  :camera,
+                  :gain,
+                  :iso,
+                  :created_at,
+                  :ccd_temp,
+                  :image_index,
+                  :path,
+                  :filename,
+                  :telescope,
+                  :filter,
+                  :target,
+                  :dark_flat,
+                  :mosaic_pane
 
     TYPES = [
       DARK = 'Dark',
       FLAT = 'Flat',
       LIGHT = 'Light',
-      BIAS = 'Bias'
+      BIAS = 'Bias',
     ]
 
     def initialize(path)

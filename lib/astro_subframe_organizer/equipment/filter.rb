@@ -7,7 +7,7 @@ module AstroSubframeOrganizer
       ALL = [
         BAADER_MOON = 'BaaderMoon',
         NBZ = 'NBZ',
-        NONE = 'NoFilter'
+        NONE = 'NoFilter',
       ].freeze
     end
   end

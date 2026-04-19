@@ -56,7 +56,7 @@ module AstroSubframeOrganizer
           "Bin_#{@metadata.bin}",
           "TELESCOPE_#{@metadata.telescope}",
           "FILTER_#{@metadata.filter}",
-          "CAMERA_#{@metadata.camera}"
+          "CAMERA_#{@metadata.camera}",
         ].compact.join('_')
       end
 
@@ -70,7 +70,7 @@ module AstroSubframeOrganizer
           "CCD-TEMP_#{@metadata.ccd_temp.gsub('0C', '')}",
           "TELESCOPE_#{@metadata.telescope}",
           "FILTER_#{@metadata.filter}",
-          "CAMERA_#{@metadata.camera}"
+          "CAMERA_#{@metadata.camera}",
         ].compact.join('_')
       end
     end

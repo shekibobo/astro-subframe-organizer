@@ -37,7 +37,7 @@ module AstroSubframeOrganizer
           "Bin_#{@metadata.bin}",
           "TELESCOPE_#{@metadata.telescope}",
           "FILTER_#{@metadata.filter}",
-          "CAMERA_#{@metadata.camera}"
+          "CAMERA_#{@metadata.camera}",
         ].compact.join('_')
       end
     end

@@ -9,7 +9,7 @@ module AstroSubframeOrganizer
         Z130 = 'ZhumellZ130',
         AD8 = 'AperturaAD8',
         DS90 = 'MeadeDS90',
-        CANON_EFS_18_55 = 'CanonEFS1855'
+        CANON_EFS_18_55 = 'CanonEFS1855',
       ].freeze
     end
   end

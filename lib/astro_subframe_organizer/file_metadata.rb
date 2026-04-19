@@ -4,9 +4,23 @@ module AstroSubframeOrganizer
   # Value object representing parsed metadata from an astrophotography file
   # Immutable after creation to prevent accidental mutations
   class FileMetadata
-    attr_reader :type, :target, :exposure, :bin, :camera, :gain, :iso, :created_at,
-                :ccd_temp, :image_index, :path, :filename, :telescope, :filter,
-                :dark_flat, :mosaic_pane, :file_format
+    attr_reader :type,
+                :target,
+                :exposure,
+                :bin,
+                :camera,
+                :gain,
+                :iso,
+                :created_at,
+                :ccd_temp,
+                :image_index,
+                :path,
+                :filename,
+                :telescope,
+                :filter,
+                :dark_flat,
+                :mosaic_pane,
+                :file_format
 
     def initialize(
       type:, path:, filename:, file_format:, exposure: nil, bin: nil, camera: nil,
@@ -53,7 +67,7 @@ module AstroSubframeOrganizer
         image_index: parsed_data[:image_index],
         telescope: parsed_data[:telescope],
         filter: parsed_data[:filter],
-        dark_flat: parsed_data[:dark_flat] || false
+        dark_flat: parsed_data[:dark_flat] || false,
       )
     end
 

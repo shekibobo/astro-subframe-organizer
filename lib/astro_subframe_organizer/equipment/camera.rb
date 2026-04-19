@@ -6,7 +6,7 @@ module AstroSubframeOrganizer
     class Camera
       ALL = [
         CANON_T7 = 'T7',
-        ASI183MC = '183MC'
+        ASI183MC = '183MC',
       ].freeze
     end
   end

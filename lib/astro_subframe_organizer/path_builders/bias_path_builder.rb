@@ -30,7 +30,7 @@ module AstroSubframeOrganizer
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
           "CAMERA_#{@metadata.camera}",
-          "MONTH_#{month}"
+          "MONTH_#{month}",
         ].compact.join('_')
       end
     end
