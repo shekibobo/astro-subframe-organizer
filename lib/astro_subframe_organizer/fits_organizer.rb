@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'equipment/telescope'
-require_relative 'equipment/filter'
-require_relative 'equipment/camera'
-require_relative 'astrophoto'
-
 module AstroSubframeOrganizer
   class FitsOrganizer
+    include Logging
+
     private attr_accessor :cli
 
     def initialize
@@ -40,7 +37,7 @@ module AstroSubframeOrganizer
     # and MONTH (optional).
     def organize_darks
       dark_sets = file_sets_for(Astrophoto::DARK)
-      puts "Preparing to move #{dark_sets.sum { |set| set.files.size }} DARK files..."
+      logger.info "Preparing to move #{dark_sets.sum { |set| set.files.size }} DARK files..."
 
       is_dry_run = is_dry_run?
 
@@ -54,17 +51,17 @@ module AstroSubframeOrganizer
 
         if darkset.maybe_flat_dark? &&
            cli.ask("Is this a flat dark set (size #{darkset.files.size})? [y/n] #{darkset.files.first.filename}: ").downcase == 'y'
-          puts "Cool, we'll move that set to a FLATSET directory..."
+          logger.info "Cool, we'll move that set to a FLATSET directory..."
 
           darkset.mark_dark_flat!
         end
 
         cameras = darkset.camera_candidates
         camera = if cameras.empty?
-                   puts '[WARNING] Camera not detected.'
+                   logger.warn 'Camera not detected.'
                    equipment_selector.choose_camera
                  elsif cameras.size > 1
-                   puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   logger.warn "Multiple cameras detected: #{cameras}"
                    equipment_selector.choose_camera
                  else
                    cameras.first
@@ -78,7 +75,7 @@ module AstroSubframeOrganizer
 
     def organize_biases
       bias_sets = file_sets_for(Astrophoto::BIAS)
-      puts "Preparing to move #{bias_sets.sum { |set| set.files.size }} BIAS files..."
+      logger.info "Preparing to move #{bias_sets.sum { |set| set.files.size }} BIAS files..."
 
       is_dry_run = is_dry_run?
 
@@ -92,10 +89,10 @@ module AstroSubframeOrganizer
 
         cameras = biases.camera_candidates
         camera = if cameras.empty?
-                   puts '[WARNING] Camera not detected.'
+                   logger.warn 'Camera not detected.'
                    equipment_selector.choose_camera
                  elsif cameras.size > 1
-                   puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   logger.warn "Multiple cameras detected: #{cameras}"
                    equipment_selector.choose_camera
                  else
                    cameras.first
@@ -120,7 +117,7 @@ module AstroSubframeOrganizer
     # when grouping flats to lights.
     def organize_flats
       flat_sets = file_sets_for(Astrophoto::FLAT)
-      puts "Preparing to move #{flat_sets.sum { |set| set.files.size }} FLAT files..."
+      logger.info "Preparing to move #{flat_sets.sum { |set| set.files.size }} FLAT files..."
 
       is_dry_run = is_dry_run?
 
@@ -132,15 +129,15 @@ module AstroSubframeOrganizer
           next unless move
         end
 
-        puts "For FLATSET #{flatset.files.first.filename}..#{flatset.files.last.filename}:"
+        logger.info "For FLATSET #{flatset.files.first.filename}..#{flatset.files.last.filename}:"
         telescope = equipment_selector.choose_telescope
         filter = equipment_selector.choose_filter
         cameras = flatset.camera_candidates
         camera = if cameras.empty?
-                   puts '[WARNING] Camera not detected.'
+                   logger.warn 'Camera not detected.'
                    equipment_selector.choose_camera
                  elsif cameras.size > 1
-                   puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   logger.warn "Multiple cameras detected: #{cameras}"
                    equipment_selector.choose_camera
                  else
                    cameras.first
@@ -168,7 +165,7 @@ module AstroSubframeOrganizer
     # to use LIGHT as a post-processing keyword and register files using `auto by LIGHT`.
     def organize_lights
       light_sets = file_sets_for(Astrophoto::LIGHT)
-      puts "Preparing to move #{light_sets.sum { |set| set.files.size }} LIGHT files..."
+      logger.info "Preparing to move #{light_sets.sum { |set| set.files.size }} LIGHT files..."
 
       is_dry_run = is_dry_run?
 
@@ -180,15 +177,15 @@ module AstroSubframeOrganizer
           next unless move
         end
 
-        puts "For LIGHTS #{lightset.files.first.filename}..#{lightset.files.last.filename}:"
+        logger.info "For LIGHTS #{lightset.files.first.filename}..#{lightset.files.last.filename}:"
         telescope = equipment_selector.choose_telescope
         filter = equipment_selector.choose_filter
         cameras = lightset.camera_candidates
         camera = if cameras.empty?
-                   puts '[WARNING] Camera not detected.'
+                   logger.warn 'Camera not detected.'
                    equipment_selector.choose_camera
                  elsif cameras.size > 1
-                   puts "[WARNING] Multiple cameras detected: #{cameras}"
+                   logger.warn "Multiple cameras detected: #{cameras}"
                    equipment_selector.choose_camera
                  else
                    cameras.first
@@ -208,7 +205,7 @@ module AstroSubframeOrganizer
     # Checks for empty directories. Run this option after performing a move of previously
     # organized data.
     def remove_empty_directories
-      puts 'Cleaning up empty directories...'
+      logger.info 'Cleaning up empty directories...'
       is_dry_run = is_dry_run?
       Dir['**/*/.DS_Store'].each { |ds_store| FileUtils.rm ds_store, verbose: true, noop: is_dry_run }
       Dir['**/*/'].reverse_each { |d| FileUtils.rmdir d, verbose: true, noop: is_dry_run if (Dir.entries(d) - ['.', '..']).empty? }
@@ -216,7 +213,7 @@ module AstroSubframeOrganizer
 
     # Removes all the jpg thumbnails under this directory.
     def remove_jpg_thumbnails
-      puts 'Removing jpg thumbnails...'
+      logger.info 'Removing jpg thumbnails...'
       is_dry_run = is_dry_run?
       Dir['**/*_thn.jpg'].each { |jpg| FileUtils.rm jpg, verbose: true, noop: is_dry_run }
     end
@@ -278,7 +275,7 @@ module AstroSubframeOrganizer
         cam_model = data['Model']
         camera = OrganizeAstroData::Camera.all.find { |it| cam_model.include?(it) }
         if camera.nil?
-          puts "Camera #{cam_model} did not match any of the expected models."
+          logger.warn "Camera #{cam_model} did not match any of the expected models."
           camera = cli.choose do |menu|
             menu.prompt = 'Choose an identifier for this camera:'
             cam_model.split(' ').each do |id|
@@ -304,7 +301,7 @@ module AstroSubframeOrganizer
       files.each_with_index do |file, index|
         idx = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
         target_file = "IMG_#{idx}.CR2"
-        puts "Renaming to #{target_file}"
+        logger.info "Renaming to #{target_file}"
 
         FileUtils.move file, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
       end

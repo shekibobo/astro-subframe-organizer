@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'equipment/camera'
-
 module AstroSubframeOrganizer
   # Class describing the properties of the file that we can determine from the filename generated
   # by the ASIAir. Depending on your camera and your filter setup, the file structure may be different.
@@ -12,6 +10,8 @@ module AstroSubframeOrganizer
   # that your data is properly parsed. You will also likely want to change your `target_dir` for each
   # type so that it organizes your data properly.
   class Astrophoto
+    include Logging
+
     DT_FORMAT = '%Y%m%d-%H%M%S'
 
     attr_accessor :type,
@@ -42,43 +42,43 @@ module AstroSubframeOrganizer
       self.path = path
       self.filename = path.split('/').last
       parts = filename.gsub('.fit', '').gsub('.cr2', '').split('_')
-      puts "PARTS: #{parts}"
+      logger.debug "PARTS: #{parts}"
       self.type = parts.shift
-      puts "TYPE: #{type}"
+      logger.debug "TYPE: #{type}"
 
       self.target = parts.shift if type == LIGHT
-      puts "TARGET: #{target}"
+      logger.debug "TARGET: #{target}"
       self.mosaic_pane = parts.shift if parts.first.match(/\A\d+-\d+\z/)
-      puts "PANE: #{mosaic_pane}"
+      logger.debug "PANE: #{mosaic_pane}"
 
       # If the file is already organized somewhere, get the information from its path.
       self.telescope = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first
-      puts "TELESCOPE: #{telescope}"
+      logger.debug "TELESCOPE: #{telescope}"
       self.filter = path.match(%r{FILTER_([^_/]+).*})&.captures&.first
-      puts "FILTER: #{filter}"
+      logger.debug "FILTER: #{filter}"
       self.dark_flat = path.include?('DarkFlat')
-      puts "DarkFlat?: #{dark_flat}"
+      logger.debug "DarkFlat?: #{dark_flat}"
 
       self.exposure = parts.shift
-      puts "EXP: #{exposure}"
+      logger.debug "EXP: #{exposure}"
 
       self.bin = parts.shift.gsub('Bin', '') if parts.first.start_with?('Bin')
-      puts "BIN: #{bin}"
+      logger.debug "BIN: #{bin}"
 
       self.camera = parts.shift if Equipment::Camera::ALL.include?(parts.first)
-      puts "CAMERA: #{camera}"
+      logger.debug "CAMERA: #{camera}"
 
       self.iso = parts.shift.gsub('ISO', '') if parts.first.start_with?('ISO')
-      puts "ISO: #{iso}"
+      logger.debug "ISO: #{iso}"
       self.gain = parts.shift.gsub('gain', '') if parts.first.start_with?('gain')
-      puts "GAIN: #{gain}"
+      logger.debug "GAIN: #{gain}"
 
       self.created_at = DateTime.strptime(parts.shift, DT_FORMAT)
-      puts "CREATED_AT: #{created_at}"
+      logger.debug "CREATED_AT: #{created_at}"
       self.ccd_temp = parts.shift
-      puts "CCD_TEMP: #{ccd_temp}"
+      logger.debug "CCD_TEMP: #{ccd_temp}"
       self.image_index = parts.shift
-      puts "IMAGE_INDEX: #{image_index}"
+      logger.debug "IMAGE_INDEX: #{image_index}"
     end
 
     def dark_flat?
@@ -156,7 +156,7 @@ module AstroSubframeOrganizer
     def move(is_dry_run)
       FileUtils.mkdir target_dir, noop: is_dry_run unless File.exist? target_dir
       if File.exist? target_path
-        puts "File already exists #{target_path}. Skipping..."
+        logger.info "File already exists #{target_path}. Skipping..."
       else
         FileUtils.move path, target_path, verbose: is_dry_run, noop: is_dry_run
         print '.' unless is_dry_run

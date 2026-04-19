@@ -1,30 +1,61 @@
 # frozen_string_literal: true
 
-require_relative 'astro_subframe_organizer/file_metadata'
-require_relative "astro_subframe_organizer/astrophoto"
-require_relative "astro_subframe_organizer/equipment_selector"
+require_relative "astro_subframe_organizer/version"
+require_relative "astro_subframe_organizer/logging"
+
 require_relative "astro_subframe_organizer/equipment/camera"
 require_relative "astro_subframe_organizer/equipment/filter"
 require_relative "astro_subframe_organizer/equipment/telescope"
-require_relative "astro_subframe_organizer/file_set"
+
 require_relative "astro_subframe_organizer/filename_parser"
 require_relative "astro_subframe_organizer/filename_parsers/cr2_parser"
 require_relative "astro_subframe_organizer/filename_parsers/fits_parser"
-require_relative "astro_subframe_organizer/fits_organizer"
-require_relative "astro_subframe_organizer/path_builder"
+
 require_relative "astro_subframe_organizer/path_builders/base_path_builder"
 require_relative "astro_subframe_organizer/path_builders/bias_path_builder"
 require_relative "astro_subframe_organizer/path_builders/dark_path_builder"
 require_relative "astro_subframe_organizer/path_builders/flat_path_builder"
 require_relative "astro_subframe_organizer/path_builders/light_path_builder"
-require_relative "astro_subframe_organizer/version"
+require_relative "astro_subframe_organizer/path_builder"
 
+require_relative 'astro_subframe_organizer/file_metadata'
+require_relative "astro_subframe_organizer/astrophoto"
+require_relative "astro_subframe_organizer/file_set"
+
+require_relative "astro_subframe_organizer/equipment_selector"
+require_relative "astro_subframe_organizer/fits_organizer"
+
+require 'logger'
 require 'fileutils'
 require 'date'
 require 'highline'
 require 'mini_exiftool'
 
 module AstroSubframeOrganizer
+  class << self
+    attr_writer :logger
+
+    def logger
+      @logger ||= default_logger
+    end
+
+    private
+
+    def default_logger
+      logger = Logger.new($stdout)
+      logger.level = Logger::INFO
+      logger.formatter = proc do |severity, _datetime, _progname, msg|
+        case severity
+        when "ERROR", "FATAL" then "✗ #{msg}\n"
+        when "WARN"           then "⚠ #{msg}\n"
+        when "DEBUG"          then "[debug] #{msg}\n"
+        else                       "#{msg}\n" # INFO → plain output
+        end
+      end
+      logger
+    end
+  end
+
   def self.run
     organizer = FitsOrganizer.new
     organizer.organize
