@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Runtime dependencies
+  spec.add_runtime_dependency 'cli-ui', '~> 2.7'
   spec.add_runtime_dependency 'highline', '~> 2.0'
   spec.add_runtime_dependency 'mini_exiftool', '~> 2.10'
 

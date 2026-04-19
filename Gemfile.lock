@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     astro-subframe-organizer (0.0.1)
+      cli-ui (~> 2.7)
       highline (~> 2.0)
       mini_exiftool (~> 2.10)
 
@@ -9,6 +10,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
+    cli-ui (2.7.0)
     docile (1.4.1)
     highline (2.1.0)
     json (2.19.3)
