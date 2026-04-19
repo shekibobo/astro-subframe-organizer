@@ -23,11 +23,13 @@ require_relative "astro_subframe_organizer/astrophoto"
 require_relative "astro_subframe_organizer/file_set"
 
 require_relative "astro_subframe_organizer/equipment_selector"
+require_relative "astro_subframe_organizer/organizers/organizer"
 require_relative "astro_subframe_organizer/fits_organizer"
 
 require 'logger'
 require 'fileutils'
 require 'date'
+require 'cli/ui'
 require 'highline'
 require 'mini_exiftool'
 

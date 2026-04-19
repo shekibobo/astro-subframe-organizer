@@ -18,6 +18,10 @@ module AstroSubframeOrganizer
         .map { |group| new(group) }
     end
 
+    def name
+      "#{type} set #{files.first.filename}..#{files.last.filename}"
+    end
+
     def each(&block)
       @files.each(&block)
     end
@@ -54,8 +58,24 @@ module AstroSubframeOrganizer
       files.each { |file| file.camera ||= camera }
     end
 
+    def telescope_candidates
+      files.map(&:telescope).compact.uniq
+    end
+
+    def telescope
+      telescope_candidates.one? ? telescope_candidates.first : nil
+    end
+
     def apply_telescope!(telescope)
       files.each { |file| file.telescope = telescope }
+    end
+
+    def filter_candidates
+      files.map(&:filter).compact.uniq
+    end
+
+    def filter
+      filter_candidates.one? ? filter_candidates.first : nil
     end
 
     def apply_filter!(filter)

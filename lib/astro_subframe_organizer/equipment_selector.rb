@@ -3,7 +3,7 @@
 module AstroSubframeOrganizer
   class EquipmentSelector
     include Equipment
-    def initialize(cli = HighLine.new)
+    def initialize(cli = CLI::UI::Prompt)
       @cli = cli
     end
 
@@ -22,11 +22,7 @@ module AstroSubframeOrganizer
     private
 
     def choose(prompt, options)
-      @cli.choose do |menu|
-        menu.prompt = prompt
-        options.each { |option| menu.choice(option) }
-        menu.default = options.first
-      end
+      @cli.ask prompt, options: options
     end
   end
 end

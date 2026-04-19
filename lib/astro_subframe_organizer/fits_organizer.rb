@@ -7,15 +7,11 @@ module AstroSubframeOrganizer
     private attr_accessor :cli
 
     def initialize
-      self.cli = HighLine.new
+      self.cli = CLI::UI::Prompt
     end
 
     def fits_files
       Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].uniq.map { |it| Astrophoto.new(it) }
-    end
-
-    private def file_sets_for(type)
-      FileSet.from_files(fits_files, type: type)
     end
 
     private def equipment_selector
@@ -36,72 +32,21 @@ module AstroSubframeOrganizer
     # With this, you can run WBPP with just bias and darks using the grouping keywords CCD-TEMP, ISO, EXP,
     # and MONTH (optional).
     def organize_darks
-      dark_sets = file_sets_for(Astrophoto::DARK)
-      logger.info "Preparing to move #{dark_sets.sum { |set| set.files.size }} DARK files..."
-
-      is_dry_run = is_dry_run?
-
-      dark_sets.each do |darkset|
-        next if darkset.already_moved?
-
-        if darkset.all_unmoved?
-          move = cli.ask("Do you want to move the darkset in #{darkset.current_dir} to #{darkset.files.first.target_dir}? [y/n] ").downcase == 'y'
-          next unless move
-        end
-
-        if darkset.maybe_flat_dark? &&
-           cli.ask("Is this a flat dark set (size #{darkset.files.size})? [y/n] #{darkset.files.first.filename}: ").downcase == 'y'
-          logger.info "Cool, we'll move that set to a FLATSET directory..."
-
-          darkset.mark_dark_flat!
-        end
-
-        cameras = darkset.camera_candidates
-        camera = if cameras.empty?
-                   logger.warn 'Camera not detected.'
-                   equipment_selector.choose_camera
-                 elsif cameras.size > 1
-                   logger.warn "Multiple cameras detected: #{cameras}"
-                   equipment_selector.choose_camera
-                 else
-                   cameras.first
-                 end
-
-        darkset.apply_camera!(camera)
-        darkset.each { |it| it.move(is_dry_run) }
-        puts "Done\n"
-      end
+      Organizer.new(
+        files: fits_files,
+        type: Astrophoto::DARK,
+        cli: cli,
+        equipment_selector: equipment_selector,
+      ).organize(dry_run: is_dry_run?)
     end
 
     def organize_biases
-      bias_sets = file_sets_for(Astrophoto::BIAS)
-      logger.info "Preparing to move #{bias_sets.sum { |set| set.files.size }} BIAS files..."
-
-      is_dry_run = is_dry_run?
-
-      bias_sets.each do |biases|
-        next if biases.already_moved?
-
-        if biases.all_unmoved?
-          move = cli.ask("Do you want to move the bias set in #{biases.current_dir} to #{biases.files.first.target_dir}? [y/n] ").downcase == 'y'
-          next unless move
-        end
-
-        cameras = biases.camera_candidates
-        camera = if cameras.empty?
-                   logger.warn 'Camera not detected.'
-                   equipment_selector.choose_camera
-                 elsif cameras.size > 1
-                   logger.warn "Multiple cameras detected: #{cameras}"
-                   equipment_selector.choose_camera
-                 else
-                   cameras.first
-                 end
-
-        biases.apply_camera!(camera)
-        biases.each { |it| it.move(is_dry_run) }
-        puts "Done\n"
-      end
+      Organizer.new(
+        files: fits_files,
+        type: Astrophoto::BIAS,
+        cli: cli,
+        equipment_selector: equipment_selector,
+      ).organize(dry_run: is_dry_run?)
     end
 
     # Organizes flat files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -116,39 +61,12 @@ module AstroSubframeOrganizer
     # before using that master flat in a WBPP integration run, since exposure time should not be considered
     # when grouping flats to lights.
     def organize_flats
-      flat_sets = file_sets_for(Astrophoto::FLAT)
-      logger.info "Preparing to move #{flat_sets.sum { |set| set.files.size }} FLAT files..."
-
-      is_dry_run = is_dry_run?
-
-      flat_sets.each do |flatset|
-        next if flatset.already_moved?
-
-        if flatset.all_unmoved?
-          move = cli.ask("Do you want to move the flatset in #{flatset.current_dir} to #{flatset.files.first.target_dir}? [y/n] ").downcase == 'y'
-          next unless move
-        end
-
-        logger.info "For FLATSET #{flatset.files.first.filename}..#{flatset.files.last.filename}:"
-        telescope = equipment_selector.choose_telescope
-        filter = equipment_selector.choose_filter
-        cameras = flatset.camera_candidates
-        camera = if cameras.empty?
-                   logger.warn 'Camera not detected.'
-                   equipment_selector.choose_camera
-                 elsif cameras.size > 1
-                   logger.warn "Multiple cameras detected: #{cameras}"
-                   equipment_selector.choose_camera
-                 else
-                   cameras.first
-                 end
-
-        flatset.apply_telescope!(telescope)
-        flatset.apply_filter!(filter)
-        flatset.apply_camera!(camera)
-        flatset.each { |it| it.move(is_dry_run) }
-        puts "Done\n"
-      end
+      Organizer.new(
+        files: fits_files,
+        type: Astrophoto::FLAT,
+        cli: cli,
+        equipment_selector: equipment_selector,
+      ).organize(dry_run: is_dry_run?)
     end
 
     # Organizes light files by FLATSET, ISO, BIN, EXP (EXPOSURE), TELESCOPE, and FILTER. To change these
@@ -164,39 +82,12 @@ module AstroSubframeOrganizer
     # If you are running WBPP on multiple targets using this data, e.g. for a mosaic, you should make sure
     # to use LIGHT as a post-processing keyword and register files using `auto by LIGHT`.
     def organize_lights
-      light_sets = file_sets_for(Astrophoto::LIGHT)
-      logger.info "Preparing to move #{light_sets.sum { |set| set.files.size }} LIGHT files..."
-
-      is_dry_run = is_dry_run?
-
-      light_sets.each do |lightset|
-        next if lightset.already_moved?
-
-        if lightset.all_unmoved?
-          move = cli.ask("Do you want to move the light set in #{lightset.current_dir} to #{lightset.files.first.target_dir}? [y/n] ").downcase == 'y'
-          next unless move
-        end
-
-        logger.info "For LIGHTS #{lightset.files.first.filename}..#{lightset.files.last.filename}:"
-        telescope = equipment_selector.choose_telescope
-        filter = equipment_selector.choose_filter
-        cameras = lightset.camera_candidates
-        camera = if cameras.empty?
-                   logger.warn 'Camera not detected.'
-                   equipment_selector.choose_camera
-                 elsif cameras.size > 1
-                   logger.warn "Multiple cameras detected: #{cameras}"
-                   equipment_selector.choose_camera
-                 else
-                   cameras.first
-                 end
-
-        lightset.apply_telescope!(telescope)
-        lightset.apply_filter!(filter)
-        lightset.apply_camera!(camera)
-        lightset.each { |it| it.move(is_dry_run) }
-        puts "Done\n"
-      end
+      Organizer.new(
+        files: fits_files,
+        type: Astrophoto::LIGHT,
+        cli: cli,
+        equipment_selector: equipment_selector,
+      ).organize(dry_run: is_dry_run?)
     end
 
     # TODO: Add menu to select for barlow/flatteners
@@ -220,26 +111,19 @@ module AstroSubframeOrganizer
 
     # Renames CR2 Raw files to match the same name pattern as ASIAir does based on EXIF data.
     def rename_from_exif
-      type = cli.choose do |menu|
-        menu.prompt = 'What is the file type?'
-        Astrophoto::TYPES.each do |t|
-          menu.choice(t)
-        end
-      end
-
+      type = cli.ask('What is the file type?', options: Astrophoto::TYPES)
       target = cli.ask('What is the target name?') if type == Astrophoto::LIGHT
 
       is_dry_run = is_dry_run?
 
       files = Dir['*.cr2', '*.CR2'].uniq
       if files.none? { |cr2| cr2.start_with?('IMG_') }
-        cli.choose do |menu|
-          menu.prompt = "Files (#{files.size}) are already named, e.g. #{files.first&.split(File::SEPARATOR)&.last}. What do?"
-          menu.choice('Skip') { return }
-          menu.choice('Proceed with rename (this cannot be undone) and continue') do
+        cli.ask "Files (#{files.size}) are already named, e.g. #{files.first&.split(File::SEPARATOR)&.last}. What do?" do |menu|
+          menu.option('Skip') { return }
+          menu.option('Proceed with rename (this cannot be undone) and continue') do
             # rename_to_img(files, is_dry_run)
           end
-          menu.choice('Only rename back to IMG_****.cr2') do
+          menu.option('Only rename back to IMG_****.cr2') do
             rename_to_img(files, is_dry_run)
             return
           end
@@ -276,12 +160,7 @@ module AstroSubframeOrganizer
         camera = OrganizeAstroData::Camera.all.find { |it| cam_model.include?(it) }
         if camera.nil?
           logger.warn "Camera #{cam_model} did not match any of the expected models."
-          camera = cli.choose do |menu|
-            menu.prompt = 'Choose an identifier for this camera:'
-            cam_model.split(' ').each do |id|
-              menu.choice(id)
-            end
-          end
+          camera = cli.ask 'Choose an identifier for this camera:', options: cam_model.split(' ')
         end
 
         target_file = [type, target, exp_time_str, 'Bin1', camera, "ISO#{data['ISO']}", created_at, ccd_temp, seq_num].compact.join('_') + '.CR2'
@@ -290,11 +169,11 @@ module AstroSubframeOrganizer
         FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
         print '.' unless is_dry_run
       end
-      puts "Done\n"
+      logger.info 'Done'
     end
 
     def is_dry_run?
-      cli.ask('Is this a dry run? [y/n]: ').downcase == 'y'
+      cli.confirm('Is this a dry run? [y/n]: ', default: 'y')
     end
 
     def rename_to_img(files, is_dry_run)
@@ -310,38 +189,36 @@ module AstroSubframeOrganizer
     # Prompts the user to choose which organizing task to run. This is the main entry point of
     # this script.
     def organize
-      cli.choose do |menu|
-        menu.prompt = 'What are we organizing?'
-
-        menu.choice('Darks') do
+      cli.ask 'What are we organizing' do |menu|
+        menu.option('Darks') do
           organize_darks
           organize
         end
-        menu.choice('Flats') do
+        menu.option('Flats') do
           organize_flats
           organize
         end
-        menu.choice('Lights') do
+        menu.option('Lights') do
           organize_lights
           organize
         end
-        menu.choice('Biases') do
+        menu.option('Biases') do
           organize_biases
           organize
         end
-        menu.choice('Remove empty directories') do
+        menu.option('Remove empty directories') do
           remove_empty_directories
           organize
         end
-        menu.choice('Remove jpg thumbnails') do
+        menu.option('Remove jpg thumbnails') do
           remove_jpg_thumbnails
           organize
         end
-        menu.choice('Rename files from EXIF data') do
+        menu.option('Rename files from EXIF data') do
           rename_from_exif
           organize
         end
-        menu.choice('Quit')
+        menu.option('Quit') { exit }
       end
     end
 

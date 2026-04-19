@@ -4,13 +4,10 @@ require_relative '../test_helper'
 
 class TestEquipmentSelector < AstroSubframeOrganizer::Test
   class DummyMenu
-    attr_accessor :prompt, :default
+    attr_accessor :prompt, :choices
 
-    def initialize
-      @choices = []
-    end
-
-    def choice(option)
+    def option(option)
+      @choices ||= []
       @choices << option
     end
   end
@@ -18,10 +15,11 @@ class TestEquipmentSelector < AstroSubframeOrganizer::Test
   class FakeCLI
     attr_reader :menu
 
-    def choose
+    def ask(prompt, options:)
       @menu = DummyMenu.new
-      yield @menu
-      @menu.default
+      @menu.prompt = prompt
+      options.each { |option| @menu.option(option) }
+      options.first
     end
   end
 
