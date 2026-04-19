@@ -12,6 +12,9 @@ require_relative "astro_subframe_organizer/path_builders/light_path_builder"
 require_relative "astro_subframe_organizer/path_builders/bias_path_builder"
 require_relative "astro_subframe_organizer/path_builder"
 require_relative "astro_subframe_organizer/fits_organizer"
+require_relative "astro_subframe_organizer/filename_parser"
+require_relative "astro_subframe_organizer/filename_parsers/cr2_parser"
+require_relative "astro_subframe_organizer/filename_parsers/fits_parser"
 
 require 'fileutils'
 require 'date'
