@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-require_relative '../test_helper'
+require_relative '../../test_helper'
 
 class TestFilter < Minitest::Test
+  include Equipment
+
   # Tests for Filter class
   def test_all_filters
     assert_includes Filter::ALL, 'BaaderMoon'

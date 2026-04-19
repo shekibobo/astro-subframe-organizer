@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-require_relative '../test_helper'
+require_relative '../../test_helper'
 
 class TestCamera < Minitest::Test
+  include Equipment
+
   # Tests for Camera class
   def test_all_cameras
     assert_includes Camera::ALL, 'T7'
