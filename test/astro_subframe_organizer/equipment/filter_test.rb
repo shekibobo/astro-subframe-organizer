@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestFilter < Minitest::Test
+class TestFilter < AstroSubframeOrganizer::Test
   include Equipment
 
   # Tests for Filter class

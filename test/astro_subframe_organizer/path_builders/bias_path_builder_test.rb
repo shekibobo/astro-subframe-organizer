@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestBiasPathBuilder < Minitest::Test
+class TestBiasPathBuilder < AstroSubframeOrganizer::Test
   include PathBuilders
 
   def test_builds_bias_path

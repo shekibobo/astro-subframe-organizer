@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestLightPathBuilder < Minitest::Test
+class TestLightPathBuilder < AstroSubframeOrganizer::Test
   include PathBuilders
 
   def test_builds_light_fits_path

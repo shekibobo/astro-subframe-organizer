@@ -2,7 +2,7 @@
 
 require_relative '../test_helper'
 
-class TestAstrophoto < Minitest::Test
+class TestAstrophoto < AstroSubframeOrganizer::Test
   def setup
     # Suppress debug output during tests
     @original_stdout = $stdout

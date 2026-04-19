@@ -2,7 +2,7 @@
 
 require_relative '../test_helper'
 
-class TestFitsOrganizer < Minitest::Test
+class TestFitsOrganizer < AstroSubframeOrganizer::Test
   def setup
     @original_stdout = $stdout
     $stdout = StringIO.new

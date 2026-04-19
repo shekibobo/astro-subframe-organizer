@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestDarkPathBuilder < Minitest::Test
+class TestDarkPathBuilder < AstroSubframeOrganizer::Test
   include PathBuilders
 
   def test_builds_normal_dark_path

@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestFlatPathBuilder < Minitest::Test
+class TestFlatPathBuilder < AstroSubframeOrganizer::Test
   include PathBuilders
 
   def test_builds_flat_path

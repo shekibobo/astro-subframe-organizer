@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestCamera < Minitest::Test
+class TestCamera < AstroSubframeOrganizer::Test
   include Equipment
 
   # Tests for Camera class

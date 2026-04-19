@@ -2,7 +2,7 @@
 
 require_relative '../../test_helper'
 
-class TestTelescope < Minitest::Test
+class TestTelescope < AstroSubframeOrganizer::Test
   include Equipment
 
   # Tests for Telescope class
