@@ -6,7 +6,18 @@ class TestFileSet < AstroSubframeOrganizer::Test
   class MockFile
     attr_accessor :type, :path, :image_index, :camera, :telescope, :filter, :dark_flat, :target_path, :current_dir, :already_moved
 
-    def initialize(type, path, image_index, camera = nil, telescope = nil, filter = nil, dark_flat = false, target_path = nil, current_dir = nil, already_moved = false) # rubocop:disable Metrics/ParameterLists,Style/OptionalBooleanParameter
+    def initialize(
+      type:,
+      path:,
+      image_index:,
+      camera: nil,
+      telescope: nil,
+      filter: nil,
+      dark_flat: false,
+      target_path: nil,
+      current_dir: nil,
+      already_moved: false
+    )
       @type = type
       @path = path
       @image_index = image_index
@@ -26,22 +37,71 @@ class TestFileSet < AstroSubframeOrganizer::Test
 
   def test_groups_files_by_image_index
     files = [
-      MockFile.new('Dark', 'a_0001.fit', '1', 'T7', nil, nil, false, 'a_0001', '/fake', false),
-      MockFile.new('Dark', 'a_0002.fit', '1', 'T7', nil, nil, false, 'a_0002', '/fake', false),
-      MockFile.new('Dark', 'b_0003.fit', '2', 'T7', nil, nil, false, 'b_0003', '/fake', false)
+      MockFile.new(
+        type: 'Dark',
+        path: 'a_0001.fit',
+        image_index: '1',
+        camera: 'T7',
+        target_path: 'a_0001',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Dark',
+        path: 'a_0002.fit',
+        image_index: '2',
+        camera: 'T7',
+        target_path: 'a_0002',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Dark',
+        path: 'a_0002.fit',
+        image_index: '3',
+        camera: 'T7',
+        target_path: 'a_0003',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Dark',
+        path: 'b_0001.fit',
+        image_index: '1',
+        camera: 'T7',
+        target_path: 'b_0003',
+        current_dir: '/fake',
+      ),
     ]
 
     sets = FileSet.from_files(files, type: 'Dark')
 
     assert_equal 2, sets.size
-    assert_equal 2, sets.first.files.size
+    assert_equal 3, sets.first.files.size
     assert_equal 1, sets.last.files.size
   end
 
   def test_camera_candidates_and_resolution
     files = [
-      MockFile.new('Light', 'a_0001.fit', '1', 'T7', nil, nil, false, 'a_0001', '/fake', false),
-      MockFile.new('Light', 'a_0002.fit', '1', nil, nil, nil, false, 'a_0002', '/fake', false)
+      MockFile.new(
+        type: 'Light',
+        path: 'a_0001.fit',
+        image_index: '1',
+        camera: 'T7',
+        telescope: nil,
+        filter: nil,
+        dark_flat: false,
+        target_path: 'a_0001',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Light',
+        path: 'a_0002.fit',
+        image_index: '1',
+        camera: nil,
+        telescope: nil,
+        filter: nil,
+        dark_flat: false,
+        target_path: 'a_0002',
+        current_dir: '/fake',
+      ),
     ]
     set = FileSet.new(files)
 
@@ -51,8 +111,28 @@ class TestFileSet < AstroSubframeOrganizer::Test
 
   def test_apply_camera_sets_missing_camera_values
     files = [
-      MockFile.new('Light', 'a_0001.fit', '1', 'T7', nil, nil, false, 'a_0001', '/fake', false),
-      MockFile.new('Light', 'a_0002.fit', '1', nil, nil, nil, false, 'a_0002', '/fake', false)
+      MockFile.new(
+        type: 'Light',
+        path: 'a_0001.fit',
+        image_index: '1',
+        camera: 'T7',
+        telescope: nil,
+        filter: nil,
+        dark_flat: false,
+        target_path: 'a_0001',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Light',
+        path: 'a_0002.fit',
+        image_index: '1',
+        camera: nil,
+        telescope: nil,
+        filter: nil,
+        dark_flat: false,
+        target_path: 'a_0002',
+        current_dir: '/fake',
+      ),
     ]
     set = FileSet.new(files)
 
@@ -63,8 +143,22 @@ class TestFileSet < AstroSubframeOrganizer::Test
 
   def test_mark_dark_flat_updates_all_files
     files = [
-      MockFile.new('Dark', 'a_0001.fit', '1', 'T7', nil, nil, false, 'a_0001', '/fake', false),
-      MockFile.new('Dark', 'a_0002.fit', '1', 'T7', nil, nil, false, 'a_0002', '/fake', false)
+      MockFile.new(
+        type: 'Dark',
+        path: 'a_0001.fit',
+        image_index: '1',
+        camera: 'T7',
+        target_path: 'a_0001',
+        current_dir: '/fake',
+      ),
+      MockFile.new(
+        type: 'Dark',
+        path: 'a_0002.fit',
+        image_index: '1',
+        camera: 'T7',
+        target_path: 'a_0002',
+        current_dir: '/fake',
+      ),
     ]
     set = FileSet.new(files)
 

@@ -14,7 +14,7 @@ module AstroSubframeOrganizer
       files
         .select { |file| file.type == type }
         .sort_by(&:path)
-        .slice_when { |a, b| a.image_index.to_i != b.image_index.to_i }
+        .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
         .map { |group| new(group) }
     end
 
