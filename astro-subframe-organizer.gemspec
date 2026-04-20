@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.metadata['changelog_uri'] = 'https://github.com/shekibobo/astro-subframe-organizer/blob/main/CHANGELOG.md'
 
   # Specify which files should be added to the gem when it is released.
-  spec.files = Dir['lib/**/*.rb'] + ['bin/astro-subframe-organizer', 'README.md', 'LICENSE']
-  spec.bindir        = 'bin'
+  spec.files = Dir['lib/**/*.rb'] + ['exe/astro-subframe-organizer', 'README.md', 'LICENSE']
+  spec.bindir        = 'exe'
   spec.executables   = ['astro-subframe-organizer']
   spec.require_paths = ['lib']
 
