@@ -5,9 +5,16 @@ SimpleCov.start
 
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'aruba/api'
 require 'tempfile'
 require 'fileutils'
 require_relative '../lib/astro_subframe_organizer'
+
+Aruba.configure do |config|
+  config.command_runtime_environment = {
+    'HOME' => config.home_directory,
+  }
+end
 
 module AstroSubframeOrganizer
   class Test < Minitest::Test

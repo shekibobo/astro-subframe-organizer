@@ -30,7 +30,7 @@ OptionParser.new do |opts|
       'cameras' => %w[
         T7
         183MC
-      ]
+      ],
     }
     require 'yaml'
     File.write(config_file, default_config.to_yaml)

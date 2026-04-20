@@ -31,7 +31,6 @@ require 'logger'
 require 'fileutils'
 require 'date'
 require 'cli/ui'
-require 'highline'
 require 'mini_exiftool'
 require 'yaml'
 

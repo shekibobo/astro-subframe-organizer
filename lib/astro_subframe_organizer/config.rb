@@ -19,7 +19,7 @@ module AstroSubframeOrganizer
       'cameras' => %w[
         T7
         183MC
-      ]
+      ],
     }.freeze
 
     def self.config_file

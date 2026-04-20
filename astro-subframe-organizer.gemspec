@@ -28,10 +28,11 @@ Gem::Specification.new do |spec|
 
   # Runtime dependencies
   spec.add_runtime_dependency 'cli-ui', '~> 2.7'
-  spec.add_runtime_dependency 'highline', '~> 2.0'
+  spec.add_runtime_dependency 'dry-cli', '~> 1.1'
   spec.add_runtime_dependency 'mini_exiftool', '~> 2.10'
 
   # Development dependencies
+  spec.add_development_dependency 'aruba', '~> 2.3'
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'rake', '~> 13.0'
