@@ -60,7 +60,6 @@ GEM
       ostruct (>= 0.6.0)
       pstore (>= 0.1.3)
     mini_mime (1.1.5)
-    minitest (5.27.0)
     multi_test (1.1.0)
     ostruct (0.6.3)
     parallel (1.28.0)
@@ -134,7 +133,6 @@ DEPENDENCIES
   aruba (~> 2.3)
   astro-subframe-organizer!
   bundler (~> 2.0)
-  minitest (~> 5.0)
   rake (~> 13.0)
   rspec (~> 3.1)
   rubocop

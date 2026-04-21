@@ -10,7 +10,6 @@ gem 'rake', '~> 13.0'
 gem 'simplecov', require: false, group: :test
 
 group :development do
-  gem 'minitest', '~> 5.0'
   gem 'rubocop', require: false
   gem 'ruby-lsp-rspec', require: false
 end
