@@ -1,0 +1,11 @@
+telescopes:
+  - MeadeLX85
+  - CarbonStar200
+filters:
+  - L
+  - R
+  - G
+  - B
+cameras:
+  - ASI2600MM
+  - ASI533MM

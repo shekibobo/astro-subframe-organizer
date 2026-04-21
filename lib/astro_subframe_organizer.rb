@@ -60,6 +60,7 @@ module AstroSubframeOrganizer
   end
 
   def self.run
+    logger.info "Using config file at #{Config.config_file}" if Config.config_file
     organizer = FitsOrganizer.new
     organizer.organize
   end

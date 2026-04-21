@@ -16,19 +16,6 @@ describe 'running astro-subframe-organizer', type: :aruba do
     end
   end
 
-  it 'creates default config file with --init' do
-    expect(file?('~/.astro-subframe-organizer.yml')).to be false
-
-    run_command_and_stop 'astro-subframe-organizer --init'
-
-    expect(last_command_started.output).to include('Created default config file at ~/.astro-subframe-organizer.yml')
-    expect(last_command_started.output).to include('Edit this file to customize your telescopes, filters, and cameras.')
-
-    expect(file?('~/.astro-subframe-organizer.yml')).to be true
-  ensure
-    remove('~/.astro-subframe-organizer.yml')
-  end
-
   it 'shows help with --help' do
     run_command_and_stop 'astro-subframe-organizer --help'
     expect(last_command_started.output).to include('Usage: astro-subframe-organizer [options]')
@@ -37,14 +24,31 @@ describe 'running astro-subframe-organizer', type: :aruba do
     expect(last_command_started.output).to include('-h, --help')
   end
 
-  it 'accepts custom config file with --config', :skip do
-    custom_config_path = 'custom_config.yml'
-    write_file(custom_config_path, "telescopes:\n  - CustomScope\nfilters:\n  - CustomFilter\ncameras:\n  - CustomCamera\n")
-    run_command "astro-subframe-organizer --config #{custom_config_path}"
-    expect(last_command_started.output).to include("Using config file at #{custom_config_path}")
-    expect(last_command_started.output).to include('Using config file at')
-    expect(last_command_started.output).to include(custom_config_path)
-  ensure
-    remove(custom_config_path) if exist?(custom_config_path)
+  describe '--init' do
+    it 'creates default config file in home directory' do
+      expect(file?('~/.astro-subframe-organizer.yml')).to be false
+
+      run_command_and_stop 'astro-subframe-organizer --init'
+
+      expect(last_command_started.output).to include('Created default config file at ~/.astro-subframe-organizer.yml')
+      expect(last_command_started.output).to include('Edit this file to customize your telescopes, filters, and cameras.')
+
+      expect(file?('~/.astro-subframe-organizer.yml')).to be true
+    ensure
+      remove('~/.astro-subframe-organizer.yml')
+    end
+  end
+
+  describe 'with custom config', :files do
+    let(:custom_config) { 'single_entry_config.yml' }
+    let!(:custom_config_path) { install_fixture_file(fixture_path: custom_config) }
+
+    it 'loads custom config file' do
+      expect(file?(custom_config_path)).to be true
+      run_command "astro-subframe-organizer --config #{custom_config_path}"
+
+      stop_all_commands
+      expect(last_command_started.output).to include("Using config file at #{custom_config_path}")
+    end
   end
 end
