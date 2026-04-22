@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'cli/ui/prompt'
+
 module AstroSubframeOrganizer
   class FitsOrganizer
     include Logging
@@ -189,7 +191,7 @@ module AstroSubframeOrganizer
     # Prompts the user to choose which organizing task to run. This is the main entry point of
     # this script.
     def organize
-      cli.ask 'What are we organizing' do |menu|
+      cli.ask 'What are we organizing?' do |menu|
         menu.option('Darks') do
           organize_darks
           organize

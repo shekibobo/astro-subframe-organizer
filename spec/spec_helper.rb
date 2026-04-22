@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
 require 'aruba/rspec'
 require 'astro_subframe_organizer'
 require 'helpers/aruba_helper'
