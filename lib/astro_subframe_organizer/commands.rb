@@ -10,6 +10,7 @@ require 'astro_subframe_organizer/commands/darks'
 require 'astro_subframe_organizer/commands/flats'
 require 'astro_subframe_organizer/commands/bias'
 require 'astro_subframe_organizer/commands/cleanup_thumbnails'
+require 'astro_subframe_organizer/commands/cleanup_empty_directories'
 
 module AstroSubframeOrganizer
   module Commands
@@ -23,7 +24,13 @@ module AstroSubframeOrganizer
     register 'biases', Commands::Bias, aliases: %w[bias]
 
     register 'cleanup', aliases: %w[clean] do |prefix|
-      prefix.register 'thumbnails', Commands::CleanupThumbnails, aliases: %w[thn thm th]
+      prefix.register 'thumbnails',
+                      Commands::CleanupThumbnails,
+                      aliases: %w[thn thm th]
+
+      prefix.register 'empty-directories',
+                      Commands::CleanupEmptyDirectories,
+                      aliases: %w[empty empties empty-folders]
     end
   end
 end

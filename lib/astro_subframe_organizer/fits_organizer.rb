@@ -99,10 +99,7 @@ module AstroSubframeOrganizer
     # Checks for empty directories. Run this option after performing a move of previously
     # organized data.
     def remove_empty_directories
-      logger.info 'Cleaning up empty directories...'
-      is_dry_run = is_dry_run?
-      Dir['**/*/.DS_Store'].each { |ds_store| FileUtils.rm ds_store, verbose: true, noop: is_dry_run }
-      Dir['**/*/'].reverse_each { |d| FileUtils.rmdir d, verbose: true, noop: is_dry_run if (Dir.entries(d) - ['.', '..']).empty? }
+      Utils::EmptyDirectoryCleaner.new(path).cleanup(dry_run: is_dry_run?)
     end
 
     # Removes all the jpg thumbnails under this directory.
