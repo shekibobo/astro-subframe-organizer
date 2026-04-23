@@ -9,6 +9,7 @@ require 'astro_subframe_organizer/commands/lights'
 require 'astro_subframe_organizer/commands/darks'
 require 'astro_subframe_organizer/commands/flats'
 require 'astro_subframe_organizer/commands/bias'
+require 'astro_subframe_organizer/commands/cleanup_thumbnails'
 
 module AstroSubframeOrganizer
   module Commands
@@ -20,5 +21,9 @@ module AstroSubframeOrganizer
     register 'darks',  Commands::Darks, aliases: %w[dark]
     register 'flats',  Commands::Flats, aliases: %w[flat]
     register 'biases', Commands::Bias, aliases: %w[bias]
+
+    register 'cleanup', aliases: %w[clean] do |prefix|
+      prefix.register 'thumbnails', Commands::CleanupThumbnails, aliases: %w[thn thm th]
+    end
   end
 end

@@ -107,9 +107,7 @@ module AstroSubframeOrganizer
 
     # Removes all the jpg thumbnails under this directory.
     def remove_jpg_thumbnails
-      logger.info 'Removing jpg thumbnails...'
-      is_dry_run = is_dry_run?
-      Dir['**/*_thn.jpg'].each { |jpg| FileUtils.rm jpg, verbose: true, noop: is_dry_run }
+      Utils::ThumbnailCleaner.new(path).cleanup(dry_run: is_dry_run?)
     end
 
     # Renames CR2 Raw files to match the same name pattern as ASIAir does based on EXIF data.
