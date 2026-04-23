@@ -5,7 +5,7 @@ require 'spec_helper'
 module AstroSubframeOrganizer
   describe EquipmentSelector do
     let(:cli) { FakeCLI.new }
-    let(:selector) { EquipmentSelector.new(cli: cli) }
+    let(:selector) { EquipmentSelector.new(cli) }
 
     it 'chooses telescope using configured options' do
       selected = selector.choose_telescope

@@ -9,8 +9,10 @@ module AstroSubframeOrganizer
         path = '/organized/Flat_FLATSET_20220508_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
         photo = Astrophoto.new(path)
 
-        expect(photo.telescope).to eq('RedCat51')
-        expect(photo.filter).to eq('BaaderMoon')
+        expect(photo).to have_attributes(
+          telescope: 'RedCat51',
+          filter: 'BaaderMoon',
+        )
       end
 
       it 'tests current_dir correctly' do
@@ -23,22 +25,24 @@ module AstroSubframeOrganizer
       it 'initializes light fits correctly' do
         path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
         photo = Astrophoto.new(path)
-        expect(photo.type).to eq('Light')
-        expect(photo.target).to eq('M42')
-        expect(photo.mosaic_pane).to be_nil
-        expect(photo.exposure).to eq('1.0s')
-        expect(photo.bin).to eq('1')
-        expect(photo.camera).to eq('T7')
-        expect(photo.iso).to eq('100')
-        expect(photo.gain).to be_nil
-        expect(photo.created_at).to eq(DateTime.new(2022, 5, 8, 12, 0, 0))
-        expect(photo.ccd_temp).to eq('-10.0C')
-        expect(photo.image_index).to eq('0001')
-        expect(photo.path).to eq(path)
-        expect(photo.filename).to eq('Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
-        expect(photo.telescope).to be_nil
-        expect(photo.filter).to be_nil
-        expect(photo.dark_flat).to eq(false)
+        expect(photo).to have_attributes(
+          type: 'Light',
+          target: 'M42',
+          mosaic_pane: nil,
+          exposure: '1.0s',
+          bin: '1',
+          camera: 'T7',
+          iso: '100',
+          gain: nil,
+          created_at: DateTime.new(2022, 5, 8, 12, 0, 0),
+          ccd_temp: '-10.0C',
+          image_index: '0001',
+          path: path,
+          filename: 'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+          telescope: nil,
+          filter: nil,
+          dark_flat: false,
+        )
       end
 
       it 'initializes with mosaic pane correctly' do

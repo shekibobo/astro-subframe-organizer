@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module AstroSubframeOrganizer
   # Class describing the properties of the file that we can determine from the filename generated
   # by the ASIAir. Depending on your camera and your filter setup, the file structure may be different.
@@ -11,25 +13,35 @@ module AstroSubframeOrganizer
   # type so that it organizes your data properly.
   class Astrophoto
     include Logging
+    extend Forwardable
 
     DT_FORMAT = '%Y%m%d-%H%M%S'
 
-    attr_accessor :type,
-                  :exposure,
-                  :bin,
-                  :camera,
-                  :gain,
-                  :iso,
-                  :created_at,
-                  :ccd_temp,
-                  :image_index,
-                  :path,
-                  :filename,
-                  :telescope,
-                  :filter,
-                  :target,
-                  :dark_flat,
-                  :mosaic_pane
+    def_delegators :file_metadata,
+                   :bin,
+                   :camera,
+                   :camera=,
+                   :ccd_temp,
+                   :created_at,
+                   :dark_flat,
+                   :dark_flat=,
+                   :exposure,
+                   :file_format,
+                   :filename,
+                   :filter,
+                   :filter=,
+                   :gain,
+                   :image_index,
+                   :iso,
+                   :mosaic_pane,
+                   :path,
+                   :path=,
+                   :target,
+                   :target=,
+                   :telescope,
+                   :telescope=,
+                   :type,
+                   :type=
 
     TYPES = [
       DARK = 'Dark',
@@ -39,46 +51,7 @@ module AstroSubframeOrganizer
     ]
 
     def initialize(path)
-      self.path = path
-      self.filename = path.split('/').last
-      parts = filename.gsub('.fit', '').gsub('.cr2', '').split('_')
-      logger.debug "PARTS: #{parts}"
-      self.type = parts.shift
-      logger.debug "TYPE: #{type}"
-
-      self.target = parts.shift if type == LIGHT
-      logger.debug "TARGET: #{target}"
-      self.mosaic_pane = parts.shift if parts.first.match(/\A\d+-\d+\z/)
-      logger.debug "PANE: #{mosaic_pane}"
-
-      # If the file is already organized somewhere, get the information from its path.
-      self.telescope = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first
-      logger.debug "TELESCOPE: #{telescope}"
-      self.filter = path.match(%r{FILTER_([^_/]+).*})&.captures&.first
-      logger.debug "FILTER: #{filter}"
-      self.dark_flat = path.include?('DarkFlat')
-      logger.debug "DarkFlat?: #{dark_flat}"
-
-      self.exposure = parts.shift
-      logger.debug "EXP: #{exposure}"
-
-      self.bin = parts.shift.gsub('Bin', '') if parts.first.start_with?('Bin')
-      logger.debug "BIN: #{bin}"
-
-      self.camera = parts.shift if Equipment::Camera.all.include?(parts.first)
-      logger.debug "CAMERA: #{camera}"
-
-      self.iso = parts.shift.gsub('ISO', '') if parts.first.start_with?('ISO')
-      logger.debug "ISO: #{iso}"
-      self.gain = parts.shift.gsub('gain', '') if parts.first.start_with?('gain')
-      logger.debug "GAIN: #{gain}"
-
-      self.created_at = DateTime.strptime(parts.shift, DT_FORMAT)
-      logger.debug "CREATED_AT: #{created_at}"
-      self.ccd_temp = parts.shift
-      logger.debug "CCD_TEMP: #{ccd_temp}"
-      self.image_index = parts.shift
-      logger.debug "IMAGE_INDEX: #{image_index}"
+      @file_parser = FilenameParser.for_file(path)
     end
 
     def dark_flat?
@@ -115,15 +88,8 @@ module AstroSubframeOrganizer
       created_at.strftime('%Y-%m')
     end
 
-    # The file format (:fits or :cr2) based on the filename extension.
-    def file_format
-      if filename.downcase.end_with?('.fit')
-        :fits
-      elsif filename.downcase.end_with?('.cr2')
-        :cr2
-      else
-        raise ArgumentError, "Unsupported file format for: #{filename}"
-      end
+    def file_metadata
+      @file_metadata ||= @file_parser.parse
     end
 
     # The directory structure used to group and categorize the files, which will include useful

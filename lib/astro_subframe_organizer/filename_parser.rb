@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module AstroSubframeOrganizer
   # Base class for parsing astrophotography filenames.
   #
@@ -15,9 +17,27 @@ module AstroSubframeOrganizer
   #
   # See FitsParser and CR2Parser for format-specific implementations.
   class FilenameParser
+    extend Forwardable
+
     DT_FORMAT = '%Y%m%d-%H%M%S'
 
-    attr_reader :filename, :path
+    attr_reader :filename, :path, :result
+
+    def_delegators :result,
+                   :type,
+                   :exposure,
+                   :bin,
+                   :camera,
+                   :gain,
+                   :iso,
+                   :created_at,
+                   :ccd_temp,
+                   :image_index,
+                   :telescope,
+                   :filter,
+                   :target,
+                   :dark_flat,
+                   :mosaic_pane
 
     def initialize(path)
       @path = path
@@ -28,7 +48,7 @@ module AstroSubframeOrganizer
     #
     # Subclasses must implement this method.
     #
-    # @return [Hash] Parsed metadata with keys like :type, :target, :exposure, etc.
+    # @return [FileMetadata] Parsed metadata with attributes like :type, :target, :exposure, etc.
     # @raise [NotImplementedError] If not implemented by subclass
     def parse
       raise NotImplementedError, 'Subclasses must implement #parse'

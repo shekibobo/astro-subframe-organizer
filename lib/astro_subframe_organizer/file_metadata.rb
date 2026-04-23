@@ -2,25 +2,18 @@
 
 module AstroSubframeOrganizer
   # Value object representing parsed metadata from an astrophotography file
-  # Immutable after creation to prevent accidental mutations
   class FileMetadata
-    attr_reader :type,
-                :target,
+    attr_accessor :path, :type, :target, :camera, :telescope, :filter, :dark_flat
+    attr_reader :filename,
+                :file_format,
                 :exposure,
                 :bin,
-                :camera,
                 :gain,
                 :iso,
                 :created_at,
                 :ccd_temp,
                 :image_index,
-                :path,
-                :filename,
-                :telescope,
-                :filter,
-                :dark_flat,
-                :mosaic_pane,
-                :file_format
+                :mosaic_pane
 
     def initialize(
       type:, path:, filename:, file_format:, exposure: nil, bin: nil, camera: nil,
@@ -44,12 +37,12 @@ module AstroSubframeOrganizer
       @filter = filter
       @dark_flat = dark_flat
       @mosaic_pane = mosaic_pane
-
-      freeze
     end
 
     # Factory method to create FileMetadata from parsed parser result
     def self.from_parsed_data(parsed_data)
+      return parsed_data if parsed_data.instance_of? FileMetadata
+
       new(
         type: parsed_data[:type],
         path: parsed_data[:path],

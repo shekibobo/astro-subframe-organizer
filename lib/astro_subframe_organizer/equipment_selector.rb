@@ -5,7 +5,7 @@ module AstroSubframeOrganizer
     include Equipment
     include Logging
 
-    def initialize(telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all, cli: CLI::UI::Prompt)
+    def initialize(cli = CLI::UI::Prompt, telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all)
       @telescopes = telescopes
       @cameras = cameras
       @filters = filters

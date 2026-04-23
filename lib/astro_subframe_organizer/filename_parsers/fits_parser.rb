@@ -27,29 +27,42 @@ module AstroSubframeOrganizer
     #   - :path (full file path)
     #   - :filename (just the filename)
     class FitsParser < FilenameParser
+      include Logging
+
       # @return [Hash] Parsed metadata from FITS filename
       def parse
         base_name = extract_base_name
         parts = parse_parts(base_name)
-
         result = {}
-        result[:type] = parts.shift
-        result[:target] = parts.shift if result[:type] == 'Light'
-        result[:mosaic_pane] = parts.shift if parts.first&.match?(/\A\d+-\d+\z/)
-        result[:exposure] = parts.shift
-        result[:bin] = parts.shift.gsub('Bin', '') if parts.first&.start_with?('Bin')
-        result[:camera] = parts.shift if Equipment::Camera.all.include?(parts.first)
-        result[:iso] = parts.shift.gsub('ISO', '') if parts.first&.start_with?('ISO')
-        result[:gain] = parts.shift.gsub('gain', '') if parts.first&.start_with?('gain')
-        result[:created_at] = DateTime.strptime(parts.shift, DT_FORMAT)
-        result[:ccd_temp] = parts.shift
-        result[:image_index] = parts.shift
 
-        result[:file_format] = :fits
-        result[:path] = @path
-        result[:filename] = @filename
+        begin
+          result[:file_format] = :fits
+          result[:path] = @path
+          result[:filename] = @filename
 
-        result
+          # If the file is already organized somewhere, get the information from its path.
+          result[:telescope] = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first
+          result[:filter] = path.match(%r{FILTER_([^_/]+).*})&.captures&.first
+          result[:dark_flat] = path.include?('DarkFlat')
+
+          result[:type] = parts.shift
+          result[:target] = parts.shift if result[:type] == 'Light'
+          result[:mosaic_pane] = parts.shift if parts.first&.match?(/\A\d+-\d+\z/)
+          result[:exposure] = parts.shift
+          result[:bin] = parts.shift.gsub('Bin', '') if parts.first&.start_with?('Bin')
+          result[:camera] = parts.shift if Equipment::Camera.all.include?(parts.first)
+          result[:iso] = parts.shift.gsub('ISO', '') if parts.first&.start_with?('ISO')
+          result[:gain] = parts.shift.gsub('gain', '') if parts.first&.start_with?('gain')
+          result[:created_at] = DateTime.strptime(parts.shift, DT_FORMAT)
+          result[:ccd_temp] = parts.shift
+          result[:image_index] = parts.shift
+        rescue StandardError => e
+          logger.error e
+        ensure
+          logger.debug result
+        end
+
+        FileMetadata.from_parsed_data(result)
       end
     end
   end
