@@ -43,6 +43,23 @@ module AstroSubframeOrganizer
            .uniq
       end
 
+      def revert(dry_run: false)
+        cr2_files = find_cr2_files
+
+        if cr2_files.empty?
+          logger.warn 'No CR2 files found.'
+          return
+        end
+
+        cr2_files.each_with_index do |file, index|
+          idx = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
+          target_file = "IMG_#{idx}.CR2"
+          logger.info "Renaming to #{target_file}"
+
+          FileUtils.move file, target_file, verbose: dry_run, noop: dry_run unless File.exist?(target_file)
+        end
+      end
+
       private
 
       def rename_file(cr2, type:, target:, dry_run:)

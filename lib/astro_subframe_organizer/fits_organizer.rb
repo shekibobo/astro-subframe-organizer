@@ -13,14 +13,6 @@ module AstroSubframeOrganizer
       self.path = path
     end
 
-    def fits_files
-      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path).uniq.map { |it| Astrophoto.new(it) }
-    end
-
-    private def equipment_selector
-      @equipment_selector ||= EquipmentSelector.new(cli)
-    end
-
     # Organizes dark files by ISO, BIN, CCD-TEMP, EXPOSURE, and MONTH to facilitate the creation of
     # master darks that may have varying temperatures. This organization can be changed by updating
     # Astrophoto#target_dir for the DARK type.
@@ -39,7 +31,6 @@ module AstroSubframeOrganizer
         path: path,
         type: Astrophoto::DARK,
         cli: cli,
-        equipment_selector: equipment_selector,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -48,7 +39,6 @@ module AstroSubframeOrganizer
         path: path,
         type: Astrophoto::BIAS,
         cli: cli,
-        equipment_selector: equipment_selector,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -68,7 +58,6 @@ module AstroSubframeOrganizer
         path: path,
         type: Astrophoto::FLAT,
         cli: cli,
-        equipment_selector: equipment_selector,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -89,7 +78,6 @@ module AstroSubframeOrganizer
         path: path,
         type: Astrophoto::LIGHT,
         cli: cli,
-        equipment_selector: equipment_selector,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -120,14 +108,9 @@ module AstroSubframeOrganizer
       cli.confirm('Is this a dry run? [y/n]: ', default: 'y')
     end
 
-    def rename_to_img(files, is_dry_run)
-      files.each_with_index do |file, index|
-        idx = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
-        target_file = "IMG_#{idx}.CR2"
-        logger.info "Renaming to #{target_file}"
-
-        FileUtils.move file, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
-      end
+    def rename_to_img
+      renamer = Utils::ExifRenamer.new(path)
+      renamer.revert(dry_run: is_dry_run?)
     end
 
     # Prompts the user to choose which organizing task to run. This is the main entry point of
