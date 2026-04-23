@@ -4,15 +4,19 @@ module AstroSubframeOrganizer
   class Organizer
     include Logging
 
-    attr_reader :file_sets, :type
+    attr_reader :file_sets, :type, :path
     protected attr_accessor :cli
 
-    def initialize(files:, type:, cli: CLI::UI::Prompt, equipment_selector: nil)
+    def initialize(type:, path: Dir.pwd, cli: CLI::UI::Prompt, equipment_selector: nil)
       @cli = cli
-      @files = files
+      @path = path
       @type = type
       @file_sets = file_sets_for(type)
       @equipment_selector = equipment_selector
+    end
+
+    def fits_files
+      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path).uniq.map { |it| Astrophoto.new(it) }
     end
 
     def organize(dry_run: false)
@@ -43,7 +47,7 @@ module AstroSubframeOrganizer
     end
 
     def file_sets_for(type)
-      FileSet.from_files(@files, type: type)
+      FileSet.from_files(fits_files, type: type)
     end
 
     def check_camera(fileset)

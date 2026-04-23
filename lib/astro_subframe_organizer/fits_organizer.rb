@@ -6,14 +6,15 @@ module AstroSubframeOrganizer
   class FitsOrganizer
     include Logging
 
-    private attr_accessor :cli
+    private attr_accessor :cli, :path
 
-    def initialize
+    def initialize(path = Dir.pwd)
       self.cli = CLI::UI::Prompt
+      self.path = path
     end
 
     def fits_files
-      Dir['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'].uniq.map { |it| Astrophoto.new(it) }
+      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path).uniq.map { |it| Astrophoto.new(it) }
     end
 
     private def equipment_selector
@@ -35,7 +36,7 @@ module AstroSubframeOrganizer
     # and MONTH (optional).
     def organize_darks
       Organizer.new(
-        files: fits_files,
+        path: path,
         type: Astrophoto::DARK,
         cli: cli,
         equipment_selector: equipment_selector,
@@ -44,7 +45,7 @@ module AstroSubframeOrganizer
 
     def organize_biases
       Organizer.new(
-        files: fits_files,
+        path: path,
         type: Astrophoto::BIAS,
         cli: cli,
         equipment_selector: equipment_selector,
@@ -64,7 +65,7 @@ module AstroSubframeOrganizer
     # when grouping flats to lights.
     def organize_flats
       Organizer.new(
-        files: fits_files,
+        path: path,
         type: Astrophoto::FLAT,
         cli: cli,
         equipment_selector: equipment_selector,
@@ -85,7 +86,7 @@ module AstroSubframeOrganizer
     # to use LIGHT as a post-processing keyword and register files using `auto by LIGHT`.
     def organize_lights
       Organizer.new(
-        files: fits_files,
+        path: path,
         type: Astrophoto::LIGHT,
         cli: cli,
         equipment_selector: equipment_selector,
