@@ -109,65 +109,11 @@ module AstroSubframeOrganizer
 
     # Renames CR2 Raw files to match the same name pattern as ASIAir does based on EXIF data.
     def rename_from_exif
+      renamer = Utils::ExifRenamer.new(path)
       type = cli.ask('What is the file type?', options: Astrophoto::TYPES)
       target = cli.ask('What is the target name?') if type == Astrophoto::LIGHT
 
-      is_dry_run = is_dry_run?
-
-      files = Dir['*.cr2', '*.CR2'].uniq
-      if files.none? { |cr2| cr2.start_with?('IMG_') }
-        cli.ask "Files (#{files.size}) are already named, e.g. #{files.first&.split(File::SEPARATOR)&.last}. What do?" do |menu|
-          menu.option('Skip') { return }
-          menu.option('Proceed with rename (this cannot be undone) and continue') do
-            # rename_to_img(files, is_dry_run)
-          end
-          menu.option('Only rename back to IMG_****.cr2') do
-            rename_to_img(files, is_dry_run)
-            return
-          end
-        end
-      end
-
-      Dir['*.cr2', '*.CR2'].uniq.each do |cr2|
-        exif = MiniExiftool.new(cr2)
-        exif['SequenceNumber'] = exif.filename.split('_').last.split('.').first.to_i if exif['SequenceNumber'] == 0
-        exif['Artist'] = 'Joshua Kovach'
-        exif.save
-        exif.reload
-
-        data = exif.to_hash
-
-        exp_time = data['ExposureTime']
-
-        exp_unit = 's'
-        if exp_time < 1.0
-          exp_time *= 1000
-          exp_unit = 'ms'
-        end
-        if exp_time < 1.0
-          exp_time *= 1000
-          exp_unit = 'us'
-        end
-
-        exp_time_str = format('%.1f%s', exp_time, exp_unit)
-
-        created_at = data['DateTimeOriginal'].strftime(DT_FORMAT)
-        ccd_temp = format('%.1fC', data['CameraTemperature'].to_f)
-        seq_num = data['SequenceNumber'].to_s.rjust(4, '0')
-        cam_model = data['Model']
-        camera = Equipment::Camera.all.find { |it| cam_model.include?(it) }
-        if camera.nil?
-          logger.warn "Camera #{cam_model} did not match any of the expected models."
-          camera = cli.ask 'Choose an identifier for this camera:', options: cam_model.split(' ')
-        end
-
-        target_file = [type, target, exp_time_str, 'Bin1', camera, "ISO#{data['ISO']}", created_at, ccd_temp, seq_num].compact.join('_') + '.CR2'
-        # target_file = "#{type}_#{target&.append("_")}#{exp_time_str}_Bin1_#{camera}_ISO#{data["ISO"]}_#{created_at}_#{ccd_temp}_#{seq_num}.CR2"
-
-        FileUtils.move cr2, target_file, verbose: is_dry_run, noop: is_dry_run unless File.exist?(target_file)
-        print '.' unless is_dry_run
-      end
-      logger.info 'Done'
+      renamer.rename(type: type, target: target, dry_run: is_dry_run?)
     end
 
     def is_dry_run?
