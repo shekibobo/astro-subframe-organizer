@@ -5,12 +5,12 @@ require 'dry/cli'
 module AstroSubframeOrganizer
   module Commands
     class Run < Dry::CLI::Command
+      include SharedOptions
+
       desc 'Run the subframe organizer'
 
-      option :config, desc: 'Use custom config file (default: ~/.astro-subframe-organizer.yml)'
-
-      def call(config: nil, **)
-        ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG'] = config if config
+      def call(config: nil, verbose: false, **)
+        setup(config: config, verbose: verbose)
         AstroSubframeOrganizer.run
       end
     end

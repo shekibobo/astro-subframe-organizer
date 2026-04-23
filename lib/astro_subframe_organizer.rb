@@ -1,31 +1,33 @@
 # frozen_string_literal: true
 
-require_relative "astro_subframe_organizer/version"
-require_relative "astro_subframe_organizer/logging"
+require "astro_subframe_organizer/version"
+require "astro_subframe_organizer/logging"
 
-require_relative "astro_subframe_organizer/config"
-require_relative "astro_subframe_organizer/equipment/camera"
-require_relative "astro_subframe_organizer/equipment/filter"
-require_relative "astro_subframe_organizer/equipment/telescope"
+require "astro_subframe_organizer/commands"
 
-require_relative "astro_subframe_organizer/filename_parser"
-require_relative "astro_subframe_organizer/filename_parsers/cr2_parser"
-require_relative "astro_subframe_organizer/filename_parsers/fits_parser"
+require "astro_subframe_organizer/config"
+require "astro_subframe_organizer/equipment/camera"
+require "astro_subframe_organizer/equipment/filter"
+require "astro_subframe_organizer/equipment/telescope"
 
-require_relative "astro_subframe_organizer/path_builders/base_path_builder"
-require_relative "astro_subframe_organizer/path_builders/bias_path_builder"
-require_relative "astro_subframe_organizer/path_builders/dark_path_builder"
-require_relative "astro_subframe_organizer/path_builders/flat_path_builder"
-require_relative "astro_subframe_organizer/path_builders/light_path_builder"
-require_relative "astro_subframe_organizer/path_builder"
+require "astro_subframe_organizer/filename_parser"
+require "astro_subframe_organizer/filename_parsers/cr2_parser"
+require "astro_subframe_organizer/filename_parsers/fits_parser"
 
-require_relative "astro_subframe_organizer/astrophoto"
-require_relative 'astro_subframe_organizer/file_metadata'
-require_relative "astro_subframe_organizer/file_set"
+require "astro_subframe_organizer/path_builders/base_path_builder"
+require "astro_subframe_organizer/path_builders/bias_path_builder"
+require "astro_subframe_organizer/path_builders/dark_path_builder"
+require "astro_subframe_organizer/path_builders/flat_path_builder"
+require "astro_subframe_organizer/path_builders/light_path_builder"
+require "astro_subframe_organizer/path_builder"
 
-require_relative "astro_subframe_organizer/equipment_selector"
-require_relative "astro_subframe_organizer/organizers/organizer"
-require_relative "astro_subframe_organizer/fits_organizer"
+require "astro_subframe_organizer/astrophoto"
+require 'astro_subframe_organizer/file_metadata'
+require "astro_subframe_organizer/file_set"
+
+require "astro_subframe_organizer/equipment_selector"
+require "astro_subframe_organizer/organizers/organizer"
+require "astro_subframe_organizer/fits_organizer"
 
 require 'logger'
 require 'fileutils'

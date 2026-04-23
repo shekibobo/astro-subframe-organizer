@@ -5,10 +5,14 @@ require 'dry/cli'
 module AstroSubframeOrganizer
   module Commands
     class Init < Dry::CLI::Command
+      include SharedOptions
+
       desc 'Create default config file at ~/.astro-subframe-organizer.yml'
 
-      def call(**)
-        config_file = File.join(ENV['HOME'], '.astro-subframe-organizer.yml')
+      def call(config: nil, verbose: false, **)
+        setup(config: config, verbose: verbose)
+        config_file = config || File.join(ENV['HOME'], '.astro-subframe-organizer.yml')
+
         default_config = {
           'telescopes' => %w[
             RedCat51

@@ -2,6 +2,7 @@
 
 require 'dry/cli'
 
+require 'astro_subframe_organizer/commands/shared_options'
 require 'astro_subframe_organizer/commands/init'
 require 'astro_subframe_organizer/commands/run'
 
