@@ -3,22 +3,9 @@
 module AstroSubframeOrganizer
   module Commands
     module Organize
-      class Darks < Dry::CLI::Command
-        include SharedOptions
-        include EquipmentOptions
-
-        desc 'Run the subframe organizer for dark calibration frames'
-
-        def call(dry_run: false, path: Dir.pwd, **options)
-          setup(**options.slice(:config, :verbose))
-          set_equipment(**options.slice(:telescope, :camera, :filter))
-
-          Organizer.new(
-            type: Astrophoto::DARK,
-            path: path,
-            equipment_selector: equipment_selector,
-          ).organize(dry_run: dry_run)
-        end
+      class Darks < Base
+        desc 'Run the subframe organizer for dark subframes'
+        def frame_type = Astrophoto::DARK
       end
     end
   end

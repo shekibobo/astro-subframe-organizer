@@ -11,11 +11,10 @@ module AstroSubframeOrganizer
     end
 
     def self.from_files(files, type:)
-      files
-        .select { |file| file.type == type }
-        .sort_by(&:path)
-        .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
-        .map { |group| new(group) }
+      files.select { |file| file.type == type }
+           .sort_by(&:path)
+           .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
+           .map { |group| new(group) }
     end
 
     def name

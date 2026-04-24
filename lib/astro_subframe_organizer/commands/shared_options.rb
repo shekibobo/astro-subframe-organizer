@@ -11,7 +11,7 @@ module AstroSubframeOrganizer
       end
 
       def setup(config: nil, verbose: false)
-        ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG'] = config if config
+        ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG'] = config
         AstroSubframeOrganizer.logger.level = Logger::DEBUG if verbose
       end
     end

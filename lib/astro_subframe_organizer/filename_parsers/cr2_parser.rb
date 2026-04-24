@@ -27,6 +27,11 @@ module AstroSubframeOrganizer
         parts = parse_parts(base_name)
         result = {}
 
+        if @filename.start_with? 'IMG_'
+          logger.error('Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.')
+          exit(1)
+        end
+
         begin
           result[:file_format] = :cr2
           result[:path] = @path
@@ -49,7 +54,7 @@ module AstroSubframeOrganizer
           result[:ccd_temp] = parts.shift
           result[:image_index] = parts.shift
         rescue StandardError => e
-          logger.error e
+          logger.error "Failed to parse #{@path}: #{e}"
         ensure
           logger.debug result
         end

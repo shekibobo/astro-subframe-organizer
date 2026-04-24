@@ -22,18 +22,28 @@ module AstroSubframeOrganizer
       ],
     }.freeze
 
+    def self.custom_config_file
+      ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG']
+    end
+
     def self.config_file
-      ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG'] || File.expand_path('~/.astro_subframe_organizer.yml')
+      custom_config_file || File.expand_path('~/.astro_subframe_organizer.yml')
     end
 
     def self.load
-      if File.exist?(config_file)
-        DEFAULT_CONFIG.merge(YAML.load_file(config_file))
-      else
-        DEFAULT_CONFIG
-      end
-    rescue StandardError
-      DEFAULT_CONFIG
+      @load ||=
+        if File.exist?(config_file)
+          AstroSubframeOrganizer.logger.info "Using config file at #{config_file}"
+          DEFAULT_CONFIG.merge(YAML.load_file(config_file))
+        elsif custom_config_file
+          AstroSubframeOrganizer.logger.error("Unable to find #{config_file}. Check path and try again.")
+          exit(1)
+        else
+          AstroSubframeOrganizer.logger.info 'Using config file at ~/.astro_subframe_organizer.yml'
+          DEFAULT_CONFIG
+        end
+    rescue StandardError => e
+      AstroSubframeOrganizer.logger.error("Failed to parse #{config_file}: #{e}")
     end
 
     def self.all_telescopes
