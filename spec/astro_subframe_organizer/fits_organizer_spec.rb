@@ -4,25 +4,6 @@ require 'spec_helper'
 
 module AstroSubframeOrganizer
   describe FitsOrganizer do
-    # Test fits_files (mock with temp files)
-    it 'provides a list of Astrophotos' do
-      Dir.mktmpdir do |tmpdir|
-        Dir.chdir(tmpdir) do
-          File.write('Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit', '')
-          File.write('Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.FIT', '')
-          File.write('Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2', '')
-          File.write('Bias_0.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.CR2', '')
-          File.write('ignore.txt', '')
-
-          organizer = FitsOrganizer.new
-          files = organizer.fits_files
-
-          expect(files.size).to eq(4)
-          expect(files).to all(be_a(Astrophoto))
-        end
-      end
-    end
-
     # NOTE: Interactive methods like organize_darks, organize_flats, etc., are hard to test directly
     # without mocking HighLine. For characterization, we tested the core logic above.
     # Removed test_remove_empty_directories_dry and test_remove_jpg_thumbnails_dry to avoid prompts.

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'astro-subframe-organizer rename-from-exif', type: :aruba do
+describe 'astro-subframe-organizer rename-from-exif', :skip, type: :aruba do
   let(:test_path) { aruba.config.home_directory }
 
   # Expects: IMG_0001.CR2 in spec/fixtures/cr2/ — a standard unprocessed

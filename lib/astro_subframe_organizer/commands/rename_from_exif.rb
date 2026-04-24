@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'astro_subframe_organizer/astrophoto'
+
 module AstroSubframeOrganizer
   module Commands
     class RenameFromExif < Dry::CLI::Command
@@ -10,7 +12,7 @@ module AstroSubframeOrganizer
       option :type,
              type: :string,
              required: true,
-             values: Astrophoto::TYPES,
+             values: AstroSubframeOrganizer::Astrophoto::TYPES,
              desc: "Frame type (#{Astrophoto::TYPES.join(', ')})"
 
       option :target,

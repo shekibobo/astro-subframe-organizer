@@ -9,6 +9,8 @@ require 'astro_subframe_organizer/commands/lights'
 require 'astro_subframe_organizer/commands/darks'
 require 'astro_subframe_organizer/commands/flats'
 require 'astro_subframe_organizer/commands/bias'
+require 'astro_subframe_organizer/commands/rename_from_exif'
+require 'astro_subframe_organizer/commands/revert_to_raw'
 require 'astro_subframe_organizer/commands/cleanup_thumbnails'
 require 'astro_subframe_organizer/commands/cleanup_empty_directories'
 
@@ -31,6 +33,11 @@ module AstroSubframeOrganizer
       prefix.register 'empty-directories',
                       Commands::CleanupEmptyDirectories,
                       aliases: %w[empty empties empty-folders]
+    end
+
+    register 'raw' do |prefix|
+      prefix.register 'rename', Commands::RenameFromExif
+      prefix.register 'revert', Commands::RevertToRaw
     end
   end
 end
