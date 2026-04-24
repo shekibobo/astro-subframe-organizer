@@ -7,12 +7,19 @@ module AstroSubframeOrganizer
     module Organize
       class Bias < Dry::CLI::Command
         include SharedOptions
+        include EquipmentOptions
 
         desc 'Run the subframe organizer for bias calibration frames'
 
-        def call(config: nil, verbose: false, dry_run: false, path: Dir.pwd, **)
-          setup(config: config, verbose: verbose)
-          Organizer.new(type: Astrophoto::BIAS, path: path).organize(dry_run: dry_run)
+        def call(dry_run: false, path: Dir.pwd, **options)
+          setup(**options.slice(:config, :verbose))
+          set_equipment(**options.slice(:telescope, :camera, :filter))
+
+          Organizer.new(
+            type: Astrophoto::BIAS,
+            path: path,
+            equipment_selector: equipment_selector,
+          ).organize(dry_run: dry_run)
         end
       end
     end

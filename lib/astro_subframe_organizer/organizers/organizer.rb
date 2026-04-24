@@ -52,7 +52,8 @@ module AstroSubframeOrganizer
 
     def check_camera(fileset)
       cameras = fileset.camera_candidates
-      camera = if cameras.empty?
+      camera = equipment_selector.camera ||
+               if cameras.empty?
                  logger.warn 'Camera not detected.'
                  equipment_selector.choose_camera
                elsif cameras.size > 1
@@ -67,7 +68,8 @@ module AstroSubframeOrganizer
 
     def check_telescope(fileset)
       telescopes = fileset.telescope_candidates
-      telescope = if telescopes.empty?
+      telescope = equipment_selector.telescope ||
+                  if telescopes.empty?
                     logger.warn 'Telescope not detected.'
                     equipment_selector.choose_telescope
                   elsif telescopes.size > 1
@@ -82,7 +84,8 @@ module AstroSubframeOrganizer
 
     def check_filter(fileset)
       filters = fileset.filter_candidates
-      filter = if filters.empty?
+      filter = equipment_selector.filter ||
+               if filters.empty?
                  logger.warn 'Filter not detected.'
                  equipment_selector.choose_filter
                elsif filters.size > 1

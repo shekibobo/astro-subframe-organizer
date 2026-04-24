@@ -5,6 +5,8 @@ module AstroSubframeOrganizer
     include Equipment
     include Logging
 
+    attr_accessor :telescope, :camera, :filter
+
     def initialize(cli = CLI::UI::Prompt, telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all)
       @telescopes = telescopes
       @cameras = cameras
@@ -13,6 +15,8 @@ module AstroSubframeOrganizer
     end
 
     def choose_telescope(index = nil)
+      return telescope if telescope
+
       if index && @telescopes[index]
         @telescopes[index]
       elsif @telescopes.one?
@@ -23,6 +27,8 @@ module AstroSubframeOrganizer
     end
 
     def choose_filter(index = nil)
+      return filter if filter
+
       if index && @filters[index]
         @filters[index]
       elsif @filters.one?
@@ -33,6 +39,8 @@ module AstroSubframeOrganizer
     end
 
     def choose_camera(index = nil)
+      return camera if camera
+
       if index && @cameras[index]
         @cameras[index]
       elsif @cameras.one?
