@@ -8,7 +8,7 @@ module AstroSubframeOrganizer
   describe FileMetadata do
     it 'parses metadata from filename' do
       path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
-      parser = FitsParser.new(path)
+      parser = FitsFilenameParser.new(path)
       parsed_data = parser.parse
 
       metadata = FileMetadata.from_parsed_data(parsed_data)
@@ -26,7 +26,7 @@ module AstroSubframeOrganizer
 
     it 'correctly identifies file format' do
       path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2'
-      parser = CR2Parser.new(path)
+      parser = CR2FilenameParser.new(path)
       parsed_data = parser.parse
       metadata = FileMetadata.from_parsed_data(parsed_data)
 
@@ -35,7 +35,7 @@ module AstroSubframeOrganizer
 
     it 'includes path and filename' do
       path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
-      parser = FitsParser.new(path)
+      parser = FitsFilenameParser.new(path)
       parsed_data = parser.parse
       metadata = FileMetadata.from_parsed_data(parsed_data)
 
@@ -47,7 +47,7 @@ module AstroSubframeOrganizer
 
     it 'can parse camera and gain' do
       path = '/fake/path/Light_M42_1.0s_Bin1_183MC_gain100_20220508-120000_-10.0C_0001.fit'
-      parser = FitsParser.new(path)
+      parser = FitsFilenameParser.new(path)
       parsed_data = parser.parse
       metadata = FileMetadata.from_parsed_data(parsed_data)
 

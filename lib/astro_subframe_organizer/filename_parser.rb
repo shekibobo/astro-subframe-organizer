@@ -15,7 +15,7 @@ module AstroSubframeOrganizer
   #   parser = FilenameParser.for_file('/path/to/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
   #   metadata_hash = parser.parse
   #
-  # See FitsParser and CR2Parser for format-specific implementations.
+  # See FitsFilenameParser and CR2FilenameParser for format-specific implementations.
   class FilenameParser
     extend Forwardable
 
@@ -60,14 +60,14 @@ module AstroSubframeOrganizer
     # Case-insensitive for file extensions.
     #
     # @param path [String] Full path to the image file
-    # @return [FitsParser, CR2Parser] Appropriate parser instance
+    # @return [FitsFilenameParser, CR2FilenameParser] Appropriate parser instance
     # @raise [ArgumentError] If file format is not supported
     def self.for_file(path)
       case File.extname(path).downcase
       when '.fit'
-        FilenameParsers::FitsParser.new(path)
+        FilenameParsers::FitsFilenameParser.new(path)
       when '.cr2'
-        FilenameParsers::CR2Parser.new(path)
+        FilenameParsers::CR2FilenameParser.new(path)
       else
         raise ArgumentError, "Unsupported file format: #{path}"
       end

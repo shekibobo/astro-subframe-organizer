@@ -26,7 +26,7 @@ module AstroSubframeOrganizer
     #   - :file_format (:fits)
     #   - :path (full file path)
     #   - :filename (just the filename)
-    class FitsParser < FilenameParser
+    class FitsFilenameParser < FilenameParser
       include Logging
 
       # @return [Hash] Parsed metadata from FITS filename

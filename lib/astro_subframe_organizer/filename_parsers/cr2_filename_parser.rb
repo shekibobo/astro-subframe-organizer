@@ -13,12 +13,12 @@ module AstroSubframeOrganizer
     # Example:
     #   Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2
     #
-    # Returns a hash with keys identical to FitsParser, except:
+    # Returns a hash with keys identical to FitsFilenameParser, except:
     #   - :file_format (:cr2 instead of :fits)
     #
     # The CR2 format uses CCD-TEMP instead of ISO for temperature tracking since RAW files
     # preserve more metadata from the camera hardware.
-    class CR2Parser < FilenameParser
+    class CR2FilenameParser < FilenameParser
       include Logging
 
       # @return [Hash] Parsed metadata from CR2 filename
