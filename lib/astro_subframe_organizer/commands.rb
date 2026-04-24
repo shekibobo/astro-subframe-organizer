@@ -20,24 +20,24 @@ module AstroSubframeOrganizer
 
     register 'init',   Commands::Init
     register 'run',    Commands::Run
-    register 'lights', Commands::Lights, aliases: %w[light]
-    register 'darks',  Commands::Darks, aliases: %w[dark]
-    register 'flats',  Commands::Flats, aliases: %w[flat]
-    register 'biases', Commands::Bias, aliases: %w[bias]
+    register 'lights', Commands::Organize::Lights, aliases: %w[light]
+    register 'darks',  Commands::Organize::Darks, aliases: %w[dark]
+    register 'flats',  Commands::Organize::Flats, aliases: %w[flat]
+    register 'biases', Commands::Organize::Bias, aliases: %w[bias]
 
     register 'cleanup', aliases: %w[clean] do |prefix|
       prefix.register 'thumbnails',
-                      Commands::CleanupThumbnails,
+                      Commands::Cleanup::Thumbnails,
                       aliases: %w[thn thm th]
 
       prefix.register 'empty-directories',
-                      Commands::CleanupEmptyDirectories,
+                      Commands::Cleanup::EmptyDirectories,
                       aliases: %w[empty empties empty-folders]
     end
 
     register 'raw' do |prefix|
-      prefix.register 'rename', Commands::RenameFromExif
-      prefix.register 'revert', Commands::RevertToRaw
+      prefix.register 'rename', Commands::Raw::RenameFromExif
+      prefix.register 'revert', Commands::Raw::RevertToRaw
     end
   end
 end
