@@ -13,6 +13,7 @@ require "astro_subframe_organizer/equipment/telescope"
 require "astro_subframe_organizer/filename_parser"
 require "astro_subframe_organizer/filename_parsers/cr2_filename_parser"
 require "astro_subframe_organizer/filename_parsers/fits_filename_parser"
+require "astro_subframe_organizer/filename_parsers/fits_header_parser"
 
 require "astro_subframe_organizer/path_builders/base_path_builder"
 require "astro_subframe_organizer/path_builders/bias_path_builder"

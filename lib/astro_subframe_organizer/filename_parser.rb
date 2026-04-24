@@ -65,7 +65,7 @@ module AstroSubframeOrganizer
     def self.for_file(path)
       case File.extname(path).downcase
       when '.fit'
-        FilenameParsers::FitsFilenameParser.new(path)
+        FilenameParsers::FitsHeaderParser.new(path)
       when '.cr2'
         FilenameParsers::CR2FilenameParser.new(path)
       else

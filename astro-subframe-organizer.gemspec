@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_runtime_dependency 'cli-ui', '~> 2.7'
   spec.add_runtime_dependency 'dry-cli', '~> 1.1'
+  spec.add_runtime_dependency 'fits_parser', '~> 0.1'
   spec.add_runtime_dependency 'mini_exiftool', '~> 2.10'
 
   # Development dependencies
