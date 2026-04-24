@@ -26,7 +26,7 @@ require 'astro_subframe_organizer/file_metadata'
 require "astro_subframe_organizer/file_set"
 
 require "astro_subframe_organizer/equipment_selector"
-require "astro_subframe_organizer/organizers/organizer"
+require "astro_subframe_organizer/organizer"
 require "astro_subframe_organizer/fits_organizer"
 
 require 'astro_subframe_organizer/utils/thumbnail_cleaner'
