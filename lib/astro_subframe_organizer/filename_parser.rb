@@ -62,10 +62,14 @@ module AstroSubframeOrganizer
     # @param path [String] Full path to the image file
     # @return [FitsFilenameParser, CR2FilenameParser] Appropriate parser instance
     # @raise [ArgumentError] If file format is not supported
-    def self.for_file(path)
+    def self.for_file(path, use_headers: false)
       case File.extname(path).downcase
       when '.fit'
-        FilenameParsers::FitsHeaderParser.new(path)
+        if use_headers
+          FilenameParsers::FitsHeaderParser.new(path)
+        else
+          FilenameParsers::FitsFilenameParser.new(path)
+        end
       when '.cr2'
         FilenameParsers::CR2FilenameParser.new(path)
       else
