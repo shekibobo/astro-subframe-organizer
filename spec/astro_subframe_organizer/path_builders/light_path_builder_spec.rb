@@ -4,17 +4,17 @@ require 'spec_helper'
 
 module AstroSubframeOrganizer
   module PathBuilders
-    describe LightPathBuilder do
+    describe LightPathBuilder, :files do
       describe 'fits files' do
         it 'builds a target directory path including matching keywords for Light frames' do
-          photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+          photo = FilenameParsers::FitsFilenameParser.new(fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-235753_288deg_-10.0C_0010.fit')).parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
           builder = LightPathBuilder.new(photo)
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7')
+          expect(target_dir).to eq('Light_C 1_FLATSET_20260411_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC')
         end
       end
 
@@ -37,16 +37,15 @@ module AstroSubframeOrganizer
 
       describe 'mosaics' do
         it 'builds a target directory path including matching keywords for Light frames and pane keyword' do
-          photo = Astrophoto.new('/fake/Light_M42_1-2_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+          parser = FilenameParsers::FitsHeaderParser.new(fixture('fits/mosaic-blanks/Light_M16_1-1_300.0s_Bin1_183MC_gain0_20240713-022314_-10.0C_0003.fit'))
+          photo = parser.parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
           builder = LightPathBuilder.new(photo)
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Light_M42_PANE_1-2_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7')
-          # assert_match(/^Light_M42_PANE_1-2/, target_dir)
-          # assert_match(/TELESCOPE_RedCat51/, target_dir)
+          expect(target_dir).to eq('Light_M16_PANE_1-1_FLATSET_20240713_GAIN_0_EXP_300.0_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
         end
       end
     end
