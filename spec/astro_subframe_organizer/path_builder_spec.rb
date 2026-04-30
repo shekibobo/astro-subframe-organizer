@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 module AstroSubframeOrganizer
-  describe PathBuilder do
+  describe PathBuilder, :files do
     it 'builds correct path for dark frames' do
-      photo = Astrophoto.new('/fake/Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('fits/dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-163937_-10.0C_0011.fit')).parse
 
       target_dir = PathBuilder.build_for(photo)
 
-      expect(target_dir).to eq('Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05')
+      expect(target_dir).to eq('Dark_GAIN_111_EXP_1.0_CCD-TEMP_-10.0_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
     end
 
     it 'builds correct path for flat frames' do
-      photo = Astrophoto.new('/fake/Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111516_-10.0C_0003.fit')).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
@@ -24,44 +24,47 @@ module AstroSubframeOrganizer
     end
 
     it 'builds correct path for light frames' do
-      photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('/fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
       target_dir = PathBuilder.build_for(photo)
 
-      expect(target_dir).to match(/^Light_M42/)
+      expect(target_dir).to match(/^Light_C 1_/)
     end
-    it 'builds correct path for bias frames' do
-      photo = Astrophoto.new('/fake/Bias_0.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+
+    it 'builds correct path for bias frames', :skip do
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('/fits/bias-blanks/TODO')).parse
 
       target_dir = PathBuilder.build_for(photo)
 
       expect(target_dir).to match(/^Bias_ISO_100/)
     end
+
     it 'builds target path that includes filename' do
-      photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('/fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
       target_path = PathBuilder.target_path_for(photo)
 
-      expect(target_path).to match(%r{Light_M42_.*/Light_M42_1\.0s_Bin1_T7_ISO100_20220508-120000_-10\.0C_0001\.fit$})
+      expect(target_path).to eq('Light_C 1_FLATSET_20260411_GAIN_111_EXP_300.0_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')
     end
+
     it 'raises error for unsupported type' do
-      photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
       photo.type = 'Unknown'
 
       expect { PathBuilder.build_for(photo) }.to raise_error(ArgumentError)
     end
+
     it 'builds correct path for flat dark frames' do
-      photo = Astrophoto.new('/fake/Dark_5.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('fits/dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit')).parse
       photo.dark_flat = true
 
       target_dir = PathBuilder.target_path_for(photo)
 
-      expect(target_dir).to match(/^DarkFlat_FLATSET_/)
-      expect(target_dir).to match(/ISO_100/)
+      expect(target_dir).to eq('DarkFlat_FLATSET_20260411_GAIN_111_EXP_1.0_Bin_1_CAMERA_ZWO ASI183MC Pro/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit')
     end
   end
 end

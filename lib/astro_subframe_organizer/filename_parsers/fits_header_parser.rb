@@ -73,16 +73,6 @@ module AstroSubframeOrganizer
         parsed_from_filename[:mosaic_pane]
       end
 
-      private
-
-      def load_headers(path)
-        hdus = FitsParser.new(path).parse_hdus
-        hdu  = hdus.find { |h| h[:header] }
-        raise "No HDU with headers found in #{path}" unless hdu
-
-        hdu[:header]
-      end
-
       def image_type
         header(:type)
       end
@@ -99,6 +89,16 @@ module AstroSubframeOrganizer
         ROTATION_HEADERS.lazy.filter_map { |key| headers[key] }.first
       end
 
+      private
+
+      def load_headers(path)
+        hdus = FitsParser.new(path).parse_hdus
+        hdu  = hdus.find { |h| h[:header] }
+        raise "No HDU with headers found in #{path}" unless hdu
+
+        hdu[:header]
+      end
+
       def parse_date(value)
         return nil if value.nil?
 
@@ -110,7 +110,7 @@ module AstroSubframeOrganizer
       def parsed_from_filename
         @parsed_from_filename ||= begin
           parts = File.basename(@path, '.*').split('_')
-          pane_index = parts.index { |p| p.match?(/\A\d+-\d+\z/) }
+          pane_index = parts.index { |p| p.match?(/\A\d{1,2}-\d{1,2}\z/) }
           {
             target: pane_index ? parts[1...pane_index].join('_') : nil,
             mosaic_pane: pane_index ? parts[pane_index] : nil,

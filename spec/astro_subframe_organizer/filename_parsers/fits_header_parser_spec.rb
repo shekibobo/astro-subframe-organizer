@@ -284,7 +284,7 @@ module AstroSubframeOrganizer
         end
 
         context 'when no rotation headers are present' do
-          before { ROTATION_HEADERS.each { |key| headers.delete(key) } }
+          before { FitsHeaderParser::ROTATION_HEADERS.each { |key| headers.delete(key) } }
 
           it 'returns nil' do
             expect(parser.rotation_angle).to be_nil
