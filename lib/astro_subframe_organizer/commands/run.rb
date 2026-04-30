@@ -9,8 +9,8 @@ module AstroSubframeOrganizer
 
       desc 'Run the subframe organizer'
 
-      def call(config: nil, verbose: false, **)
-        setup(config: config, verbose: verbose)
+      def call(**options)
+        setup(**options.slice(:config, :verbose, :skip_confirm))
         AstroSubframeOrganizer.run
       end
     end

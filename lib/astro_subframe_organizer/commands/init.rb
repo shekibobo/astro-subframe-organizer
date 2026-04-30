@@ -9,9 +9,9 @@ module AstroSubframeOrganizer
 
       desc 'Create default config file at ~/.astro-subframe-organizer.yml'
 
-      def call(config: nil, verbose: false, **)
-        setup(config: config, verbose: verbose)
-        config_file = config || File.join(ENV['HOME'], '.astro-subframe-organizer.yml')
+      def call(**options)
+        setup(**options.slice(:config, :verbose, :skip_confirm))
+        config_file = options[:config] || File.join(ENV['HOME'], '.astro-subframe-organizer.yml')
 
         default_config = {
           'telescopes' => %w[

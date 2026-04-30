@@ -10,8 +10,8 @@ module AstroSubframeOrganizer
 
         desc 'Revert previously renamed CR2 files to their original names'
 
-        def call(verbose: false, dry_run: false, path: Dir.pwd, **)
-          setup(verbose: verbose)
+        def call(dry_run: false, path: Dir.pwd, **options)
+          setup(**options.slice(:config, :verbose, :skip_confirm))
 
           renamer = AstroSubframeOrganizer::Utils::ExifRenamer.new(path)
 

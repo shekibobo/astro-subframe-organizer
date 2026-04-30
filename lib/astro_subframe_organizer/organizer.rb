@@ -25,7 +25,8 @@ module AstroSubframeOrganizer
         next if fileset.already_moved?
 
         if fileset.all_unmoved?
-          move = cli.confirm("Do you want to move the #{fileset.type} files in #{fileset.current_dir} to #{fileset.files.first.target_dir}? [y/n] ", default: 'y')
+          move = ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] == 'true' ||
+                 cli.confirm("Do you want to move the #{fileset.type} files in #{fileset.current_dir} to #{fileset.files.first.target_dir}? [y/n] ", default: 'y')
           next unless move
         end
 

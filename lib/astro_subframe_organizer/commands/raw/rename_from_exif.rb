@@ -21,8 +21,8 @@ module AstroSubframeOrganizer
                required: false,
                desc: 'Target name (required for light frames)'
 
-        def call(type:, config: nil, verbose: false, dry_run: false, path: Dir.pwd, target: nil, **)
-          setup(config: config, verbose: verbose)
+        def call(type:, dry_run: false, path: Dir.pwd, target: nil, **options)
+          setup(**options.slice(:config, :verbose, :skip_confirm))
 
           if type == Astrophoto::LIGHT && target.nil?
             logger.error 'A --target is required for light frames.'

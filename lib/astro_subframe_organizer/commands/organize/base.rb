@@ -9,7 +9,7 @@ module AstroSubframeOrganizer
         include EquipmentOptions
 
         def call(dry_run: false, path: Dir.pwd, **options)
-          setup(**options.slice(:config, :verbose))
+          setup(**options.slice(:config, :verbose, :skip_confirm))
           set_equipment(**options.slice(:telescope, :camera, :filter))
 
           Organizer.new(

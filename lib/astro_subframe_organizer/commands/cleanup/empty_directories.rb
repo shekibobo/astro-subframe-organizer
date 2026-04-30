@@ -8,9 +8,9 @@ module AstroSubframeOrganizer
 
         desc 'Remove empty directories'
 
-        def call(config: nil, verbose: false, dry_run: false, path: Dir.pwd, **)
-          setup(config: config, verbose: verbose)
-          AstroSubframeOrganizer::Utils::EmptyDirectoryCleaner.new(path).cleanup(dry_run: dry_run, verbose: verbose)
+        def call(dry_run: false, path: Dir.pwd, **options)
+          setup(**options.slice(:config, :verbose, :skip_confirm))
+          AstroSubframeOrganizer::Utils::EmptyDirectoryCleaner.new(path).cleanup(dry_run: dry_run, verbose: options[:verbose])
         end
       end
     end

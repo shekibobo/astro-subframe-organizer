@@ -17,9 +17,9 @@ module AstroSubframeOrganizer
                required: false,
                desc: 'A glob pattern to match thumbnail files.'
 
-        def call(config: nil, verbose: false, dry_run: false, path: Dir.pwd, pattern: THUMBNAIL_PATTERN, **)
-          setup(config: config, verbose: verbose)
-          AstroSubframeOrganizer::Utils::ThumbnailCleaner.new(path).cleanup(pattern: pattern, dry_run: dry_run, verbose: verbose)
+        def call(dry_run: false, path: Dir.pwd, pattern: THUMBNAIL_PATTERN, **options)
+          setup(**options.slice(:config, :verbose, :skip_confirm))
+          AstroSubframeOrganizer::Utils::ThumbnailCleaner.new(path).cleanup(pattern: pattern, dry_run: dry_run, verbose: options[:verbose])
         end
       end
     end
