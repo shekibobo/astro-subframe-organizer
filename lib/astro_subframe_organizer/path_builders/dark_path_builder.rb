@@ -42,14 +42,14 @@ module AstroSubframeOrganizer
           "EXP_#{@metadata.exposure}",
           "CCD-TEMP_#{@metadata.ccd_temp}",
           "CAMERA_#{@metadata.camera}",
-          "MONTH_#{month}",
+          "MONTH_#{@metadata.month}",
         ].compact.join('_')
       end
 
       def build_flat_dark_path
         [
           'DarkFlat',
-          "FLATSET_#{flatset_id}",
+          "FLATSET_#{@metadata.flatset_id}",
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",

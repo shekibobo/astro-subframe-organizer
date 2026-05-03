@@ -6,8 +6,9 @@ module AstroSubframeOrganizer
   module PathBuilders
     describe LightPathBuilder, :files do
       describe 'fits files' do
+        let(:path) { fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-235753_288deg_-10.0C_0010.fit') }
         it 'builds a target directory path including matching keywords for Light frames' do
-          photo = FilenameParsers::FitsFilenameParser.new(fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-235753_288deg_-10.0C_0010.fit')).parse
+          photo = FilenameParsers::FitsFilenameParser.new(path).parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
           builder = LightPathBuilder.new(photo)
@@ -36,8 +37,10 @@ module AstroSubframeOrganizer
       end
 
       describe 'mosaics' do
+        let(:path) { fixture('fits/mosaic-blanks/Light_M16_1-1_300.0s_Bin1_183MC_gain0_20240713-022314_-10.0C_0003.fit') }
+
         it 'builds a target directory path including matching keywords for Light frames and pane keyword' do
-          parser = FilenameParsers::FitsHeaderParser.new(fixture('fits/mosaic-blanks/Light_M16_1-1_300.0s_Bin1_183MC_gain0_20240713-022314_-10.0C_0003.fit'))
+          parser = FilenameParsers::FitsHeaderParser.new(path)
           photo = parser.parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'

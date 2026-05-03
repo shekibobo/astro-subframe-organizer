@@ -6,6 +6,7 @@ module AstroSubframeOrganizer
   module FilenameParsers
     class FitsHeaderParser < FilenameParser
       include Logging
+      include AstroSubframeOrganizer::Utils::ExposureFormat
 
       HEADER_MAP = {
         telescope: 'TELESCOP',
@@ -45,7 +46,7 @@ module AstroSubframeOrganizer
         result[:filter]      = header(:filter)
         result[:type]        = image_type
         result[:target]      = target if light_frame?
-        result[:exposure]    = header(:exposure)
+        result[:exposure]    = format_exposure(header(:exposure))
         result[:bin]         = header(:binning)
         result[:camera]      = header(:camera)
         result[:gain]        = header(:gain)

@@ -28,16 +28,6 @@ module AstroSubframeOrganizer
           "GAIN_#{@metadata.gain}"
         end
       end
-
-      # @return [String] The flatset ID (date-based grouping for flats and flat darks)
-      def flatset_id
-        @metadata.flatset_id
-      end
-
-      # @return [String] Year-Month in YYYY-MM format (used for seasonal dark grouping)
-      def month
-        @metadata.month
-      end
     end
   end
 end

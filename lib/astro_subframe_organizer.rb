@@ -2,6 +2,7 @@
 
 require "astro_subframe_organizer/version"
 require "astro_subframe_organizer/logging"
+require "astro_subframe_organizer/utils/exposure_format"
 
 require "astro_subframe_organizer/commands"
 

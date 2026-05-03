@@ -4,6 +4,8 @@ require 'mini_exiftool'
 
 module AstroSubframeOrganizer
   module Utils
+    include ExposureFormat
+
     # Renames CR2 files based on EXIF data to match the standard subframe naming
     # convention: TYPE_TARGET_EXPTIME_BIN_CAMERA_ISO_DATETIME_TEMP_SEQ.CR2
     class ExifRenamer
@@ -99,20 +101,6 @@ module AstroSubframeOrganizer
         [type, target, exp_str, 'Bin1', camera, "ISO#{data['ISO']}", created_at, ccd_temp, seq_num]
           .compact
           .join('_') + '.CR2'
-      end
-
-      def format_exposure(exp_time)
-        exp_time  = exp_time.to_f
-        unit      = 's'
-        if exp_time < 1.0
-          exp_time *= 1000
-          unit = 'ms'
-        end
-        if exp_time < 1.0
-          exp_time *= 1000
-          unit = 'us'
-        end
-        format('%.1f%s', exp_time, unit)
       end
 
       def resolve_camera(cam_model)

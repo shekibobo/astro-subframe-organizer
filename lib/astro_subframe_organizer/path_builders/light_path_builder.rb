@@ -50,7 +50,7 @@ module AstroSubframeOrganizer
       def build_fits_path(prefix)
         [
           prefix,
-          "FLATSET_#{flatset_id}",
+          "FLATSET_#{@metadata.flatset_id}",
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
@@ -63,7 +63,7 @@ module AstroSubframeOrganizer
       def build_cr2_path(prefix)
         [
           prefix,
-          "FLATSET_#{flatset_id}",
+          "FLATSET_#{@metadata.flatset_id}",
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",

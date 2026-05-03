@@ -31,7 +31,7 @@ module AstroSubframeOrganizer
       def build
         [
           'Flat',
-          "FLATSET_#{flatset_id}",
+          "FLATSET_#{@metadata.flatset_id}",
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
