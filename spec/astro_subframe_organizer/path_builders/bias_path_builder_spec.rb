@@ -4,14 +4,18 @@ require 'spec_helper'
 
 module AstroSubframeOrganizer
   module PathBuilders
-    describe BiasPathBuilder do
+    describe BiasPathBuilder, :files do
+      let(:path) { fixture('fits/bias-blanks/Bias_250.0us_Bin1_ISO800_20220916-150614_37.0C_0012.fit') }
+
+      # TODO: Fix sub-second exposure parsing on header parser
       it 'builds a target directory path including matching keywords for Bias frames' do
-        photo = Astrophoto.new('/fake/Bias_0.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
-        builder = BiasPathBuilder.new(photo)
+        metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
+        metadata.camera = 'T7'
+        builder = BiasPathBuilder.new(metadata)
 
         target_dir = builder.build
 
-        expect(target_dir).to eq('Bias_ISO_100_EXP_0.0s_Bin_1_CAMERA_T7_MONTH_2022-05')
+        expect(target_dir).to eq('Bias_ISO_800_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-11')
       end
     end
   end
