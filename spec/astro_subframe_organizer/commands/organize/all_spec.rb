@@ -16,10 +16,6 @@ require 'spec_helper'
 #               captured across three sessions: 2025-12-24, 2026-01-13,
 #               2026-02-18. Some files have -9.5C or -10.5C temp variations.
 
-FIXTURE_ROOT = File.expand_path('../../../fixtures/fits', __dir__)
-puts FIXTURE_ROOT
-puts Dir.exist?(FIXTURE_ROOT)
-
 def fixture(relative_path)
   File.join(FIXTURE_ROOT, relative_path)
 end
@@ -28,13 +24,13 @@ def skip_unless_fixture_exists(path)
   skip "Fixture not found: #{path}" unless File.exist?(path)
 end
 
-shared_examples 'a successful organize command' do |command|
+shared_examples 'a successful organize command', :files do |command|
   it 'exits successfully' do
     expect(last_command_started.exit_status).to eq(0)
   end
 end
 
-shared_examples 'a dry run that preserves files' do |command:, fixture_files:|
+shared_examples 'a dry run that preserves files', :files do |command:, fixture_files:|
   it 'exits successfully' do
     expect(last_command_started.exit_status).to eq(0)
   end

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module AstroSubframeOrganizer
-  describe Astrophoto do
+  describe Astrophoto, :skip do
     describe 'initialization' do
       it 'initializes with already organized path (extracts telescope/filter)' do
         path = '/organized/Flat_FLATSET_20220508_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'

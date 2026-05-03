@@ -21,7 +21,7 @@ module AstroSubframeOrganizer
 
       describe 'raw files' do
         it 'builds a target directory path including matching keywords for Light frames' do
-          photo = Astrophoto.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2')
+          photo = FilenameParsers::CR2FilenameParser.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2').parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
           builder = LightPathBuilder.new(photo)
@@ -48,7 +48,7 @@ module AstroSubframeOrganizer
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Light_M16_PANE_1-1_FLATSET_20240713_GAIN_0_EXP_300.0_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
+          expect(target_dir).to eq('Light_M16_PANE_1-1_FLATSET_20240713_GAIN_0_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
         end
       end
     end

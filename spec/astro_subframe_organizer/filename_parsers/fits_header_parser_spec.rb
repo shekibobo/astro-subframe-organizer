@@ -148,7 +148,7 @@ module AstroSubframeOrganizer
 
         describe 'exposure' do
           it 'reads EXPOSURE from headers' do
-            expect(metadata.exposure).to eq(300.0)
+            expect(metadata.exposure).to eq('300.0s')
           end
         end
 
@@ -172,7 +172,7 @@ module AstroSubframeOrganizer
 
         describe 'date' do
           it 'parses DATE-OBS with microsecond precision' do
-            expect(metadata.created_at).to eq(DateTime.strptime('2025-09-08T02:46:15.614262', '%Y-%m-%dT%H:%M:%S.%6N'))
+            expect(metadata.created_at).to eq(DateTime.parse('2025-09-08T02:46:15.614262'))
           end
 
           context 'when DATE-OBS has no fractional seconds' do

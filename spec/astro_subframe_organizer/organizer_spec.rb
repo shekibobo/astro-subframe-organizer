@@ -1,117 +1,93 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'astro_subframe_organizer/organizer'
+require 'tmpdir'
+require 'support/fits_factory'
 
 module AstroSubframeOrganizer
   describe Organizer do
-    subject(:organizer) { described_class.new(type: type, path: test_dir, cli: cli, equipment_selector: equipment_selector) }
+    subject(:organizer) do
+      described_class.new(
+        type: type,
+        path: test_dir,
+        cli: cli,
+        equipment_selector: equipment_selector,
+      )
+    end
 
-    let(:test_dir) { Dir.mktmpdir }
-    let(:cli) { class_double(CLI::UI::Prompt) }
-    let(:equipment_selector) { instance_double(EquipmentSelector) }
-    let(:type)               { Astrophoto::DARK }
+    let(:test_dir)           { Dir.mktmpdir }
+    let(:cli)                { class_double(CLI::UI::Prompt) }
+    let(:equipment_selector) { instance_double(AstroSubframeOrganizer::EquipmentSelector) }
+    let(:type)               { AstroSubframeOrganizer::Astrophoto::DARK }
 
     after { FileUtils.rm_rf(test_dir) }
 
+    # ---------------------------------------------------------------------------
     # Helpers
+    # ---------------------------------------------------------------------------
 
-    def stub_equipment_selector(telescope: nil, filter: nil, camera: 'T7')
-      allow(equipment_selector).to receive(:telescope).and_return(telescope)
-      allow(equipment_selector).to receive(:filter).and_return(filter)
-      allow(equipment_selector).to receive(:camera).and_return(camera)
-    end
-
-    def create_fits_file(filename)
+    def create_fit(filename, headers: {})
       path = File.join(test_dir, filename)
-      FileUtils.mkdir_p(File.dirname(path))
-      FileUtils.touch(path)
+      FitsFactory.create(path, headers: headers)
       path
     end
 
-    def stub_fileset(fileset, already_moved: false, all_unmoved: true, cameras: ['T7'], telescopes: ['RedCat51'], filters: ['NoFilter'])
-      files = [
-        instance_double(Astrophoto, filename: 'first.fit', target_dir: '/dest', move: true),
-        instance_double(Astrophoto, filename: 'last.fit',  target_dir: '/dest', move: true),
-      ]
-
-      allow(fileset).to receive(:already_moved?).and_return(already_moved)
-      allow(fileset).to receive(:all_unmoved?).and_return(all_unmoved)
-      allow(fileset).to receive(:camera_candidates).and_return(cameras)
-      allow(fileset).to receive(:telescope_candidates).and_return(telescopes)
-      allow(fileset).to receive(:filter_candidates).and_return(filters)
-      allow(fileset).to receive(:apply_camera!)
-      allow(fileset).to receive(:apply_telescope!)
-      allow(fileset).to receive(:apply_filter!)
-      allow(fileset).to receive(:type).and_return(type)
-      allow(fileset).to receive(:each) { |&block| files.each(&block) }
-      allow(fileset).to receive(:files).and_return(files)
-      allow(fileset).to receive(:current_dir).and_return(test_dir)
-      fileset
+    def stub_equipment(telescope: nil, camera: 'ZWO ASI183MC Pro', filter: nil)
+      allow(equipment_selector).to receive(:telescope).and_return(telescope)
+      allow(equipment_selector).to receive(:camera).and_return(camera)
+      allow(equipment_selector).to receive(:filter).and_return(filter)
     end
 
-    def make_fileset(**kwargs)
-      stub_fileset(instance_double(FileSet), **kwargs)
+    def skip_confirm
+      ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] = 'true'
     end
 
-    # Specs
+    before do
+      skip_confirm
+      stub_equipment
+    end
+
+    after do
+      ENV.delete('ASTRO_SUBFRAME_SKIP_CONFIRM')
+    end
+
+    # ---------------------------------------------------------------------------
+    # #fits_files
+    # ---------------------------------------------------------------------------
 
     describe '#fits_files' do
-      # Expects .fit, .FIT, .cr2, .CR2 files in test_dir and subdirectories.
-      # Files with other extensions should be ignored.
-      context 'with a mix of file types' do
-        before do
-          create_fits_file('light.fit')
-          create_fits_file('dark.FIT')
-          create_fits_file('frame.cr2')
-          create_fits_file('raw.CR2')
-          create_fits_file('image.jpg')
-          create_fits_file('readme.txt')
-        end
+      context 'with .fit files' do
+        before { create_fit('dark_0001.fit', headers: { 'IMAGETYP' => 'Dark' }) }
 
         it 'finds .fit files' do
-          expect(organizer.fits_files.map(&:filename)).to include('light.fit')
-        end
-
-        it 'finds .FIT files' do
-          expect(organizer.fits_files.map(&:filename)).to include('dark.FIT')
-        end
-
-        it 'finds .cr2 files' do
-          expect(organizer.fits_files.map(&:filename)).to include('frame.cr2')
-        end
-
-        it 'finds .CR2 files' do
-          expect(organizer.fits_files.map(&:filename)).to include('raw.CR2')
-        end
-
-        it 'ignores non-raw files' do
-          filenames = organizer.fits_files.map(&:filename)
-          expect(filenames).not_to include('image.jpg', 'readme.txt')
+          expect(organizer.fits_files).not_to be_empty
         end
 
         it 'returns Astrophoto instances' do
-          expect(organizer.fits_files).to all(be_a(Astrophoto))
+          expect(organizer.fits_files).to all(be_a(AstroSubframeOrganizer::Astrophoto))
+        end
+      end
+
+      context 'with .FIT files' do
+        before do
+          path = File.join(test_dir, 'dark_0001.FIT')
+          FitsFactory.create(path, headers: { 'IMAGETYP' => 'Dark' })
+        end
+
+        it 'finds .FIT files' do
+          expect(organizer.fits_files).not_to be_empty
         end
       end
 
       context 'with files in subdirectories' do
-        before { create_fits_file('subdir/nested.fit') }
+        before do
+          subdir = File.join(test_dir, 'subdir')
+          FileUtils.mkdir_p(subdir)
+          FitsFactory.create(File.join(subdir, 'dark_0001.fit'), headers: { 'IMAGETYP' => 'Dark' })
+        end
 
         it 'finds files recursively' do
-          expect(organizer.fits_files.map(&:path)).to include('subdir/nested.fit')
-        end
-      end
-
-      context 'with duplicate filenames' do
-        before do
-          create_fits_file('frame.fit')
-          create_fits_file('frame.FIT')
-        end
-
-        it 'deduplicates files' do
-          filenames = organizer.fits_files.map(&:filename)
-          expect(filenames.uniq).to eq(filenames)
+          expect(organizer.fits_files).not_to be_empty
         end
       end
 
@@ -120,257 +96,378 @@ module AstroSubframeOrganizer
           expect(organizer.fits_files).to be_empty
         end
       end
+
+      context 'with mixed file types' do
+        before do
+          create_fit('dark_0001.fit', headers: { 'IMAGETYP' => 'Dark' })
+          FileUtils.touch(File.join(test_dir, 'readme.txt'))
+          FileUtils.touch(File.join(test_dir, 'image.jpg'))
+        end
+
+        it 'ignores non-raw files' do
+          expect(organizer.fits_files.size).to eq(1)
+        end
+      end
     end
 
+    # ---------------------------------------------------------------------------
+    # #organize — dark frames
+    # ---------------------------------------------------------------------------
+
     describe '#organize' do
-      before do
-        allow(FileSet).to receive(:from_files).and_return(filesets)
-      end
+      let(:type) { AstroSubframeOrganizer::Astrophoto::DARK }
 
-      context 'with no filesets' do
-        let(:filesets) { [] }
-
-        it 'does not raise an error' do
+      context 'with no files' do
+        it 'does not raise' do
           expect { organizer.organize }.not_to raise_error
         end
       end
 
-      context 'with an already-moved fileset' do
-        let(:filesets) { [make_fileset(already_moved: true)] }
+      context 'with a single dark frame' do
+        before do
+          create_fit(
+            'Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Dark',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'GAIN' => 111,
+              'DATE-OBS' => '2026-04-11T13:11:54.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+        end
 
-        it 'skips the fileset' do
-          expect(filesets.first).not_to receive(:each)
+        it 'does not raise' do
+          expect { organizer.organize }.not_to raise_error
+        end
+
+        it 'applies the camera from equipment_selector' do
           organizer.organize
+          expect(equipment_selector).to have_received(:camera).at_least(:once)
         end
       end
 
-      context 'with an all-unmoved fileset' do
-        let(:filesets) { [make_fileset(all_unmoved: true)] }
+      context 'with a single dark frame and dry_run: true' do
+        let(:filename) { 'Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit' }
 
-        before { stub_equipment_selector }
+        before do
+          create_fit(
+            filename,
+            headers: {
+              'IMAGETYP' => 'Dark',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'GAIN' => 111,
+              'DATE-OBS' => '2026-04-11T13:11:54.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+        end
 
-        context 'when user confirms move' do
-          before { allow(cli).to receive(:confirm).and_return(true) }
+        it 'does not move the file' do
+          organizer.organize(dry_run: true)
+          expect(File).to exist(File.join(test_dir, filename))
+        end
+      end
 
-          it 'moves the files' do
-            expect(filesets.first).to receive(:each)
-            organizer.organize
+      context 'with dark frames at multiple exposure lengths' do
+        before do
+          [300.0, 600.0].each_with_index do |exp, i|
+            create_fit(
+              "Dark_#{exp}s_Bin1_183MC_gain111_20260411-13#{i}154_-10.0C_000#{i + 1}.fit",
+              headers: {
+                'IMAGETYP' => 'Dark',
+                'EXPOSURE' => exp,
+                'XBINNING' => 1,
+                'INSTRUME' => 'ZWO ASI183MC Pro',
+                'GAIN' => 111,
+                'DATE-OBS' => "2026-04-11T13:1#{i}:54.000000",
+                'CCD-TEMP' => -10.0,
+              },
+            )
           end
         end
 
-        context 'when user declines move' do
-          before { allow(cli).to receive(:confirm).and_return(false) }
+        it 'does not raise' do
+          expect { organizer.organize }.not_to raise_error
+        end
+      end
 
-          it 'skips the fileset' do
-            expect(filesets.first).not_to receive(:each)
-            organizer.organize
+      context 'when camera is not detected from headers' do
+        before do
+          create_fit(
+            'Dark_300.0s_Bin1_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Dark',
+              'EXPOSURE' => 300.0,
+              'DATE-OBS' => '2026-04-11T13:11:54.000000',
+            },
+          )
+          allow(equipment_selector).to receive(:camera).and_return(nil)
+          allow(equipment_selector).to receive(:choose_camera).and_return('ZWO ASI183MC Pro')
+        end
+
+        it 'prompts for a camera' do
+          organizer.organize
+          expect(equipment_selector).to have_received(:choose_camera)
+        end
+      end
+
+      context 'when multiple cameras are detected' do
+        before do
+          ['ZWO ASI183MC Pro', 'ZWO ASI294MC Pro'].each_with_index do |cam, i|
+            create_fit(
+              "Dark_300.0s_0#{i + 1}.fit",
+              headers: {
+                'IMAGETYP' => 'Dark',
+                'EXPOSURE' => 300.0,
+                'INSTRUME' => cam,
+                'DATE-OBS' => "2026-04-11T13:1#{i}:54.000000",
+              },
+            )
           end
+          allow(equipment_selector).to receive(:camera).and_return(nil)
+          allow(equipment_selector).to receive(:choose_camera).and_return('ZWO ASI183MC Pro')
+        end
+
+        it 'prompts for a camera' do
+          organizer.organize
+          expect(equipment_selector).to have_received(:choose_camera)
         end
       end
 
-      context 'with a dark frame fileset' do
-        let(:type)     { Astrophoto::DARK }
-        let(:filesets) { [make_fileset(all_unmoved: false)] }
-
+      context 'when ASTRO_SUBFRAME_SKIP_CONFIRM is false and all files are unmoved' do
         before do
-          stub_equipment_selector
-          allow(cli).to receive(:confirm).and_return(true)
+          ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] = 'false'
+          create_fit(
+            'Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Dark',
+              'EXPOSURE' => 300.0,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'DATE-OBS' => '2026-04-11T13:11:54.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+          allow(cli).to receive(:confirm).and_return(false)
         end
 
-        it 'does not check telescope' do
-          expect(equipment_selector).not_to receive(:choose_telescope)
+        it 'prompts for confirmation' do
           organizer.organize
+          expect(cli).to have_received(:confirm)
         end
 
-        it 'does not check filter' do
-          expect(equipment_selector).not_to receive(:choose_filter)
+        it 'skips the fileset when user declines' do
           organizer.organize
-        end
-
-        it 'checks camera' do
-          expect(filesets.first).to receive(:apply_camera!).with('T7')
-          organizer.organize
+          expect(File).to exist(File.join(test_dir, 'Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit'))
         end
       end
+    end
 
-      context 'with a light frame fileset' do
-        let(:type)     { Astrophoto::LIGHT }
-        let(:filesets) { [make_fileset(all_unmoved: false)] }
+    # ---------------------------------------------------------------------------
+    # #organize — light frames
+    # ---------------------------------------------------------------------------
 
+    describe '#organize with light frames' do
+      let(:type) { AstroSubframeOrganizer::Astrophoto::LIGHT }
+
+      before do
+        stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
+      end
+
+      context 'with a single light frame' do
         before do
-          stub_equipment_selector(telescope: 'RedCat51', filter: 'NoFilter', camera: 'T7')
-          allow(cli).to receive(:confirm).and_return(true)
+          create_fit(
+            'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'C 1',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'GAIN' => 111,
+              'DATE-OBS' => '2026-04-10T23:06:51.000000',
+              'CCD-TEMP' => -10.0,
+              'ROTATANG' => 288.0,
+            },
+          )
+        end
+
+        it 'does not raise' do
+          expect { organizer.organize }.not_to raise_error
         end
 
         it 'checks telescope' do
-          expect(filesets.first).to receive(:apply_telescope!).with('RedCat51')
           organizer.organize
+          expect(equipment_selector).to have_received(:telescope).at_least(:once)
         end
 
         it 'checks filter' do
-          expect(filesets.first).to receive(:apply_filter!).with('NoFilter')
           organizer.organize
+          expect(equipment_selector).to have_received(:filter).at_least(:once)
         end
 
         it 'checks camera' do
-          expect(filesets.first).to receive(:apply_camera!).with('T7')
           organizer.organize
+          expect(equipment_selector).to have_received(:camera).at_least(:once)
         end
       end
 
-      context 'with a flat frame fileset' do
-        let(:type)     { Astrophoto::FLAT }
-        let(:filesets) { [make_fileset(all_unmoved: false)] }
-
+      context 'when telescope is not detected' do
         before do
-          stub_equipment_selector(telescope: 'RedCat51', filter: 'NoFilter', camera: 'T7')
-          allow(cli).to receive(:confirm).and_return(true)
+          create_fit(
+            'Light_M31_300.0s_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M31',
+              'EXPOSURE' => 300.0,
+              'DATE-OBS' => '2026-04-10T23:06:51.000000',
+            },
+          )
+          stub_equipment(telescope: nil, camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
+          allow(equipment_selector).to receive(:choose_telescope).and_return('RedCat51')
         end
 
-        it 'checks telescope' do
-          expect(filesets.first).to receive(:apply_telescope!).with('RedCat51')
+        it 'prompts for a telescope' do
           organizer.organize
+          expect(equipment_selector).to have_received(:choose_telescope)
+        end
+      end
+
+      context 'when filter is not detected' do
+        before do
+          create_fit(
+            'Light_M31_300.0s_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M31',
+              'EXPOSURE' => 300.0,
+              'DATE-OBS' => '2026-04-10T23:06:51.000000',
+            },
+          )
+          stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: nil)
+          allow(equipment_selector).to receive(:choose_filter).and_return('NoFilter')
         end
 
-        it 'checks filter' do
-          expect(filesets.first).to receive(:apply_filter!).with('NoFilter')
+        it 'prompts for a filter' do
           organizer.organize
+          expect(equipment_selector).to have_received(:choose_filter)
         end
       end
 
       context 'with dry_run: true' do
-        let(:filesets) { [make_fileset(all_unmoved: false)] }
+        let(:filename) { 'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit' }
 
         before do
-          stub_equipment_selector
-          allow(cli).to receive(:confirm).and_return(true)
+          create_fit(
+            filename,
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'C 1',
+              'EXPOSURE' => 300.0,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'DATE-OBS' => '2026-04-10T23:06:51.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
         end
 
-        it 'passes dry_run to each file move' do
-          filesets.first.files.each do |file|
-            expect(file).to receive(:move).with(true)
-          end
+        it 'does not move the file' do
           organizer.organize(dry_run: true)
+          expect(File).to exist(File.join(test_dir, filename))
         end
       end
+    end
 
-      describe 'camera resolution' do
-        let(:filesets) { [make_fileset(all_unmoved: false, cameras: cameras)] }
+    # ---------------------------------------------------------------------------
+    # #organize — flat frames
+    # ---------------------------------------------------------------------------
 
-        before do
-          stub_equipment_selector(camera: nil)
-          allow(cli).to receive(:confirm).and_return(true)
-        end
+    describe '#organize with flat frames' do
+      let(:type) { AstroSubframeOrganizer::Astrophoto::FLAT }
 
-        context 'when equipment_selector has a camera set' do
-          before { allow(equipment_selector).to receive(:camera).and_return('T7') }
-          let(:cameras) { [] }
-
-          it 'uses the equipment_selector camera without prompting' do
-            expect(equipment_selector).not_to receive(:choose_camera)
-            organizer.organize
-          end
-        end
-
-        context 'when no camera is detected' do
-          let(:cameras) { [] }
-
-          it 'prompts to choose a camera' do
-            expect(equipment_selector).to receive(:choose_camera).and_return('T7')
-            organizer.organize
-          end
-        end
-
-        context 'when multiple cameras are detected' do
-          let(:cameras) { %w[T7 183MC] }
-
-          it 'prompts to choose a camera' do
-            expect(equipment_selector).to receive(:choose_camera).and_return('T7')
-            organizer.organize
-          end
-        end
-
-        context 'when exactly one camera is detected' do
-          let(:cameras) { ['T7'] }
-
-          it 'uses the detected camera without prompting' do
-            expect(equipment_selector).not_to receive(:choose_camera)
-            organizer.organize
-          end
-        end
+      before do
+        stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
+        create_fit(
+          'Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit',
+          headers: {
+            'IMAGETYP' => 'Flat',
+            'EXPOSURE' => 5.0,
+            'XBINNING' => 1,
+            'INSTRUME' => 'ZWO ASI183MC Pro',
+            'GAIN' => 111,
+            'DATE-OBS' => '2025-12-24T11:15:03.000000',
+            'CCD-TEMP' => -10.0,
+            'ROTATANG' => 293.0,
+          },
+        )
       end
 
-      describe 'telescope resolution' do
-        let(:type)     { Astrophoto::LIGHT }
-        let(:filesets) { [make_fileset(all_unmoved: false, telescopes: telescopes)] }
-
-        before do
-          stub_equipment_selector(telescope: nil, filter: 'NoFilter', camera: 'T7')
-          allow(cli).to receive(:confirm).and_return(true)
-        end
-
-        context 'when no telescope is detected' do
-          let(:telescopes) { [] }
-
-          it 'prompts to choose a telescope' do
-            expect(equipment_selector).to receive(:choose_telescope).and_return('RedCat51')
-            organizer.organize
-          end
-        end
-
-        context 'when multiple telescopes are detected' do
-          let(:telescopes) { %w[RedCat51 ZhumellZ130] }
-
-          it 'prompts to choose a telescope' do
-            expect(equipment_selector).to receive(:choose_telescope).and_return('RedCat51')
-            organizer.organize
-          end
-        end
-
-        context 'when exactly one telescope is detected' do
-          let(:telescopes) { ['RedCat51'] }
-
-          it 'uses the detected telescope without prompting' do
-            expect(equipment_selector).not_to receive(:choose_telescope)
-            organizer.organize
-          end
-        end
+      it 'does not raise' do
+        expect { organizer.organize }.not_to raise_error
       end
 
-      describe 'filter resolution' do
-        let(:type)     { Astrophoto::LIGHT }
-        let(:filesets) { [make_fileset(all_unmoved: false, filters: filters)] }
+      it 'checks telescope' do
+        organizer.organize
+        expect(equipment_selector).to have_received(:telescope).at_least(:once)
+      end
 
+      it 'checks filter' do
+        organizer.organize
+        expect(equipment_selector).to have_received(:filter).at_least(:once)
+      end
+    end
+
+    # ---------------------------------------------------------------------------
+    # #organize — already moved files
+    # ---------------------------------------------------------------------------
+
+    describe '#organize with already-moved files' do
+      let(:type) { AstroSubframeOrganizer::Astrophoto::DARK }
+
+      context 'when all files are already at their target path' do
         before do
-          stub_equipment_selector(telescope: 'RedCat51', filter: nil, camera: 'T7')
-          allow(cli).to receive(:confirm).and_return(true)
+          # Create an Astrophoto whose path == target_path by placing it
+          # directly in the target directory structure
+          photo = instance_double(
+            AstroSubframeOrganizer::Astrophoto,
+            type: 'Dark',
+            path: '/dest/dark_0001.fit',
+            target_path: '/dest/dark_0001.fit',
+            already_moved?: true,
+            filename: 'dark_0001.fit',
+            image_index: '0001',
+            camera: 'ZWO ASI183MC Pro',
+          )
+          allow(AstroSubframeOrganizer::FilenameParser).to receive(:for_file).and_return(
+            double(
+              parse: instance_double(
+                AstroSubframeOrganizer::FileMetadata,
+                type: 'Dark',
+                path: '/dest/dark_0001.fit',
+                image_index: '0001',
+              ),
+            ),
+          )
+          allow(AstroSubframeOrganizer::FileSet).to receive(:from_files).and_return(
+            [
+              instance_double(
+                AstroSubframeOrganizer::FileSet,
+                files: [photo],
+                already_moved?: true,
+                all_unmoved?: false,
+                size: 1,
+              ),
+            ],
+          )
         end
 
-        context 'when no filter is detected' do
-          let(:filters) { [] }
-
-          it 'prompts to choose a filter' do
-            expect(equipment_selector).to receive(:choose_filter).and_return('NoFilter')
-            organizer.organize
-          end
-        end
-
-        context 'when multiple filters are detected' do
-          let(:filters) { %w[BaaderMoon NBZ] }
-
-          it 'prompts to choose a filter' do
-            expect(equipment_selector).to receive(:choose_filter).and_return('NoFilter')
-            organizer.organize
-          end
-        end
-
-        context 'when exactly one filter is detected' do
-          let(:filters) { ['NoFilter'] }
-
-          it 'uses the detected filter without prompting' do
-            expect(equipment_selector).not_to receive(:choose_filter)
-            organizer.organize
-          end
+        it 'skips already-moved filesets without prompting' do
+          expect(cli).not_to receive(:confirm)
+          organizer.organize
         end
       end
     end

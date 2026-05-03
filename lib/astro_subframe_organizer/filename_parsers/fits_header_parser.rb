@@ -27,7 +27,7 @@ module AstroSubframeOrganizer
 
       def initialize(path)
         super(path)
-        @headers = load_headers(path)
+        @headers = {}
       end
 
       def [](key)
@@ -35,6 +35,7 @@ module AstroSubframeOrganizer
       end
 
       def parse
+        @headers = load_headers(path)
         result = {
           file_format: :fits,
           path: @path,
