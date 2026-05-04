@@ -329,12 +329,12 @@ module AstroSubframeOrganizer
             },
           )
           stub_equipment(telescope: nil, camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
-          allow(equipment_selector).to receive(:choose_telescope).and_return('RedCat51')
+          allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('RedCat51')
         end
 
         it 'prompts for a telescope' do
           organizer.organize
-          expect(equipment_selector).to have_received(:choose_telescope)
+          expect(equipment_selector).to have_received(:choose_telescope_or_confirm)
         end
       end
 

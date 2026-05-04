@@ -72,16 +72,13 @@ module AstroSubframeOrganizer
 
     def check_telescope(fileset)
       telescopes = fileset.telescope_candidates
-      telescope = equipment_selector.telescope ||
-                  if telescopes.empty?
-                    logger.warn 'Telescope not detected.'
-                    equipment_selector.choose_telescope
-                  elsif telescopes.size > 1
-                    logger.warn "Multiple telescopes detected: #{telescopes}"
-                    equipment_selector.choose_telescope
-                  else
-                    telescopes.first
-                  end
+      telescope  = equipment_selector.telescope ||
+                   if telescopes.size > 1
+                     logger.warn "Multiple telescopes detected: #{telescopes}"
+                     equipment_selector.choose_telescope
+                   else
+                     equipment_selector.choose_telescope_or_confirm(detected: telescopes.first)
+                   end
 
       fileset.apply_telescope!(telescope)
     end

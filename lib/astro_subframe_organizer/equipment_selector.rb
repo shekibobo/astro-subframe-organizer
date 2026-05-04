@@ -26,6 +26,26 @@ module AstroSubframeOrganizer
       end.tap { |it| logger.info("Selected Telescope: #{it}") }
     end
 
+    def choose_telescope_or_confirm(detected:)
+      return telescope if telescope
+
+      if detected && @telescopes.include?(detected)
+        # Header value matches a known telescope — use it directly
+        detected
+      elsif detected
+        # Header has a value but it's not in the configured list (e.g. "EQMod Mount")
+        logger.warn "TELESCOP header '#{detected}' is not in the configured telescope list."
+        choose(
+          "TELESCOP is '#{detected}' — select the actual telescope or confirm:",
+          [detected] + @telescopes,
+        ).tap { |it| logger.info("Selected Telescope: #{it}") }
+      else
+        # No header value at all
+        logger.warn 'Telescope not detected.'
+        choose_telescope
+      end
+    end
+
     def choose_filter(index = nil)
       return filter if filter
 
