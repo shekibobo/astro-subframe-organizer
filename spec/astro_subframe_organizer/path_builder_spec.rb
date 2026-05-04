@@ -9,7 +9,7 @@ module AstroSubframeOrganizer
 
       target_dir = PathBuilder.build_for(photo)
 
-      expect(target_dir).to eq('Dark_GAIN_111_EXP_30.0s_CCD-TEMP_-10.0_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
+      expect(target_dir).to eq('Dark_GAIN_111_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
     end
 
     it 'builds correct path for flat frames' do

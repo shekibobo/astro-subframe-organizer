@@ -14,7 +14,7 @@ module AstroSubframeOrganizer
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Dark_GAIN_111_EXP_180.0s_CCD-TEMP_-10.0_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
+          expect(target_dir).to eq('Dark_GAIN_111_EXP_180.0s_CCD-TEMP_-10.0C_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
         end
       end
 

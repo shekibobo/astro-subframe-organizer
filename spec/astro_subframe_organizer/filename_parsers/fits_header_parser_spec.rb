@@ -57,7 +57,7 @@ module AstroSubframeOrganizer
       let(:fits_parser_double) { instance_double(FitsParser) }
       let(:headers)            { SAMPLE_HEADERS.dup }
 
-      describe '#initialize' do
+      describe '#headers' do
         it 'loads headers from the FITS file' do
           expect(parser.headers).to eq(SAMPLE_HEADERS)
         end
@@ -68,7 +68,7 @@ module AstroSubframeOrganizer
           end
 
           it 'raises an error' do
-            expect { parser }.to raise_error(RuntimeError, /No HDU with headers found/)
+            expect { parser.headers }.to raise_error(RuntimeError, /No HDU with headers found/)
           end
         end
       end
@@ -194,7 +194,7 @@ module AstroSubframeOrganizer
 
         describe 'temperature' do
           it 'reads CCD-TEMP from headers' do
-            expect(metadata.ccd_temp).to eq(-10.0)
+            expect(metadata.ccd_temp).to eq('-10.0C')
           end
         end
 

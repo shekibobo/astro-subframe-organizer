@@ -17,17 +17,15 @@ module AstroSubframeOrganizer
         binning: 'XBINNING',
         camera: 'INSTRUME',
         gain: 'GAIN',
+        iso: 'ISO',
         date_obs: 'DATE-OBS',
         ccd_temp: 'CCD-TEMP',
       }.freeze
 
       ROTATION_HEADERS = %w[ROTATANG ANGLE POSANGLE ROTATOR ROTAT OBJCTROT CCDROTSA].freeze
 
-      attr_reader :headers
-
-      def initialize(path)
-        super(path)
-        @headers = {}
+      def headers
+        @headers ||= load_headers(path)
       end
 
       def [](key)
@@ -35,7 +33,6 @@ module AstroSubframeOrganizer
       end
 
       def parse
-        @headers = load_headers(path)
         result = {
           file_format: :fits,
           path: @path,
@@ -43,16 +40,20 @@ module AstroSubframeOrganizer
           dark_flat: @path.include?('DarkFlat'),
         }
 
-        result[:telescope]   = header(:telescope)
-        result[:filter]      = header(:filter)
+        # If the file is already organized somewhere, get the information from its path.
+        result[:telescope] = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first || header(:telescope)
+        result[:filter] = path.match(%r{FILTER_([^_/]+).*})&.captures&.first || header(:filter)
+        result[:dark_flat] = path.include?('DarkFlat')
+
         result[:type]        = image_type
         result[:target]      = target if light_frame?
         result[:exposure]    = format_exposure(header(:exposure))
         result[:bin]         = header(:binning)
         result[:camera]      = header(:camera)
         result[:gain]        = header(:gain)
+        result[:iso]         = header(:iso)
         result[:created_at]  = parse_date(header(:date_obs))
-        result[:ccd_temp]    = header(:ccd_temp)
+        result[:ccd_temp]    = format_temp(header(:ccd_temp))
         result[:image_index] = parse_parts(extract_base_name).last
         result[:rotation]    = rotation_angle
         result[:mosaic_pane] = mosaic_pane
@@ -118,6 +119,10 @@ module AstroSubframeOrganizer
             mosaic_pane: pane_index ? parts[pane_index] : nil,
           }
         end
+      end
+
+      def format_temp(temp)
+        format '%0.1fC', temp
       end
     end
   end

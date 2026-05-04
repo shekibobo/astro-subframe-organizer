@@ -16,7 +16,10 @@ module AstroSubframeOrganizer
     end
 
     def fits_files
-      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path).uniq.map { |it| Astrophoto.new(it) }
+      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path)
+         .uniq
+         .map { |relative| File.join(path, relative) }
+         .map { |it| Astrophoto.new(it) }
     end
 
     def organize(dry_run: false)

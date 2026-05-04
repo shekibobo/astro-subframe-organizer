@@ -2,10 +2,9 @@
 
 require 'spec_helper'
 require 'tmpdir'
-require 'support/fits_factory'
 
 module AstroSubframeOrganizer
-  describe Organizer do
+  describe Organizer, :files do
     subject(:organizer) do
       described_class.new(
         type: type,
@@ -204,6 +203,7 @@ module AstroSubframeOrganizer
               'IMAGETYP' => 'Dark',
               'EXPOSURE' => 300.0,
               'DATE-OBS' => '2026-04-11T13:11:54.000000',
+              'INSTRUME' => nil,
             },
           )
           allow(equipment_selector).to receive(:camera).and_return(nil)
@@ -325,6 +325,7 @@ module AstroSubframeOrganizer
               'OBJECT' => 'M31',
               'EXPOSURE' => 300.0,
               'DATE-OBS' => '2026-04-10T23:06:51.000000',
+              'TELESCOP' => nil,
             },
           )
           stub_equipment(telescope: nil, camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
@@ -459,7 +460,6 @@ module AstroSubframeOrganizer
                 files: [photo],
                 already_moved?: true,
                 all_unmoved?: false,
-                size: 1,
               ),
             ],
           )
