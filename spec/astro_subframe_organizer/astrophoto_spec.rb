@@ -207,7 +207,10 @@ module AstroSubframeOrganizer
           photo.filter    = 'BaaderMoon'
 
           expect(photo.target_dir).to eq(
-            'Light_68 Cygni_FLATSET_20250908_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC',
+            File.join(
+              tmpdir,
+              'Light_68 Cygni_FLATSET_20250908_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC',
+            ),
           )
         end
       end
@@ -232,8 +235,11 @@ module AstroSubframeOrganizer
           photo.filter    = 'BaaderMoon'
 
           expect(photo.target_path).to eq(
-            'Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
-            'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            File.join(
+              tmpdir,
+              'Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
+              'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            ),
           )
         end
       end
@@ -320,7 +326,10 @@ module AstroSubframeOrganizer
           photo = Astrophoto.new(dark_path)
 
           expect(photo.target_dir).to eq(
-            'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05',
+            File.join(
+              tmpdir,
+              'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05',
+            ),
           )
         end
 
@@ -341,7 +350,10 @@ module AstroSubframeOrganizer
           photo.dark_flat = true
 
           expect(photo.target_dir).to eq(
-            'DarkFlat_FLATSET_20220508_ISO_100_EXP_5.0s_Bin_1_CAMERA_T7',
+            File.join(
+              tmpdir,
+              'DarkFlat_FLATSET_20220508_ISO_100_EXP_5.0s_Bin_1_CAMERA_T7',
+            ),
           )
         end
       end
@@ -351,8 +363,11 @@ module AstroSubframeOrganizer
           photo = Astrophoto.new(dark_path)
 
           expect(photo.target_path).to eq(
-            'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05/' \
-            'Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            File.join(
+              tmpdir,
+              'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05/' \
+              'Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            ),
           )
         end
       end
@@ -405,7 +420,10 @@ module AstroSubframeOrganizer
           photo.filter    = 'BaaderMoon'
 
           expect(photo.target_dir).to eq(
-            'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7',
+            File.join(
+              tmpdir,
+              'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7',
+            ),
           )
         end
       end
@@ -417,8 +435,11 @@ module AstroSubframeOrganizer
           photo.filter    = 'BaaderMoon'
 
           expect(photo.target_path).to eq(
-            'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
-            'Flat_5.0s_Bin1_T7_GAIN111_20220508-120000_-10.0C_0001.fit',
+            File.join(
+              tmpdir,
+              'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
+              'Flat_5.0s_Bin1_T7_GAIN111_20220508-120000_-10.0C_0001.fit',
+            ),
           )
         end
       end
@@ -451,7 +472,10 @@ module AstroSubframeOrganizer
       describe 'target_dir' do
         it 'builds target dir with bias keywords' do
           expect(Astrophoto.new(bias_path).target_dir).to eq(
-            'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05',
+            File.join(
+              tmpdir,
+              'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05',
+            ),
           )
         end
       end
@@ -459,8 +483,11 @@ module AstroSubframeOrganizer
       describe 'target_path' do
         it 'moves the file without renaming it' do
           expect(Astrophoto.new(bias_path).target_path).to eq(
-            'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05/' \
-            'Bias_250.0us_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            File.join(
+              tmpdir,
+              'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05/' \
+              'Bias_250.0us_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+            ),
           )
         end
       end
@@ -489,9 +516,13 @@ module AstroSubframeOrganizer
 
       it 'reports already_moved? correctly' do
         photo = Astrophoto.new(move_path)
+        photo.telescope = 'RedCat51'
+        photo.filter    = 'BaaderMoon'
+
         expect(photo.already_moved?).to eq(false)
 
-        photo.path = photo.target_path
+        photo.move(false)
+
         expect(photo.already_moved?).to eq(true)
       end
 
@@ -507,30 +538,27 @@ module AstroSubframeOrganizer
       end
 
       it 'moves the file to the target directory' do
-        Dir.chdir(tmpdir) do
-          filename = 'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
-          path = FitsFactory.create(
-            filename,
-            headers: {
-              'IMAGETYP' => 'Light',
-              'OBJECT' => 'M42',
-              'EXPOSURE' => 1.0,
-              'INSTRUME' => 'T7',
-              'ISO' => 100,
-              'XBINNING' => 1,
-              'DATE-OBS' => '2022-05-08T12:00:00.000000',
-              'CCD-TEMP' => -10.0,
-            },
-          )
-          photo = Astrophoto.new(path)
-          photo.telescope = 'RedCat51'
-          photo.filter    = 'BaaderMoon'
+        path = create_fit(
+          'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
+          headers: {
+            'IMAGETYP' => 'Light',
+            'OBJECT' => 'M42',
+            'EXPOSURE' => 1.0,
+            'INSTRUME' => 'T7',
+            'ISO' => 100,
+            'XBINNING' => 1,
+            'DATE-OBS' => '2022-05-08T12:00:00.000000',
+            'CCD-TEMP' => -10.0,
+          },
+        )
+        photo = Astrophoto.new(path)
+        photo.telescope = 'RedCat51'
+        photo.filter    = 'BaaderMoon'
 
-          photo.move(false)
+        photo.move(false)
 
-          expect(File).to     exist(photo.target_path)
-          expect(File).not_to exist(filename)
-        end
+        expect(File).to     exist(photo.target_path)
+        expect(File).not_to exist(path)
       end
     end
   end

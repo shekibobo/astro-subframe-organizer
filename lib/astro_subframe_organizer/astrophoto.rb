@@ -65,12 +65,12 @@ module AstroSubframeOrganizer
     # The directory structure used to group and categorize the files, which will include useful
     # grouping keywords for PixInsight's WeightedBatchPreProcessing script.
     def target_dir
-      PathBuilder.build_for(file_metadata)
+      @target_dir ||= File.join(current_dir, PathBuilder.build_for(file_metadata))
     end
 
     # The full path where this file will be moved.
     def target_path
-      File.join(target_dir, filename)
+      @target_path ||= File.join(target_dir, filename)
     end
 
     # The current directory of the file. If this is different from the target directory,
@@ -90,11 +90,16 @@ module AstroSubframeOrganizer
     # the file's current location and target location so you can verify it is correct before
     # performing the actual move.
     def move(is_dry_run)
-      FileUtils.mkdir target_dir, noop: is_dry_run unless File.exist? target_dir
-      if File.exist? target_path
-        logger.info "File already exists #{target_path}. Skipping..."
+      destination = target_path # capture before path changes
+      dest_dir    = target_dir
+
+      FileUtils.mkdir_p(dest_dir) unless is_dry_run || File.exist?(dest_dir)
+
+      if File.exist?(destination)
+        logger.info "File already exists #{destination}. Skipping..."
       else
-        FileUtils.move path, target_path, verbose: is_dry_run, noop: is_dry_run
+        FileUtils.move(path, destination, verbose: is_dry_run, noop: is_dry_run)
+        self.path = destination unless is_dry_run
         print '.' unless is_dry_run
       end
     end

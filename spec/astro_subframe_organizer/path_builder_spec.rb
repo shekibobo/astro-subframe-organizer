@@ -33,12 +33,12 @@ module AstroSubframeOrganizer
       expect(target_dir).to match(/^Light_C 1_/)
     end
 
-    it 'builds correct path for bias frames', :skip do
-      photo = FilenameParsers::FitsHeaderParser.new(fixture('/fits/bias-blanks/TODO')).parse
+    it 'builds correct path for bias frames' do
+      photo = FilenameParsers::FitsHeaderParser.new(fixture('/fits/bias-blanks/Bias_32.0us_Bin1_183MC_gain111_20221229-095800_-10.0C_0093.fit')).parse
 
       target_dir = PathBuilder.build_for(photo)
 
-      expect(target_dir).to match(/^Bias_ISO_100/)
+      expect(target_dir).to eq('Bias_GAIN_111_EXP_32.0us_Bin_1_CAMERA_ZWO ASI183MC Pro_MONTH_2022-12')
     end
 
     it 'builds target path that includes filename' do
