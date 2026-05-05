@@ -45,7 +45,7 @@ end
 describe 'astro-subframe-organizer light', type: :aruba do
   let(:test_path) { aruba.config.home_directory }
   let(:light_fixture) do
-    fixture('C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit')
+    fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit')
   end
 
   before do
@@ -123,8 +123,8 @@ describe 'astro-subframe-organizer light', type: :aruba do
     # Uses first 3 files from C1-blanks — same target, exposure, camera, rotation
     let(:additional_fixtures) do
       [
-        fixture('C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-231319_288deg_-10.0C_0002.fit'),
-        fixture('C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-231831_288deg_-10.0C_0003.fit'),
+        fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-231319_288deg_-10.0C_0002.fit'),
+        fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-231831_288deg_-10.0C_0003.fit'),
       ]
     end
 
@@ -153,15 +153,15 @@ RSpec.describe 'astro-subframe-organizer dark', type: :aruba, announce_output: f
 
   # Dark frames at multiple exposures to verify grouping by exposure time
   {
-    '1s' => 'dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit',
-    '5s' => 'dark-blanks/Dark_5.0s_Bin1_183MC_gain111_20260411-130006_-10.0C_0001.fit',
-    '10s' => 'dark-blanks/Dark_10.0s_Bin1_183MC_gain111_20260411-130018_-10.0C_0001.fit',
-    '30s' => 'dark-blanks/Dark_30.0s_Bin1_183MC_gain111_20260411-130049_-10.0C_0001.fit',
-    '60s' => 'dark-blanks/Dark_60.0s_Bin1_183MC_gain111_20260411-130150_-10.0C_0001.fit',
-    '120s' => 'dark-blanks/Dark_120.0s_Bin1_183MC_gain111_20260411-130352_-10.0C_0001.fit',
-    '180s' => 'dark-blanks/Dark_180.0s_Bin1_183MC_gain111_20260411-130653_-10.0C_0001.fit',
-    '300s' => 'dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit',
-    '600s' => 'dark-blanks/Dark_600.0s_Bin1_183MC_gain111_20260411-132156_-10.0C_0001.fit',
+    '1s' => 'fits/dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit',
+    '5s' => 'fits/dark-blanks/Dark_5.0s_Bin1_183MC_gain111_20260411-130006_-10.0C_0001.fit',
+    '10s' => 'fits/dark-blanks/Dark_10.0s_Bin1_183MC_gain111_20260411-130018_-10.0C_0001.fit',
+    '30s' => 'fits/dark-blanks/Dark_30.0s_Bin1_183MC_gain111_20260411-130049_-10.0C_0001.fit',
+    '60s' => 'fits/dark-blanks/Dark_60.0s_Bin1_183MC_gain111_20260411-130150_-10.0C_0001.fit',
+    '120s' => 'fits/dark-blanks/Dark_120.0s_Bin1_183MC_gain111_20260411-130352_-10.0C_0001.fit',
+    '180s' => 'fits/dark-blanks/Dark_180.0s_Bin1_183MC_gain111_20260411-130653_-10.0C_0001.fit',
+    '300s' => 'fits/dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit',
+    '600s' => 'fits/dark-blanks/Dark_600.0s_Bin1_183MC_gain111_20260411-132156_-10.0C_0001.fit',
   }.each do |exposure, relative_path|
     context "with a #{exposure} dark frame" do
       let(:dark_fixture) { fixture(relative_path) }
@@ -184,7 +184,7 @@ RSpec.describe 'astro-subframe-organizer dark', type: :aruba, announce_output: f
   context 'with a dark frame with temperature variation (-10.5C)' do
     # Dark_10.0s file 0021 has -10.5C instead of -10.0C — verify it still organizes
     let(:dark_fixture) do
-      fixture('dark-blanks/Dark_10.0s_Bin1_183MC_gain111_20260411-201934_-10.5C_0021.fit')
+      fixture('fits/dark-blanks/Dark_10.0s_Bin1_183MC_gain111_20260411-201934_-10.5C_0021.fit')
     end
 
     before do
@@ -204,8 +204,8 @@ RSpec.describe 'astro-subframe-organizer dark', type: :aruba, announce_output: f
     # grouped separately rather than merged into one fileset
     let(:fixtures) do
       [
-        fixture('dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit'),
-        fixture('dark-blanks/Dark_600.0s_Bin1_183MC_gain111_20260411-132156_-10.0C_0001.fit'),
+        fixture('fits/dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit'),
+        fixture('fits/dark-blanks/Dark_600.0s_Bin1_183MC_gain111_20260411-132156_-10.0C_0001.fit'),
       ]
     end
 
@@ -223,7 +223,7 @@ RSpec.describe 'astro-subframe-organizer dark', type: :aruba, announce_output: f
 
   context 'with --dry-run' do
     let(:dark_fixture) do
-      fixture('dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit')
+      fixture('fits/dark-blanks/Dark_300.0s_Bin1_183MC_gain111_20260411-131154_-10.0C_0001.fit')
     end
     let(:copied_path) { File.join(test_path, File.basename(dark_fixture)) }
 
@@ -261,9 +261,9 @@ RSpec.describe 'astro-subframe-organizer flat', type: :aruba do
   # All are 5s, 293deg rotation, 183MC, gain 111
 
   {
-    'December 2025 session' => 'flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit',
-    'January 2026 session' => 'flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260113-011341_-10.5C_0001.fit',
-    'February 2026 session' => 'flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260218-232013_-10.0C_0001.fit',
+    'December 2025 session' => 'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit',
+    'January 2026 session' => 'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260113-011341_-10.5C_0001.fit',
+    'February 2026 session' => 'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260218-232013_-10.0C_0001.fit',
   }.each do |session_name, relative_path|
     context "with a flat from the #{session_name}" do
       let(:flat_fixture) { fixture(relative_path) }
@@ -288,7 +288,7 @@ RSpec.describe 'astro-subframe-organizer flat', type: :aruba do
   context 'with a flat with temperature variation (-9.5C)' do
     # flat-blanks/20251224 file 0005 and 0006 have -9.5C — verify they still organize
     let(:flat_fixture) do
-      fixture('flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111528_-9.5C_0005.fit')
+      fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111528_-9.5C_0005.fit')
     end
 
     before do
@@ -313,9 +313,9 @@ RSpec.describe 'astro-subframe-organizer flat', type: :aruba do
     # as one homogeneous set.
     let(:fixtures) do
       [
-        fixture('flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit'),
-        fixture('flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260113-011341_-10.5C_0001.fit'),
-        fixture('flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260218-232013_-10.0C_0001.fit'),
+        fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit'),
+        fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260113-011341_-10.5C_0001.fit'),
+        fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20260218-232013_-10.0C_0001.fit'),
       ]
     end
 
@@ -339,7 +339,7 @@ RSpec.describe 'astro-subframe-organizer flat', type: :aruba do
 
   context 'with --dry-run' do
     let(:flat_fixture) do
-      fixture('flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit')
+      fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111503_-10.0C_0001.fit')
     end
     let(:copied_path) { File.join(test_path, File.basename(flat_fixture)) }
 

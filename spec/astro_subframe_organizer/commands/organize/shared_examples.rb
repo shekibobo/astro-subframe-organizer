@@ -21,9 +21,6 @@ require 'spec_helper'
 #                     INSTRUME matches a known camera. Exposure is typically 0.
 #
 # All fixtures should have DATE-OBS present in ISO 8601 format.
-
-FIXTURE_DIR = File.expand_path('../fixtures/fits', __dir__)
-
 shared_examples 'an organize command' do |command:, type:|
   let(:test_path)    { aruba.config.home_directory }
   let(:fixture_file) { "#{type}_single.fit" }
@@ -113,7 +110,7 @@ shared_examples 'an organize command' do |command:, type:|
   end
 end
 
-RSpec.shared_examples 'an organize command with equipment options' do |command:|
+shared_examples 'an organize command with equipment options' do |command:|
   let(:test_path) { aruba.config.home_directory }
 
   context 'with --telescope' do
