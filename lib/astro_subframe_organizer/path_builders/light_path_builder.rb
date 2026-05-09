@@ -67,7 +67,7 @@ module AstroSubframeOrganizer
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
-          "CCD-TEMP_#{@metadata.ccd_temp.gsub('0C', '')}",
+          "CCD-TEMP_#{@metadata.rounded_ccd_temp.gsub('0C', '')}",
           "TELESCOPE_#{@metadata.telescope}",
           "FILTER_#{@metadata.filter}",
           "CAMERA_#{@metadata.camera}",

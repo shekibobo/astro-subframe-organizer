@@ -108,5 +108,14 @@ module AstroSubframeOrganizer
     def already_moved?(target_path)
       path == target_path
     end
+
+    def rounded_ccd_temp
+      return nil if ccd_temp.nil?
+
+      # Extract numeric value from string like "-10.0C" or "-9.5C"
+      temp_value = ccd_temp.to_f
+      rounded    = (temp_value / 5.0).round * 5.0
+      format('%.1fC', rounded)
+    end
   end
 end

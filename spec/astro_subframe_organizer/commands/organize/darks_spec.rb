@@ -25,6 +25,48 @@ describe 'astro-subframe-organizer dark', type: :aruba do
     end
   end
 
+  context 'with --config pointing to a custom config file' do
+    let(:custom_config) { File.join(test_path, 'custom.yml') }
+
+    before do
+      File.write(
+        custom_config,
+        {
+          'telescopes' => ['RedCat51'],
+          'cameras' => ['183MC'],
+          'filters' => ['NoFilter'],
+        }.to_yaml,
+      )
+      copy_dark_fixtures(exposure: '300.0', count: 1)
+      run_command_and_stop(
+        "astro-subframe-organizer dark --path #{test_path} " \
+        "--config #{custom_config} --skip-confirm",
+      )
+    end
+
+    it 'exits successfully' do
+      expect(last_command_started.exit_status).to eq(0)
+    end
+  end
+
+  context 'with --config pointing to a nonexistent file' do
+    before do
+      run_command_and_stop(
+        "astro-subframe-organizer dark --path #{test_path} " \
+        '--config /nonexistent/config.yml --skip-confirm',
+        fail_on_error: false,
+      )
+    end
+
+    it 'exits with a non-zero status' do
+      expect(last_command_started.exit_status).not_to eq(0)
+    end
+
+    it 'outputs an error message' do
+      expect(last_command_started.output).to include('Unable to find')
+    end
+  end
+
   context 'with 300s dark frames' do
     before do
       copy_dark_fixtures(exposure: '300.0')

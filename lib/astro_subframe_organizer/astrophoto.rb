@@ -38,6 +38,7 @@ module AstroSubframeOrganizer
                    :mosaic_pane,
                    :path,
                    :path=,
+                   :rounded_ccd_temp,
                    :target,
                    :target=,
                    :telescope,

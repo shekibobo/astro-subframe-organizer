@@ -40,7 +40,7 @@ module AstroSubframeOrganizer
           'Dark',
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
-          "CCD-TEMP_#{@metadata.ccd_temp}",
+          "CCD-TEMP_#{@metadata.rounded_ccd_temp}",
           "CAMERA_#{@metadata.camera}",
           "MONTH_#{@metadata.month}",
         ].compact.join('_')

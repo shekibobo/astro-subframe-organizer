@@ -194,7 +194,7 @@ module AstroSubframeOrganizer
 
         describe 'temperature' do
           it 'reads CCD-TEMP from headers' do
-            expect(metadata.ccd_temp).to eq('-10.0C')
+            expect(metadata.rounded_ccd_temp).to eq('-10.0C')
           end
         end
 
