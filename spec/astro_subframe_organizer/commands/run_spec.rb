@@ -7,7 +7,7 @@ describe 'astro-subframe-organizer run', type: :aruba do
     let!(:command) { run_command 'astro-subframe-organizer run' }
 
     it 'exits successfully' do
-      type '8'
+      type '8\n'
       stop_all_commands
       expect(last_command_started).to have_output an_output_string_including 'What are we organizing?'
       expect(last_command_started).to have_exit_status(0)
@@ -25,7 +25,7 @@ describe 'astro-subframe-organizer run', type: :aruba do
     it 'exits successfully' do
       puts ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG']
 
-      type '8'
+      type '8\n'
       stop_all_commands
       expect(last_command_started).to have_output an_output_string_including "Using config file at #{custom_config}"
     end

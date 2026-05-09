@@ -7,11 +7,11 @@ module AstroSubframeOrganizer
 
     attr_accessor :telescope, :camera, :filter
 
-    def initialize(cli = CLI::UI::Prompt, telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all)
+    def initialize(prompt = AstroSubframeOrganizer.prompt, telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all)
       @telescopes = telescopes
       @cameras = cameras
       @filters = filters
-      @cli = cli
+      @prompt = prompt
     end
 
     def choose_telescope(index = nil)
@@ -73,7 +73,7 @@ module AstroSubframeOrganizer
     private
 
     def choose(prompt, options)
-      @cli.ask prompt, options: options
+      @prompt.enum_select prompt, options
     end
   end
 end

@@ -27,10 +27,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Runtime dependencies
-  spec.add_runtime_dependency 'cli-ui', '~> 2.7'
   spec.add_runtime_dependency 'dry-cli', '~> 1.1'
   spec.add_runtime_dependency 'fits_parser', '~> 0.1'
   spec.add_runtime_dependency 'mini_exiftool', '~> 2.10'
+  spec.add_runtime_dependency 'tty-prompt', '~> 0.23'
 
   # Development dependencies
   spec.add_development_dependency 'aruba', '~> 2.3'

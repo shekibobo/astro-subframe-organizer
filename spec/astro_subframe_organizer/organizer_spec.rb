@@ -9,13 +9,13 @@ module AstroSubframeOrganizer
       described_class.new(
         type: type,
         path: test_dir,
-        cli: cli,
+        prompt: prompt,
         equipment_selector: equipment_selector,
       )
     end
 
     let(:test_dir)           { Dir.mktmpdir }
-    let(:cli)                { class_double(CLI::UI::Prompt) }
+    let(:prompt)             { instance_double(TTY::Prompt) }
     let(:equipment_selector) { instance_double(AstroSubframeOrganizer::EquipmentSelector) }
     let(:type)               { AstroSubframeOrganizer::Astrophoto::DARK }
 
@@ -252,12 +252,12 @@ module AstroSubframeOrganizer
               'CCD-TEMP' => -10.0,
             },
           )
-          allow(cli).to receive(:confirm).and_return(false)
+          allow(prompt).to receive(:yes?).and_return(false)
         end
 
         it 'prompts for confirmation' do
           organizer.organize
-          expect(cli).to have_received(:confirm)
+          expect(prompt).to have_received(:yes?)
         end
 
         it 'skips the fileset when user declines' do
@@ -466,7 +466,7 @@ module AstroSubframeOrganizer
         end
 
         it 'skips already-moved filesets without prompting' do
-          expect(cli).not_to receive(:confirm)
+          expect(prompt).not_to receive(:yes?)
           organizer.organize
         end
       end

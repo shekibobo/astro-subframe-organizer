@@ -5,14 +5,14 @@ module AstroSubframeOrganizer
     include Logging
 
     attr_reader :file_sets, :type, :path, :equipment_selector
-    protected attr_accessor :cli
+    protected attr_accessor :prompt
 
-    def initialize(type:, path: Dir.pwd, cli: CLI::UI::Prompt, equipment_selector: nil)
-      @cli = cli
+    def initialize(type:, path: Dir.pwd, prompt: AstroSubframeOrganizer.prompt, equipment_selector: nil)
+      @prompt = prompt
       @path = path
       @type = type
       @file_sets = file_sets_for(type)
-      @equipment_selector = equipment_selector || EquipmentSelector.new(cli)
+      @equipment_selector = equipment_selector || EquipmentSelector.new(prompt)
     end
 
     def fits_files
@@ -29,7 +29,7 @@ module AstroSubframeOrganizer
 
         if fileset.all_unmoved?
           move = ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] == 'true' ||
-                 cli.confirm("Do you want to move the #{fileset.type} files in #{fileset.current_dir} to #{fileset.files.first.target_dir}? [y/n] ", default: 'y')
+                 prompt.yes?("Do you want to move the #{fileset.type} files in #{fileset.current_dir} to #{fileset.files.first.target_dir}? [y/n] ", default: 'y')
           next unless move
         end
 

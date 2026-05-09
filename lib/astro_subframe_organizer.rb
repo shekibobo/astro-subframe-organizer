@@ -38,7 +38,7 @@ require 'astro_subframe_organizer/utils/unorganizer'
 require 'logger'
 require 'fileutils'
 require 'date'
-require 'cli/ui'
+require 'tty-prompt'
 require 'mini_exiftool'
 require 'yaml'
 
@@ -48,6 +48,10 @@ module AstroSubframeOrganizer
 
     def logger
       @logger ||= default_logger
+    end
+
+    def prompt
+      @prompt ||= default_prompt
     end
 
     private
@@ -64,6 +68,14 @@ module AstroSubframeOrganizer
         end
       end
       logger
+    end
+
+    def default_prompt
+      TTY::Prompt.new(
+        active_color: :bright_cyan,
+        help_color: :bright_white,
+        error_color: :bright_red,
+      )
     end
   end
 

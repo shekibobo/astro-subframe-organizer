@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
-require 'cli/ui/prompt'
-
 module AstroSubframeOrganizer
   class FitsOrganizer
     include Logging
 
-    private attr_accessor :cli, :path
+    private attr_accessor :prompt, :path
 
     def initialize(path = Dir.pwd)
-      self.cli = CLI::UI::Prompt
+      self.prompt = AstroSubframeOrganizer.prompt
       self.path = path
     end
 
@@ -30,7 +28,7 @@ module AstroSubframeOrganizer
       Organizer.new(
         path: path,
         type: Astrophoto::DARK,
-        cli: cli,
+        prompt: prompt,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -38,7 +36,7 @@ module AstroSubframeOrganizer
       Organizer.new(
         path: path,
         type: Astrophoto::BIAS,
-        cli: cli,
+        prompt: prompt,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -57,7 +55,7 @@ module AstroSubframeOrganizer
       Organizer.new(
         path: path,
         type: Astrophoto::FLAT,
-        cli: cli,
+        prompt: prompt,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -77,7 +75,7 @@ module AstroSubframeOrganizer
       Organizer.new(
         path: path,
         type: Astrophoto::LIGHT,
-        cli: cli,
+        prompt: prompt,
       ).organize(dry_run: is_dry_run?)
     end
 
@@ -98,14 +96,14 @@ module AstroSubframeOrganizer
     # Renames CR2 Raw files to match the same name pattern as ASIAir does based on EXIF data.
     def rename_from_exif
       renamer = Utils::ExifRenamer.new(path)
-      type = cli.ask('What is the file type?', options: Astrophoto::TYPES)
-      target = cli.ask('What is the target name?') if type == Astrophoto::LIGHT
+      type = prompt.select('What is the file type?', Astrophoto::TYPES)
+      target = prompt.ask('What is the target name?') if type == Astrophoto::LIGHT
 
       renamer.rename(type: type, target: target, dry_run: is_dry_run?)
     end
 
     def is_dry_run?
-      cli.confirm('Is this a dry run? [y/n]: ', default: 'y')
+      prompt.yes?('Is this a dry run? [y/n]: ', default: 'y')
     end
 
     def rename_to_img
@@ -116,36 +114,36 @@ module AstroSubframeOrganizer
     # Prompts the user to choose which organizing task to run. This is the main entry point of
     # this script.
     def organize
-      cli.ask 'What are we organizing?' do |menu|
-        menu.option('Darks') do
+      prompt.enum_select 'What are we organizing?' do |menu|
+        menu.choice('Darks') do
           organize_darks
           organize
         end
-        menu.option('Flats') do
+        menu.choice('Flats') do
           organize_flats
           organize
         end
-        menu.option('Lights') do
+        menu.choice('Lights') do
           organize_lights
           organize
         end
-        menu.option('Biases') do
+        menu.choice('Biases') do
           organize_biases
           organize
         end
-        menu.option('Remove empty directories') do
+        menu.choice('Remove empty directories') do
           remove_empty_directories
           organize
         end
-        menu.option('Remove jpg thumbnails') do
+        menu.choice('Remove jpg thumbnails') do
           remove_jpg_thumbnails
           organize
         end
-        menu.option('Rename files from EXIF data') do
+        menu.choice('Rename files from EXIF data') do
           rename_from_exif
           organize
         end
-        menu.option('Quit') { exit }
+        menu.choice('Quit') { exit }
       end
     end
 
