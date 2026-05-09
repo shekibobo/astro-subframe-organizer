@@ -33,6 +33,7 @@ require "astro_subframe_organizer/fits_organizer"
 
 require 'astro_subframe_organizer/utils/thumbnail_cleaner'
 require 'astro_subframe_organizer/utils/empty_directory_cleaner'
+require 'astro_subframe_organizer/utils/unorganizer'
 
 require 'logger'
 require 'fileutils'

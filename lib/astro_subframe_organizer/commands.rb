@@ -15,6 +15,7 @@ require 'astro_subframe_organizer/commands/raw/rename_from_exif'
 require 'astro_subframe_organizer/commands/raw/revert_name'
 require 'astro_subframe_organizer/commands/cleanup/thumbnails'
 require 'astro_subframe_organizer/commands/cleanup/empty_directories'
+require 'astro_subframe_organizer/commands/cleanup/unorganize'
 
 module AstroSubframeOrganizer
   module Commands
@@ -26,6 +27,8 @@ module AstroSubframeOrganizer
     register 'darks',  Commands::Organize::Darks, aliases: %w[dark]
     register 'flats',  Commands::Organize::Flats, aliases: %w[flat]
     register 'biases', Commands::Organize::Bias, aliases: %w[bias]
+
+    register 'unorganize', Commands::Cleanup::Unorganize, aliases: %w[reset revert]
 
     register 'cleanup', aliases: %w[clean] do |prefix|
       prefix.register 'thumbnails',
