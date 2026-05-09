@@ -471,5 +471,167 @@ module AstroSubframeOrganizer
         end
       end
     end
+
+    describe 'equipment option precedence' do
+      let(:type) { AstroSubframeOrganizer::Astrophoto::LIGHT }
+
+      before do
+        create_fit(
+          'Light_M42_300.0s_Bin1_183MC_gain111_20260410-230000_-10.0C_0001.fit',
+          headers: {
+            'IMAGETYP' => 'Light',
+            'OBJECT' => 'M42',
+            'EXPOSURE' => 300.0,
+            'XBINNING' => 1,
+            'GAIN' => 111,
+            'INSTRUME' => 'ZWO ASI183MC Pro',
+            'TELESCOP' => 'RedCat51',
+            'FILTER' => 'BaaderMoon',
+            'DATE-OBS' => '2026-04-10T23:00:00.000000',
+            'CCD-TEMP' => -10.0,
+          },
+        )
+      end
+
+      context 'when --telescope overrides header telescope' do
+        before do
+          stub_equipment(telescope: 'ZhumellZ130', camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
+        end
+
+        it 'uses the CLI-provided telescope in the target path' do
+          puts "equipment_selector.telescope = #{equipment_selector.telescope.inspect}"
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          puts "moved_dirs = #{moved_dirs.inspect}"
+          expect(moved_dirs.first).to include('ZhumellZ130')
+        end
+
+        it 'does not use the header telescope value in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).not_to include('RedCat51')
+        end
+
+        it 'does not prompt for telescope' do
+          expect(equipment_selector).not_to receive(:choose_telescope)
+          expect(equipment_selector).not_to receive(:choose_telescope_or_confirm)
+          organizer.organize
+        end
+      end
+
+      context 'when --telescope overrides a mount name in headers (ASIAIR)' do
+        before do
+          stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: 'NoFilter')
+          # Re-create the fit with EQMod Mount as TELESCOP
+          create_fit(
+            'Light_M42_300.0s_Bin1_183MC_gain111_20260410-230000_-10.0C_0002.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M42',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'GAIN' => 111,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'TELESCOP' => 'EQMod Mount',
+              'DATE-OBS' => '2026-04-10T23:00:01.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+        end
+
+        it 'uses the CLI-provided telescope in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).to include('RedCat51')
+        end
+
+        it 'does not use the mount name in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).not_to include('EQMod')
+        end
+
+        it 'does not prompt for telescope' do
+          expect(equipment_selector).not_to receive(:choose_telescope)
+          expect(equipment_selector).not_to receive(:choose_telescope_or_confirm)
+          organizer.organize
+        end
+      end
+
+      context 'when --camera overrides header camera' do
+        before do
+          stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI294MC Pro', filter: 'NoFilter')
+        end
+
+        it 'uses the CLI-provided camera in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).to include('ZWO ASI294MC Pro')
+        end
+
+        it 'does not use the header camera value in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).not_to include('ZWO ASI183MC Pro')
+        end
+
+        it 'does not prompt for camera' do
+          expect(equipment_selector).not_to receive(:choose_camera)
+          organizer.organize
+        end
+      end
+
+      context 'when --filter overrides header filter' do
+        before do
+          stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: 'NBZ')
+        end
+
+        it 'uses the CLI-provided filter in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).to include('NBZ')
+        end
+
+        it 'does not use the header filter value in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).not_to include('BaaderMoon')
+        end
+
+        it 'does not prompt for filter' do
+          expect(equipment_selector).not_to receive(:choose_filter)
+          organizer.organize
+        end
+      end
+
+      context 'when --filter overrides absent filter header (OSC camera)' do
+        before do
+          stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: 'NBZ')
+          create_fit(
+            'Light_M42_300.0s_Bin1_183MC_gain111_20260410-230000_-10.0C_0003.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M42',
+              'EXPOSURE' => 300.0,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'FILTER' => nil,
+              'DATE-OBS' => '2026-04-10T23:00:02.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+        end
+
+        it 'uses the CLI-provided filter in the target path' do
+          organizer.organize
+          moved_dirs = Dir.glob(File.join(test_dir, '*/'))
+          expect(moved_dirs.first).to include('NBZ')
+        end
+
+        it 'does not prompt for filter' do
+          expect(equipment_selector).not_to receive(:choose_filter)
+          organizer.organize
+        end
+      end
+    end
   end
 end

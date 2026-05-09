@@ -54,7 +54,7 @@ module AstroSubframeOrganizer
     end
 
     def apply_camera!(camera)
-      files.each { |file| file.camera ||= camera }
+      files.each { |file| file.camera = camera }
     end
 
     def telescope_candidates

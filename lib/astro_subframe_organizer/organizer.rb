@@ -4,7 +4,7 @@ module AstroSubframeOrganizer
   class Organizer
     include Logging
 
-    attr_reader :file_sets, :type, :path
+    attr_reader :file_sets, :type, :path, :equipment_selector
     protected attr_accessor :cli
 
     def initialize(type:, path: Dir.pwd, cli: CLI::UI::Prompt, equipment_selector: nil)
@@ -12,7 +12,7 @@ module AstroSubframeOrganizer
       @path = path
       @type = type
       @file_sets = file_sets_for(type)
-      @equipment_selector = equipment_selector
+      @equipment_selector = equipment_selector || EquipmentSelector.new(cli)
     end
 
     def fits_files
@@ -46,55 +46,63 @@ module AstroSubframeOrganizer
 
     private
 
-    def equipment_selector
-      @equipment_selector ||= EquipmentSelector.new(cli)
-    end
-
     def file_sets_for(type)
       FileSet.from_files(fits_files, type: type)
     end
 
     def check_camera(fileset)
-      cameras = fileset.camera_candidates
-      camera = equipment_selector.camera ||
-               if cameras.empty?
-                 logger.warn 'Camera not detected.'
-                 equipment_selector.choose_camera
-               elsif cameras.size > 1
-                 logger.warn "Multiple cameras detected: #{cameras}"
-                 equipment_selector.choose_camera
-               else
-                 cameras.first
-               end
+      camera = equipment_selector.camera
+
+      unless camera
+        cameras = fileset.camera_candidates
+        camera = if cameras.empty?
+                   logger.warn 'Camera not detected.'
+                   equipment_selector.choose_camera
+                 elsif cameras.size > 1
+                   logger.warn "Multiple cameras detected: #{cameras}"
+                   equipment_selector.choose_camera
+                 else
+                   cameras.first
+                 end
+      end
 
       fileset.apply_camera!(camera)
     end
 
     def check_telescope(fileset)
-      telescopes = fileset.telescope_candidates
-      telescope  = equipment_selector.telescope ||
-                   if telescopes.size > 1
-                     logger.warn "Multiple telescopes detected: #{telescopes}"
-                     equipment_selector.choose_telescope
-                   else
-                     equipment_selector.choose_telescope_or_confirm(detected: telescopes.first)
-                   end
+      telescope = equipment_selector.telescope
+
+      unless telescope
+        telescopes = fileset.telescope_candidates
+        telescope = if telescopes.empty?
+                      logger.warn 'Telescope not detected.'
+                      equipment_selector.choose_telescope_or_confirm(detected: nil)
+                    elsif telescopes.size > 1
+                      logger.warn "Multiple telescopes detected: #{telescopes}"
+                      equipment_selector.choose_telescope
+                    else
+                      equipment_selector.choose_telescope_or_confirm(detected: telescopes.first)
+                    end
+      end
 
       fileset.apply_telescope!(telescope)
     end
 
     def check_filter(fileset)
-      filters = fileset.filter_candidates
-      filter = equipment_selector.filter ||
-               if filters.empty?
-                 logger.warn 'Filter not detected.'
-                 equipment_selector.choose_filter
-               elsif filters.size > 1
-                 logger.warn "Multiple filters detected: #{filters}"
-                 equipment_selector.choose_filter
-               else
-                 filters.first
-               end
+      filter = equipment_selector.filter
+
+      unless filter
+        filters = fileset.filter_candidates
+        filter = if filters.empty?
+                   logger.warn 'Filter not detected.'
+                   equipment_selector.choose_filter
+                 elsif filters.size > 1
+                   logger.warn "Multiple filters detected: #{filters}"
+                   equipment_selector.choose_filter
+                 else
+                   filters.first
+                 end
+      end
 
       fileset.apply_filter!(filter)
     end

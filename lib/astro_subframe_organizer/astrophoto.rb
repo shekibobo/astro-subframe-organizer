@@ -20,7 +20,6 @@ module AstroSubframeOrganizer
     def_delegators :file_metadata,
                    :bin,
                    :camera,
-                   :camera=,
                    :ccd_temp,
                    :created_at,
                    :dark_flat,
@@ -30,7 +29,6 @@ module AstroSubframeOrganizer
                    :file_format,
                    :filename,
                    :filter,
-                   :filter=,
                    :flatset_id,
                    :gain,
                    :image_index,
@@ -43,7 +41,6 @@ module AstroSubframeOrganizer
                    :target,
                    :target=,
                    :telescope,
-                   :telescope=,
                    :type,
                    :type=
 
@@ -60,6 +57,24 @@ module AstroSubframeOrganizer
 
     def file_metadata
       @file_metadata ||= @file_parser.parse
+    end
+
+    def telescope=(value)
+      @target_dir = nil
+      @target_path = nil
+      file_metadata.telescope = value
+    end
+
+    def camera=(value)
+      @target_dir = nil
+      @target_path = nil
+      file_metadata.camera = value
+    end
+
+    def filter=(value)
+      @target_dir = nil
+      @target_path = nil
+      file_metadata.filter = value
     end
 
     # The directory structure used to group and categorize the files, which will include useful
@@ -83,7 +98,7 @@ module AstroSubframeOrganizer
     # True if the path is already at the target destination. We don't need to move or ask
     # anything about these files.
     def already_moved?
-      path == target_path
+      File.basename(current_dir) == File.basename(PathBuilder.build_for(file_metadata))
     end
 
     # Performs the move. If `is_dry_run` is true, it will not move the files, but will output
