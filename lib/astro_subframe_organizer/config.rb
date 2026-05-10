@@ -58,6 +58,10 @@ module AstroSubframeOrganizer
       load['cameras']
     end
 
+    def self.temperature_tolerance
+      load['temperature_tolerance']&.to_f || 5.0
+    end
+
     def self.create_default_config
       File.write(config_file, DEFAULT_CONFIG.to_yaml)
     end

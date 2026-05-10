@@ -6,6 +6,20 @@ module AstroSubframeOrganizer
   include FilenameParsers
 
   describe FileMetadata do
+    def build_metadata(ccd_temp:, type: 'Dark')
+      FileMetadata.new(
+        type: type,
+        path: 'dark.fit',
+        filename: 'dark.fit',
+        file_format: :fits,
+        ccd_temp: ccd_temp,
+        exposure: '300.0s',
+        gain: 111,
+        camera: '183MC',
+        created_at: DateTime.new(2026, 4, 11, 13, 0, 0),
+      )
+    end
+
     it 'parses metadata from filename' do
       path = '/fake/path/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
       parser = FitsFilenameParser.new(path)
@@ -57,32 +71,79 @@ module AstroSubframeOrganizer
         iso: nil,
       )
     end
-  end
 
-  describe '#rounded_ccd_temp' do
-    {
-      '-9.5C' => '-10.0C',
-      '-10.0C' => '-10.0C',
-      '-10.5C' => '-10.0C',
-      '-12.5C' => '-15.0C', # equidistant, rounds away from zero
-      '36.0C' => '35.0C',
-      '38.0C' => '40.0C',
-      '0.0C' => '0.0C',
-    }.each do |input, expected|
-      context "with ccd_temp #{input}" do
-        subject { FileMetadata.new(path: 'dark.fit', filename: 'dark.fit', file_format: 'fit', type: Astrophoto::DARK, ccd_temp: input) }
+    describe '#rounded_ccd_temp' do
+      context 'when ccd_temp is nil' do
+        subject { build_metadata(ccd_temp: nil) }
 
-        it "rounds to #{expected}" do
-          expect(subject.rounded_ccd_temp).to eq(expected)
+        it 'returns nil' do
+          expect(subject.rounded_ccd_temp).to be_nil
         end
       end
-    end
 
-    context 'when ccd_temp is nil' do
-      subject { FileMetadata.new(type: 'Dark', path: 'dark.fit', filename: 'dark.fit', file_format: :fits, ccd_temp: nil) }
+      context 'with default tolerance of 5.0 degrees' do
+        {
+          '-10.0C' => '-10.0C', # exactly on boundary
+          '-9.5C' => '-10.0C', # 0.5 below boundary, rounds to -10
+          '-10.5C' => '-10.0C', # 0.5 above boundary, rounds to -10
+          '-7.5C' => '-10.0C', # equidistant between -5 and -10, rounds toward -10
+          '-12.5C' => '-15.0C',  # equidistant between -10 and -15, rounds toward -15
+          '-13.0C' => '-15.0C',  # closer to -15
+          '-8.0C' => '-10.0C', # closer to -10
+          '0.0C' => '0.0C', # zero
+          '36.0C' => '35.0C',   # warm DSLR, rounds to 35
+          '37.0C' => '35.0C',   # closer to 35
+          '38.0C' => '40.0C',   # closer to 40
+          '-20.0C' => '-20.0C',  # colder target, exactly on boundary
+          '-18.0C' => '-20.0C',  # closer to -20
+        }.each do |input, expected|
+          it "rounds #{input} to #{expected}" do
+            expect(build_metadata(ccd_temp: input).rounded_ccd_temp).to eq(expected)
+          end
+        end
+      end
 
-      it 'returns nil' do
-        expect(subject.rounded_ccd_temp).to be_nil
+      context 'with tolerance of 1.0 degree (exact grouping)' do
+        {
+          '-10.0C' => '-10.0C',
+          '-10.5C' => '-11.0C',
+          '-9.5C' => '-10.0C',
+          '-9.6C' => '-10.0C',
+          '-9.4C' => '-9.0C',
+        }.each do |input, expected|
+          it "rounds #{input} to #{expected}" do
+            expect(build_metadata(ccd_temp: input).rounded_ccd_temp(tolerance: 1.0)).to eq(expected)
+          end
+        end
+      end
+
+      context 'with tolerance of 10.0 degrees (broad grouping)' do
+        {
+          '-10.0C' => '-10.0C',
+          '-9.5C' => '-10.0C',
+          '-14.9C' => '-10.0C',
+          '-15.0C' => '-20.0C',
+          '36.0C' => '40.0C',
+          '34.9C' => '30.0C',
+        }.each do |input, expected|
+          it "rounds #{input} to #{expected}" do
+            expect(build_metadata(ccd_temp: input).rounded_ccd_temp(tolerance: 10.0)).to eq(expected)
+          end
+        end
+      end
+
+      context 'when config provides the tolerance' do
+        before do
+          allow(Config).to receive(:temperature_tolerance).and_return(2.0)
+        end
+
+        it 'uses the configured tolerance by default' do
+          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp).to eq('-10.0C')
+        end
+
+        it 'uses explicit tolerance over config when provided' do
+          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp(tolerance: 5.0)).to eq('-10.0C')
+        end
       end
     end
   end

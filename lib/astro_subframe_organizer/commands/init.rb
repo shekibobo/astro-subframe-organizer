@@ -30,6 +30,7 @@ module AstroSubframeOrganizer
             T7
             183MC
           ],
+          'temperature_tolerance' => 5.0,
         }
         require 'yaml'
         File.write(config_file, default_config.to_yaml)
