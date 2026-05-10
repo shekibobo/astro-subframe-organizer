@@ -13,12 +13,14 @@ module AstroSubframeOrganizer
                 :created_at,
                 :ccd_temp,
                 :image_index,
-                :mosaic_pane
+                :mosaic_pane,
+                :rotation
 
     def initialize(
       type:, path:, filename:, file_format:, exposure: nil, bin: nil, camera: nil,
       iso: nil, gain: nil, created_at: nil, ccd_temp: nil, image_index: nil,
-      target: nil, telescope: nil, filter: nil, dark_flat: false, mosaic_pane: nil
+      target: nil, telescope: nil, filter: nil, dark_flat: false, mosaic_pane: nil,
+      rotation: nil
     )
       @type = type
       @path = path
@@ -37,6 +39,7 @@ module AstroSubframeOrganizer
       @filter = filter
       @dark_flat = dark_flat
       @mosaic_pane = mosaic_pane
+      @rotation = rotation
     end
 
     # Factory method to create FileMetadata from parsed parser result
@@ -61,6 +64,7 @@ module AstroSubframeOrganizer
         telescope: parsed_data[:telescope],
         filter: parsed_data[:filter],
         dark_flat: parsed_data[:dark_flat] || false,
+        rotation: parsed_data[:rotation],
       )
     end
 

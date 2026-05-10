@@ -12,7 +12,7 @@ describe 'astro-subframe-organizer light', type: :aruba do
   # FILTER header absent (OSC camera) — filter must be passed via CLI.
 
   def copy_light_fixtures(count: 3, start: 1)
-    Dir.glob(File.join(FIXTURE_ROOT, 'fits/C1-blanks', '*.fit'))
+    Dir.glob(File.join(FIXTURE_ROOT, 'fits/light-blanks', '*.fit'))
        .sort
        .first(count)
        .drop(start - 1)

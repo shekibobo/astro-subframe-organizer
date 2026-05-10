@@ -6,22 +6,40 @@ module AstroSubframeOrganizer
   module PathBuilders
     describe LightPathBuilder, :files do
       describe 'fits files' do
-        let(:path) { fixture('fits/C1-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-235753_288deg_-10.0C_0010.fit') }
-        it 'builds a target directory path including matching keywords for Light frames' do
-          photo = FilenameParsers::FitsFilenameParser.new(path).parse
-          photo.telescope = 'RedCat51'
-          photo.filter = 'BaaderMoon'
-          builder = LightPathBuilder.new(photo)
+        context 'without rotation headers' do
+          let(:path) { fixture('fits/light-blanks/Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit') }
 
-          target_dir = builder.build
+          it 'builds a target directory path including matching keywords for Light frames' do
+            photo = FilenameParser.for_file(path).parse
+            photo.telescope = 'RedCat51'
+            photo.filter = 'NBZ'
+            builder = LightPathBuilder.new(photo)
 
-          expect(target_dir).to eq('Light_C 1_FLATSET_20260411_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC')
+            target_dir = builder.build
+
+            expect(target_dir).to eq('Light_IC 63_FLATSET_20251114_GAIN_111_EXP_600.0s_Bin_1_TELESCOPE_RedCat51_FILTER_NBZ_CAMERA_ZWO ASI183MC Pro')
+          end
+        end
+
+        context 'with rotation headers' do
+          let(:path) { fixture('fits/light-blanks/Light_NGC 2264_113deg_600.0s_Bin1_183MC_gain111_20260112-202400_-10.0C_0006.fit') }
+
+          it 'builds a target directory path including matching keywords for Light frames' do
+            photo = FilenameParser.for_file(path).parse
+            photo.telescope = 'RedCat51'
+            photo.filter = 'BaaderMoon'
+            builder = LightPathBuilder.new(photo)
+
+            target_dir = builder.build
+
+            expect(target_dir).to eq('Light_NGC 2264_FLATSET_20260113_ROTATION_113deg_GAIN_111_EXP_600.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
+          end
         end
       end
 
       describe 'raw files' do
         it 'builds a target directory path including matching keywords for Light frames' do
-          photo = FilenameParsers::CR2FilenameParser.new('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2').parse
+          photo = FilenameParser.for_file('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2').parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
           builder = LightPathBuilder.new(photo)
@@ -29,10 +47,6 @@ module AstroSubframeOrganizer
           target_dir = builder.build
 
           expect(target_dir).to eq('Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7')
-          # assert_match(/^Light_M42/, target_dir)
-          # assert_match(/CCD-TEMP_-10\./, target_dir)
-          # assert_match(/TELESCOPE_RedCat51/, target_dir)
-          # assert_match(/FILTER_BaaderMoon/, target_dir)
         end
       end
 

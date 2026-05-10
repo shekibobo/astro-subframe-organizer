@@ -6,7 +6,7 @@ require 'fileutils'
 # Fixtures in spec/fixtures/fits/ are header-only FITS files stripped with
 # bin/strip_fits. One representative file from each set is used per frame type.
 #
-# C1-blanks:    Light frames, target "C 1", 300s, Bin1, 183MC, gain 111,
+# light-blanks: Light frames, target "C 1", 300s, Bin1, 183MC, gain 111,
 #               rotation 288deg, -10.0C, captured 2026-04-10 through 2026-04-11
 #
 # dark-blanks:  Dark frames at multiple exposures (1s, 5s, 10s, 30s, 60s,

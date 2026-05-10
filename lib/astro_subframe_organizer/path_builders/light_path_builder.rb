@@ -51,6 +51,7 @@ module AstroSubframeOrganizer
         [
           prefix,
           "FLATSET_#{@metadata.flatset_id}",
+          @metadata.rotation&.then { |r| "ROTATION_#{r}deg" },
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
