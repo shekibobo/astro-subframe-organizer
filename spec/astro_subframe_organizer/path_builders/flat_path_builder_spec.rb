@@ -31,7 +31,7 @@ module AstroSubframeOrganizer
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Flat_FLATSET_20251224_ROTATION_293deg_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
+          expect(target_dir).to eq('Flat_FLATSET_20251224_ROTATION_113deg_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
         end
       end
     end

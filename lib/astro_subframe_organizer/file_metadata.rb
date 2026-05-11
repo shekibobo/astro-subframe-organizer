@@ -120,5 +120,12 @@ module AstroSubframeOrganizer
       rounded    = (temp_value / tolerance).round * tolerance
       format('%.1fC', rounded)
     end
+
+    def normalized_rotation
+      return nil if rotation.nil?
+
+      angle = rotation.to_i % 180
+      format('%d', angle)
+    end
   end
 end

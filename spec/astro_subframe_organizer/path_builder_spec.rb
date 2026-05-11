@@ -48,7 +48,7 @@ module AstroSubframeOrganizer
 
       target_path = PathBuilder.target_path_for(photo)
 
-      expect(target_path).to eq('Light_C 1_FLATSET_20260411_ROTATION_288deg_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')
+      expect(target_path).to eq('Light_C 1_FLATSET_20260411_ROTATION_108deg_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')
     end
 
     it 'raises error for unsupported type' do

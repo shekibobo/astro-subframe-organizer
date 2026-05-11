@@ -17,7 +17,8 @@ module AstroSubframeOrganizer
     # - Target: Object being imaged (e.g., M42, NGC1977)
     # - PANE: Mosaic pane identifier (e.g., 1-1, 1-2) - optional
     # - FLATSET: Date-based grouping matching the flats/darks captured for this light set
-    # - ISO: Camera ISO setting (must match darks and flats)
+    # - ROTATION: Normalized rotation angle (module 180 to ignore meridian flip, only present if rotation is recorded in FITS)
+    # - ISO/GAIN: Camera ISO or GAIN setting (must match darks and flats)
     # - EXP: Exposure time (must match darks and flats)
     # - Bin: Binning mode (must match darks and flats)
     # - CCD-TEMP: CCD temperature (CR2 only; WBPP matches +/- 1°C for darks)
@@ -51,7 +52,7 @@ module AstroSubframeOrganizer
         [
           prefix,
           "FLATSET_#{@metadata.flatset_id}",
-          @metadata.rotation&.then { |r| "ROTATION_#{r}deg" },
+          @metadata.normalized_rotation&.then { |r| "ROTATION_#{r}deg" },
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
