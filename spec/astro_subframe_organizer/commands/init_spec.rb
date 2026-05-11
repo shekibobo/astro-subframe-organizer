@@ -201,5 +201,41 @@ describe 'astro-subframe-organizer init', type: :aruba do
         end
       end
     end
+
+    context 'with specific equipment' do
+      let(:command) { "astro-subframe-organizer init --config #{custom_config_path} --telescope ZhumellZ130 --filter BaaderMoon --camera 183MC" }
+
+      before { run_command_and_stop command }
+
+      it 'exits successfully' do
+        expect(last_command_started.exit_status).to eq(0)
+      end
+
+      it 'creates the config file in the home directory' do
+        expect(File).to exist(custom_config_path)
+      end
+
+      it 'outputs a confirmation message' do
+        expect(last_command_started.output).to include('Created config file')
+      end
+
+      it 'outputs an instruction to edit the file' do
+        expect(last_command_started.output).to include('Edit this file to customize')
+      end
+
+      describe 'the created config file' do
+        it 'includes telescopes' do
+          expect(custom_config['telescopes']).to contain_exactly('ZhumellZ130')
+        end
+
+        it 'includes filters' do
+          expect(custom_config['filters']).to contain_exactly('BaaderMoon')
+        end
+
+        it 'includes cameras' do
+          expect(custom_config['cameras']).to contain_exactly('183MC')
+        end
+      end
+    end
   end
 end
