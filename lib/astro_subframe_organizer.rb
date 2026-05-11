@@ -1,38 +1,86 @@
 # frozen_string_literal: true
 
-require_relative "astro_subframe_organizer/version"
-require_relative "astro_subframe_organizer/telescope"
-require_relative "astro_subframe_organizer/filter"
-require_relative "astro_subframe_organizer/camera"
-require_relative "astro_subframe_organizer/astrophoto"
-require_relative "astro_subframe_organizer/fits_organizer"
+require "astro_subframe_organizer/version"
+require "astro_subframe_organizer/logging"
+require "astro_subframe_organizer/utils/exposure_format"
 
-# Copyright 2022 Joshua Kovach
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this
-# software and associated documentation files (the "Software"), to deal in the Software
-# without restriction, including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-# persons to whom the Software is furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all copies or
-# substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-# FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-# DEALINGS IN THE SOFTWARE.
-#
+require "astro_subframe_organizer/commands"
 
+require "astro_subframe_organizer/config"
+require "astro_subframe_organizer/equipment/camera"
+require "astro_subframe_organizer/equipment/filter"
+require "astro_subframe_organizer/equipment/telescope"
+
+require "astro_subframe_organizer/filename_parser"
+require "astro_subframe_organizer/filename_parsers/cr2_filename_parser"
+require "astro_subframe_organizer/filename_parsers/fits_filename_parser"
+require "astro_subframe_organizer/filename_parsers/fits_header_parser"
+
+require "astro_subframe_organizer/path_builders/base_path_builder"
+require "astro_subframe_organizer/path_builders/bias_path_builder"
+require "astro_subframe_organizer/path_builders/dark_path_builder"
+require "astro_subframe_organizer/path_builders/flat_path_builder"
+require "astro_subframe_organizer/path_builders/light_path_builder"
+require "astro_subframe_organizer/path_builder"
+
+require "astro_subframe_organizer/astrophoto"
+require 'astro_subframe_organizer/file_metadata'
+require "astro_subframe_organizer/file_set"
+
+require "astro_subframe_organizer/equipment_selector"
+require "astro_subframe_organizer/organizer"
+require "astro_subframe_organizer/fits_organizer"
+
+require 'astro_subframe_organizer/utils/thumbnail_cleaner'
+require 'astro_subframe_organizer/utils/empty_directory_cleaner'
+require 'astro_subframe_organizer/utils/unorganizer'
+
+require 'logger'
 require 'fileutils'
 require 'date'
-require 'highline'
+require 'tty-prompt'
 require 'mini_exiftool'
+require 'yaml'
 
 module AstroSubframeOrganizer
+  class << self
+    attr_writer :logger
+
+    def logger
+      @logger ||= default_logger
+    end
+
+    def prompt
+      @prompt ||= default_prompt
+    end
+
+    private
+
+    def default_logger
+      logger = Logger.new($stdout)
+      logger.level = Logger::INFO
+      logger.formatter = proc do |severity, _datetime, _progname, msg|
+        case severity
+        when "ERROR", "FATAL" then "✗ #{msg}\n"
+        when "WARN"           then "⚠ #{msg}\n"
+        when "DEBUG"          then "[debug] #{msg}\n"
+        else                       "#{msg}\n" # INFO → plain output
+        end
+      end
+      logger
+    end
+
+    def default_prompt
+      TTY::Prompt.new(
+        active_color: :bright_cyan,
+        help_color: :bright_white,
+        error_color: :bright_red,
+      )
+    end
+  end
+
   def self.run
+    logger.info "Using config file at #{Config.config_file}" if Config.config_file
     organizer = FitsOrganizer.new
     organizer.organize
   end

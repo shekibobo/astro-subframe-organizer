@@ -1,0 +1,9 @@
+# Example config that only has one option for each equipment category.
+# CLI will auto-select equipment for this config, since there are no
+# other options.
+telescopes:
+  - MeadeLX85
+filters:
+  - BaaderMoon
+cameras:
+  - ASI183MC

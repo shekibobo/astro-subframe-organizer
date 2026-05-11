@@ -30,7 +30,49 @@ astro-subframe-organizer
 
 Follow the interactive prompts to organize your files.
 
-## Camera
+## Configuration
+
+The gem supports customizable lists of telescopes, filters, and cameras. By default, it uses built-in lists, but you can create a personal configuration file.
+
+### Creating a Config File
+
+To create a default configuration file:
+
+```bash
+astro-subframe-organizer --init
+```
+
+This creates `~/.astro-subframe-organizer.yml` with default values. Edit this file to customize your equipment:
+
+```yaml
+telescopes:
+  - RedCat51
+  - ZhumellZ130
+  - YourTelescope
+filters:
+  - BaaderMoon
+  - NBZ
+  - YourFilter
+cameras:
+  - T7
+  - 183MC
+  - YourCamera
+```
+
+### Using a Custom Config File
+
+You can specify a custom config file:
+
+```bash
+astro-subframe-organizer --config /path/to/your/config.yml
+```
+
+Or set the environment variable:
+
+```bash
+export ASTRO_SUBFRAME_ORGANIZER_CONFIG=/path/to/your/config.yml
+astro-subframe-organizer
+```
 
 ## Camera
 

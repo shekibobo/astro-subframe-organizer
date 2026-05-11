@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'dry/cli'
+require 'astro_subframe_organizer'
+require 'astro_subframe_organizer/commands'
+
+Dry::CLI.new(AstroSubframeOrganizer::Commands).call

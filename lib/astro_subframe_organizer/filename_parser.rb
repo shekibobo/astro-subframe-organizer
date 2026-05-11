@@ -1,0 +1,97 @@
+# frozen_string_literal: true
+
+require 'forwardable'
+
+module AstroSubframeOrganizer
+  # Base class for parsing astrophotography filenames.
+  #
+  # This class uses the Strategy pattern to handle format-specific filename parsing.
+  # The factory method `for_file` creates the appropriate parser subclass based on file extension.
+  #
+  # Subclasses must implement the `parse` method, which returns a hash of metadata keys
+  # extracted from the filename.
+  #
+  # **Usage:**
+  #   parser = FilenameParser.for_file('/path/to/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit')
+  #   metadata_hash = parser.parse
+  #
+  # See FitsFilenameParser and CR2FilenameParser for format-specific implementations.
+  class FilenameParser
+    extend Forwardable
+
+    DT_FORMAT = '%Y%m%d-%H%M%S'
+
+    attr_reader :filename, :path, :result
+
+    def_delegators :result,
+                   :type,
+                   :exposure,
+                   :bin,
+                   :camera,
+                   :gain,
+                   :iso,
+                   :created_at,
+                   :ccd_temp,
+                   :image_index,
+                   :telescope,
+                   :filter,
+                   :target,
+                   :dark_flat,
+                   :mosaic_pane
+
+    def initialize(path)
+      @path = path
+      @filename = path.split('/').last
+    end
+
+    # Returns a hash of parsed metadata.
+    #
+    # Subclasses must implement this method.
+    #
+    # @return [FileMetadata] Parsed metadata with attributes like :type, :target, :exposure, etc.
+    # @raise [NotImplementedError] If not implemented by subclass
+    def parse
+      raise NotImplementedError, 'Subclasses must implement #parse'
+    end
+
+    # Factory method to create the appropriate parser for a file.
+    #
+    # Determines the correct parser based on file extension (.fit or .cr2).
+    # Case-insensitive for file extensions.
+    #
+    # @param path [String] Full path to the image file
+    # @return [FitsFilenameParser, CR2FilenameParser] Appropriate parser instance
+    # @raise [ArgumentError] If file format is not supported
+    def self.for_file(path, use_headers: true)
+      case File.extname(path).downcase
+      when '.fit'
+        if use_headers
+          FilenameParsers::FitsHeaderParser.new(path)
+        else
+          FilenameParsers::FitsFilenameParser.new(path)
+        end
+      when '.cr2'
+        FilenameParsers::CR2FilenameParser.new(path)
+      else
+        raise ArgumentError, "Unsupported file format: #{path}"
+      end
+    end
+
+    protected
+
+    # Removes file extension from filename.
+    #
+    # @return [String] Filename without extension
+    def extract_base_name
+      @filename.gsub(/\.(fit|FIT|cr2|CR2)$/, '')
+    end
+
+    # Splits filename into parts separated by underscores.
+    #
+    # @param base_name [String] Filename without extension
+    # @return [Array<String>] Parts of the filename
+    def parse_parts(base_name)
+      base_name.split('_')
+    end
+  end
+end

@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
+require 'astro_subframe_organizer'
+require 'astro_subframe_organizer/utils/fits_stripper'
+require 'optparse'
+
+options = {
+  output_dir: nil,
+  in_place: false,
+  force: false,
+}
+
+OptionParser.new do |opts|
+  opts.banner = <<~DESC
+    Strips image data and identifying location information from FITS files.
+    The resulting file is valid FITS with NAXIS set to 0, meaning no
+    data array follows the header block.
+
+    Location headers stripped: SITELAT, SITELONG, SITEELEV, RA, DEC,
+    OBJCTRA, OBJCTDEC, CRVAL1, CRVAL2, CRPIX1, CRPIX2, and WCS keywords.
+
+    Usage: bin/strip_fits [options] <file1.fit> [file2.fit ...]
+
+    Examples:
+
+      Copy and strip fresh fits files:
+        bundle exec bin/strip_fits -o spec/fixtures/fits/light-blanks/ /Volumes/Sirius/staging/Plan/Light/NGC\ 2264/**/*.fit
+
+      Re-strip fixture files in place:
+        bundle exec bin/strip_fits --in-place --force spec/fixtures/fits/**/*.fit
+
+  DESC
+
+  opts.on('-o', '--output DIR', 'Output directory (default: same as input)') do |dir|
+    options[:output_dir] = dir
+  end
+
+  opts.on('-i', '--in-place', 'Strip files in place (overwrite originals)') do
+    options[:in_place] = true
+  end
+
+  opts.on('-f', '--force', 'Re-strip files even if already stripped') do
+    options[:force] = true
+  end
+
+  opts.on('-h', '--help', 'Show this help') do
+    puts opts
+    exit
+  end
+end.parse!
+
+files = ARGV
+
+if files.empty?
+  puts 'Error: no input files specified.'
+  puts 'Usage: bin/strip_fits [options] <file1.fit> [file2.fit ...]'
+  puts 'Run bin/strip_fits --help for options.'
+  exit 1
+end
+
+invalid = files.reject { |f| File.file?(f) }
+if invalid.any?
+  puts "Error: not valid files: #{invalid.join(', ')}"
+  exit 1
+end
+
+if options[:output_dir]
+  unless File.directory?(options[:output_dir]) || !File.exist?(options[:output_dir])
+    puts "Error: '#{options[:output_dir]}' is not a directory."
+    exit 1
+  end
+  FileUtils.mkdir_p(options[:output_dir])
+end
+
+skipped = 0
+processed = 0
+
+files.each do |input|
+  stripper = AstroSubframeOrganizer::Utils::FitsStripper.new(
+    input,
+    options[:output_dir] ? File.join(options[:output_dir], File.basename(input)) : input,
+  )
+
+  if !options[:force] && stripper.already_stripped?
+    puts "#{File.basename(input)}: already stripped, skipping (use --force to re-strip)"
+    skipped += 1
+    next
+  end
+
+  original_size = File.size(input)
+  stripper.strip
+  output = options[:output_dir] ? File.join(options[:output_dir], File.basename(input)) : input
+  stripped_size = File.size(output)
+  puts "#{File.basename(input)}: #{original_size / 1024}KB → #{stripped_size / 1024}KB"
+  processed += 1
+end
+
+puts "Done. #{processed} files processed, #{skipped} skipped."

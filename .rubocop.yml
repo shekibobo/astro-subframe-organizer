@@ -1,1 +1,21 @@
 inherit_from: .rubocop_todo.yml
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+Metrics/ModuleLength:
+  Exclude:
+    - 'spec/**/*'
+Layout/MultilineMethodArgumentLineBreaks:
+  EnforcedStyle: trailing_comma
+  Enabled: true
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+  Enabled: true
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+  Enabled: true
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+  Enabled: true
