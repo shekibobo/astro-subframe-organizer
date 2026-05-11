@@ -5,6 +5,7 @@ require 'dry/cli'
 require 'astro_subframe_organizer/commands/shared_options'
 require 'astro_subframe_organizer/commands/init'
 require 'astro_subframe_organizer/commands/run'
+require 'astro_subframe_organizer/commands/version'
 require 'astro_subframe_organizer/commands/organize/equipment_options'
 require 'astro_subframe_organizer/commands/organize/base'
 require 'astro_subframe_organizer/commands/organize/lights'
@@ -21,13 +22,14 @@ module AstroSubframeOrganizer
   module Commands
     extend Dry::CLI::Registry
 
-    register 'init',   Commands::Init
-    register 'run',    Commands::Run
-    register 'lights', Commands::Organize::Lights, aliases: %w[light]
-    register 'darks',  Commands::Organize::Darks, aliases: %w[dark]
-    register 'flats',  Commands::Organize::Flats, aliases: %w[flat]
-    register 'biases', Commands::Organize::Bias, aliases: %w[bias]
+    register 'version',    Commands::Version, aliases: ['v', '-v', '--version']
+    register 'init',       Commands::Init
+    register 'run',        Commands::Run
 
+    register 'lights',     Commands::Organize::Lights, aliases: %w[light]
+    register 'darks',      Commands::Organize::Darks, aliases: %w[dark]
+    register 'flats',      Commands::Organize::Flats, aliases: %w[flat]
+    register 'biases',     Commands::Organize::Bias, aliases: %w[bias]
     register 'unorganize', Commands::Cleanup::Unorganize, aliases: %w[reset revert]
 
     register 'cleanup', aliases: %w[clean] do |prefix|
