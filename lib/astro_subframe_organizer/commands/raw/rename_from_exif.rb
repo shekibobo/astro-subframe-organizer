@@ -8,7 +8,7 @@ module AstroSubframeOrganizer
       class RenameFromExif < Dry::CLI::Command
         include SharedOptions
 
-        desc 'Rename CR2 files using EXIF metadata'
+        desc 'Rename CR2 files using EXIF metadata. Use on generically named RAW (CR2) files prior to organization.'
 
         option :type,
                type: :string,

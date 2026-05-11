@@ -8,7 +8,7 @@ module AstroSubframeOrganizer
       class RevertToRaw < Dry::CLI::Command
         include SharedOptions
 
-        desc 'Revert previously renamed CR2 files to their original names'
+        desc 'Revert previously renamed CR2 files to their original names (IMG_XXXX.CR2)'
 
         def call(dry_run: false, path: Dir.pwd, **options)
           setup(**options.slice(:config, :verbose, :skip_confirm))

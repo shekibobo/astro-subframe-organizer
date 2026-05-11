@@ -41,6 +41,26 @@ describe 'astro-subframe-organizer light', type: :aruba do
     end
   end
 
+  context 'with a single light frame and equipment specified via CLI with spaces in the names' do
+    before do
+      copy_light_fixtures(count: 1)
+      run_command_and_stop(
+        "astro-subframe-organizer light --path #{test_path} " \
+        "--telescope 'William Optics RedCat51' --camera 'ZWO ASI183MC Pro' --filter 'Baader Moon & Skyglow' --skip-confirm",
+      )
+    end
+
+    it 'exits successfully' do
+      expect(last_command_started.exit_status).to eq(0)
+    end
+
+    it 'groups all files into a single flatset directory' do
+      subdirs = Dir.glob(File.join(test_path, '*/'))
+      expect(subdirs.size).to eq(1)
+      expect(subdirs.first).to end_with('Light_C 1_FLATSET_20260411_ROTATION_288deg_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_William Optics RedCat51_FILTER_Baader Moon & Skyglow_CAMERA_ZWO ASI183MC Pro/')
+    end
+  end
+
   context 'with a full session of light frames (first night, files 0001-0010)' do
     before do
       copy_light_fixtures(count: 10)
