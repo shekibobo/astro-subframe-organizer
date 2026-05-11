@@ -11,6 +11,13 @@ module AstroSubframeOrganizer
 
         THUMBNAIL_PATTERN = AstroSubframeOrganizer::Utils::ThumbnailCleaner::ASIAIR_THUMBNAIL_PATTERN
 
+        desc "Delete all thumbnail images. Default matches #{THUMBNAIL_PATTERN}."
+
+        example [
+          "                           # Default, matches #{THUMBNAIL_PATTERN}",
+          "--pattern '**/*_thumb.png' # Use a custom pattern to match thumbnails",
+        ]
+
         option :pattern,
                type: :string,
                default: THUMBNAIL_PATTERN,

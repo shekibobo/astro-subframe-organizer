@@ -6,7 +6,13 @@ module AstroSubframeOrganizer
       class EmptyDirectories < Dry::CLI::Command
         include SharedOptions
 
-        desc 'Remove empty directories'
+        desc 'Remove empty directories and subdirectories'
+
+        example [
+          '          # Default, deletes silently',
+          '--verbose # Print the directories that are being deleted',
+          '--dry-run # Print empty directories without deleting them',
+        ]
 
         def call(dry_run: false, path: Dir.pwd, **options)
           setup(**options.slice(:config, :verbose, :skip_confirm))
