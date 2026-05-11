@@ -7,6 +7,7 @@ require 'astro_subframe_organizer/commands/equipment_options'
 require 'astro_subframe_organizer/commands/init'
 require 'astro_subframe_organizer/commands/run'
 require 'astro_subframe_organizer/commands/version'
+require 'astro_subframe_organizer/commands/inspect'
 require 'astro_subframe_organizer/commands/organize/base'
 require 'astro_subframe_organizer/commands/organize/lights'
 require 'astro_subframe_organizer/commands/organize/darks'
@@ -25,6 +26,7 @@ module AstroSubframeOrganizer
     register 'version',    Commands::Version, aliases: ['v', '-v', '--version']
     register 'init',       Commands::Init
     register 'run',        Commands::Run
+    register 'inspect',    Commands::Inspect, aliases: %w[metadata view]
 
     register 'lights',     Commands::Organize::Lights, aliases: %w[light]
     register 'darks',      Commands::Organize::Darks, aliases: %w[dark]
