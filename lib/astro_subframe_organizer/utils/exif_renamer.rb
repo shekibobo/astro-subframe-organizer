@@ -4,12 +4,11 @@ require 'mini_exiftool'
 
 module AstroSubframeOrganizer
   module Utils
-    include ExposureFormat
-
     # Renames CR2 files based on EXIF data to match the standard subframe naming
     # convention: TYPE_TARGET_EXPTIME_BIN_CAMERA_ISO_DATETIME_TEMP_SEQ.CR2
     class ExifRenamer
       include Logging
+      include ExposureFormat
 
       DT_FORMAT = '%Y%m%dT%H%M%S'
 
@@ -40,13 +39,13 @@ module AstroSubframeOrganizer
       end
 
       def find_cr2_files
-        Dir.glob(['*.cr2', '*.CR2'], base: path)
+        Dir.glob(['**/*.cr2', '**/*.CR2'], base: path)
            .map { |f| File.join(path, f) }
            .uniq
       end
 
       def revert(dry_run: false)
-        cr2_files = find_cr2_files
+        cr2_files = find_cr2_files # recursive search
 
         if cr2_files.empty?
           logger.warn 'No CR2 files found.'
@@ -54,11 +53,12 @@ module AstroSubframeOrganizer
         end
 
         cr2_files.each_with_index do |file, index|
-          idx = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
-          target_file = "IMG_#{idx}.CR2"
-          logger.info "Renaming to #{target_file}"
+          idx         = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
+          filename    = "IMG_#{idx}.CR2"
+          target_file = File.join(File.dirname(file), filename) # rename in place
 
-          FileUtils.move file, target_file, verbose: dry_run, noop: dry_run unless File.exist?(target_file)
+          logger.info "Renaming #{File.basename(file)} to #{filename}"
+          FileUtils.move(file, target_file, verbose: dry_run, noop: dry_run) unless File.exist?(target_file)
         end
       end
 
@@ -66,7 +66,7 @@ module AstroSubframeOrganizer
 
       def rename_file(cr2, type:, target:, dry_run:)
         exif = load_exif(cr2)
-        target_file = File.join(path, build_filename(exif, type: type, target: target))
+        target_file = File.join(File.dirname(cr2), build_filename(exif, type: type, target: target))
 
         if File.exist?(target_file)
           logger.warn "Skipping #{cr2}, target #{target_file} already exists."

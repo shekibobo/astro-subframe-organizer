@@ -123,8 +123,7 @@ describe 'astro-subframe-organizer dark', type: :aruba do
   context 'with a frame that has a temperature variation (-10.5C)' do
     # Dark_10.0s file 0021 has -10.5C — verify it organizes without error
     before do
-      path = File.join(FIXTURE_ROOT, 'dark-blanks', 'Dark_10.0s_Bin1_183MC_gain111_20260411-201934_-10.5C_0021.fit')
-      skip 'Fixture not found' unless File.exist?(path)
+      path = File.join(FIXTURE_ROOT, 'fits', 'dark-blanks', 'Dark_10.0s_Bin1_183MC_gain111_20260411-201934_-10.5C_0021.fit')
       FileUtils.cp(path, File.join(test_path, File.basename(path)))
       run_command_and_stop "astro-subframe-organizer dark --path #{test_path} --skip-confirm"
     end
