@@ -1,11 +1,15 @@
 Organize Astrophotography Data
 ===============
 
-This is a Ruby gem to help organize astrophotography data into folders using keywords that can then be used to help process in PixInsight using `WeightedBatchPreProcessing`.
+This is a Ruby gem command line tool to help organize astrophotography data into folders using keywords to assist in grouping and matching subframes for preprocessing and calibration. Subframe organization is compatible with keyword grouping in PixInsight using `WeightedBatchPreProcessing`.
 
-This version of the gem was written to organize or reorganize the data collected to match my current workflow, which I will outline below.
+The tool can quickly rename raw (CR2) files based on EXIF metadata and manual user input, which can then be used to group for preprocessing and calibration.
 
-## Installation
+AstroSubframeOrganizer has been adapted from a standalone [Ruby Script](https://gist.github.com/shekibobo/b8e853bf70d787b55a87f7a4cf7ed248) to a customizable gem, with more features, customizability, and improved usability and safeguards.
+
+This version of the gem was written to organize or reorganize the data collected to match [my current workflow](#workflow).
+
+# Installation
 
 Install the gem:
 
@@ -20,12 +24,26 @@ bundle install
 bundle exec rake install
 ```
 
-## Usage
+# Getting Started
+
+## Initialize your equipment set:
+
+Create a default config file with sample equipment and settings (~/.astro-subframe-organizer.yml) and edit it to include your equipment:
+
+```bash
+astro-subframe-organizer init
+```
+
+Or create it with your equipment list directly:
+
+```bash
+astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro`
+```
 
 Run the organizer:
 
 ```bash
-astro-subframe-organizer
+astro-subframe-organizer run
 ```
 
 Follow the interactive prompts to organize your files.
@@ -39,10 +57,10 @@ The gem supports customizable lists of telescopes, filters, and cameras. By defa
 To create a default configuration file:
 
 ```bash
-astro-subframe-organizer --init
+astro-subframe-organizer init
 ```
 
-This creates `~/.astro-subframe-organizer.yml` with default values. Edit this file to customize your equipment:
+This creates `~/.astro-subframe-organizer.yml` with default values. Edit this file to customize your equipment or change configurations:
 
 ```yaml
 telescopes:
@@ -57,28 +75,71 @@ cameras:
   - T7
   - 183MC
   - YourCamera
+temperature_tolerance: 5.0
 ```
+
+If you only use one set of equipment, you can create and update the config file in one shot:
+
+```bash
+astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro`
+```
+
+When you run the organizer with only one option in each equipment category, the interactive organizer will automatically select the equipment unless there's a mismatch in the available metadata (FITS headers or EXIF data), so it may be useful to create multiple config files that include your common equipment configurations:
+
+```bash
+astro-subframe-organizer init --config ~/galaxy-season.yml --telescope CarbonStar200 --filter BaaderMoon --camera 'ZWO ASI533MC Pro`
+```
+
+```bash
+astro-subframe-organizer init --config ~/nightscape.yml --telescope Rokinon135 --filter BaaderMoon --camera 'Canon T7`
+```
+
+```bash
+astro-subframe-organizer init --config ~/dual-narrowband.yml --telescope Redcat51 --filter NBZ --camera 'ZWO ASI183MC Pro`
+```
+
+If you shoot with multiple filters, you can add additional filters in the config file:
+
+```yaml
+telescopes:
+  - Redcat71
+filters:
+  - L
+  - R
+  - G
+  - B
+cameras:
+  - ZWO ASI2600MM Pro
+temperature_tolerance: 5.0
+```
+
+Note: if you have an automatic filter wheel and your software records the filter name in FITS headers, ASO will automatically select the assigned filter for organization.
 
 ### Using a Custom Config File
 
-You can specify a custom config file:
+You can specify a custom config file in all subcommands, and that config will be used for the duration of that run session:
 
 ```bash
-astro-subframe-organizer --config /path/to/your/config.yml
+astro-subframe-organizer run --config ~/galaxy-season.yml # All interactive menus will use equipment from galaxy-season.yml until you quit
 ```
 
-Or set the environment variable:
+# Organization Commands
+
+To run the interactive organizer script:
 
 ```bash
-export ASTRO_SUBFRAME_ORGANIZER_CONFIG=/path/to/your/config.yml
-astro-subframe-organizer
+astro-subframe-organizer run
 ```
+
+This will present you with a series of interactive menus to walk you through organizating each subframe type. Each subframe type has its own set of required inputs, which it will try to gather from FITS headers or filename patterns. If the information can't be detected automatically, the you will be prompted to choose, typically from the equipment in your [configuration file](#configuration).
+
+
 
 ## Camera
 
-I currently use a Canon EOS 1500 (T7) DSLR for astrophotography, and attach it to one of my telescopes. Data capture is performed using the ASIAir Plus. In the ASIAir app, my camera's settings are configured to include ISO, Date, and Temp in the customized file name.
+I used to use a Canon EOS 1500 (T7) DSLR for astrophotography, and attach it to one of my telescopes. Data capture is performed using the ASIAir Plus. In the ASIAir app, my camera's settings are configured to include ISO, Date, and Temp in the customized file name.
 
-> Note: If you are using a different camera, the paarameters included in your file name will likely be different, and you will need to change the `FitsFile#initialize` method to correctly match your file's properties based on the order they appear. You may also want to update your target directories to include those parameters, in whatever order you feel is appropriate for your workflow.
+> Note: If you are using a different camera, the parameters included in your file name will likely be different, and you will need to change the `FitsFile#initialize` method to correctly match your file's properties based on the order they appear. You may also want to update your target directories to include those parameters, in whatever order you feel is appropriate for your workflow.
 
 With the above settings, the files I generally capture are formatted as follows:
 
@@ -220,7 +281,7 @@ Here is an example run:
 
 ```bash
 $ cd /path/to/your/astrophotography/files
-$ astro-subframe-organizer
+$ astro-subframe-organizer run
 ```
 
 You will then be led through a list of prompts depending on what data you are organizing. You also have the option of doing a dry-run for each organization task you can choose.
