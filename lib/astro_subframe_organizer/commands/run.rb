@@ -14,11 +14,12 @@ module AstroSubframeOrganizer
         '--config ~/.custom-setup.yml # Uses alternative setup with specific equipment',
         '--verbose                    # Log more details while running',
         '--skip-confirm               # Skip confirmation step before moving files',
+        '--dry-run                    # Run interactively, dry-run only',
       ]
 
       def call(**options)
         setup(**options.slice(:config, :verbose, :skip_confirm))
-        AstroSubframeOrganizer.run
+        AstroSubframeOrganizer.run(dry_run: options[:dry_run])
       end
     end
   end

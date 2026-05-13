@@ -4,11 +4,12 @@ module AstroSubframeOrganizer
   class FitsOrganizer
     include Logging
 
-    private attr_accessor :prompt, :path
+    private attr_accessor :prompt, :path, :dry_run
 
-    def initialize(path = Dir.pwd)
+    def initialize(path = Dir.pwd, dry_run: nil)
       self.prompt = AstroSubframeOrganizer.prompt
       self.path = path
+      self.dry_run = dry_run
     end
 
     # Organizes dark files by ISO, BIN, CCD-TEMP, EXPOSURE, and MONTH to facilitate the creation of
@@ -103,7 +104,7 @@ module AstroSubframeOrganizer
     end
 
     def is_dry_run?
-      prompt.yes?('Is this a dry run? [y/n]: ', default: 'y')
+      dry_run&.then { |it| it } || prompt.yes?('Is this a dry run? [y/n]: ', default: 'y')
     end
 
     def rename_to_img
@@ -114,7 +115,10 @@ module AstroSubframeOrganizer
     # Prompts the user to choose which organizing task to run. This is the main entry point of
     # this script.
     def organize
-      prompt.enum_select 'What are we organizing?' do |menu|
+      message = 'What are we organizing?'
+      message += ' (Dry Run)' if dry_run
+
+      prompt.enum_select message do |menu|
         menu.choice('Darks') do
           organize_darks
           organize

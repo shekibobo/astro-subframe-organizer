@@ -79,9 +79,9 @@ module AstroSubframeOrganizer
     end
   end
 
-  def self.run
+  def self.run(dry_run: nil)
     logger.info "Using config file at #{Config.config_file}" if Config.config_file
-    organizer = FitsOrganizer.new
+    organizer = FitsOrganizer.new(dry_run: dry_run)
     organizer.organize
   end
 end
