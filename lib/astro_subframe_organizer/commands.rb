@@ -24,15 +24,15 @@ module AstroSubframeOrganizer
     extend Dry::CLI::Registry
 
     register 'version',    Commands::Version, aliases: ['v', '-v', '--version']
-    register 'init',       Commands::Init
-    register 'run',        Commands::Run
-    register 'inspect',    Commands::Inspect, aliases: %w[metadata view]
+    register 'init',       Commands::Init, aliases: ['--init']
+    register 'run',        Commands::Run, aliases: %w[-i --interactive]
+    register 'inspect',    Commands::Inspect, aliases: %w[metadata view headers]
 
-    register 'lights',     Commands::Organize::Lights, aliases: %w[light]
-    register 'darks',      Commands::Organize::Darks, aliases: %w[dark]
-    register 'flats',      Commands::Organize::Flats, aliases: %w[flat]
-    register 'biases',     Commands::Organize::Bias, aliases: %w[bias]
-    register 'unorganize', Commands::Cleanup::Unorganize, aliases: %w[reset revert]
+    register 'lights',     Commands::Organize::Lights, aliases: %w[light --light --lights]
+    register 'darks',      Commands::Organize::Darks, aliases: %w[dark --dark --darks]
+    register 'flats',      Commands::Organize::Flats, aliases: %w[flat --flat --flats]
+    register 'biases',     Commands::Organize::Bias, aliases: %w[bias --bias --biases]
+    register 'unorganize', Commands::Cleanup::Unorganize, aliases: %w[reset revert undo]
 
     register 'cleanup', aliases: %w[clean] do |prefix|
       prefix.register 'thumbnails',
@@ -45,8 +45,8 @@ module AstroSubframeOrganizer
     end
 
     register 'raw' do |prefix|
-      prefix.register 'rename', Commands::Raw::RenameFromExif
-      prefix.register 'revert', Commands::Raw::RevertToRaw
+      prefix.register 'rename', Commands::Raw::RenameFromExif, aliases: %w[autoname]
+      prefix.register 'revert', Commands::Raw::RevertToRaw, aliases: %w[undo reset]
     end
   end
 end
