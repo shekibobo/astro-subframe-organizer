@@ -27,7 +27,10 @@ module AstroSubframeOrganizer
     end
 
     def choose_telescope_or_confirm(detected:)
-      return telescope if telescope
+      if telescope
+        logger.warn "Using telescope #{telescope}, but detected #{detected}" if detected && telescope != detected
+        return telescope
+      end
 
       if detected && @telescopes.include?(detected)
         # Header value matches a known telescope — use it directly
@@ -41,7 +44,7 @@ module AstroSubframeOrganizer
         ).tap { |it| logger.info("Selected Telescope: #{it}") }
       else
         # No header value at all
-        logger.warn 'Telescope not detected.'
+        logger.warn 'Telescope auto-detect failed.'
         choose_telescope
       end
     end
