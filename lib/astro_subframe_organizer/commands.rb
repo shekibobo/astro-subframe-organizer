@@ -37,7 +37,7 @@ module AstroSubframeOrganizer
     register 'cleanup', aliases: %w[clean] do |prefix|
       prefix.register 'thumbnails',
                       Cleanup::Thumbnails,
-                      aliases: %w[thn thm th]
+                      aliases: %w[thn thm th thumbs]
 
       prefix.register 'empty-directories',
                       Cleanup::EmptyDirectories,
