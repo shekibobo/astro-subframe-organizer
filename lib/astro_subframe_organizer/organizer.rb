@@ -23,21 +23,21 @@ module AstroSubframeOrganizer
 
       if processable.size != all.size
         unprocessable_raw_files_warning = 'Unprocessed raw images detected, but will be ignored. Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.'
-        logger.info(unprocessable_raw_files_warning)
+        logger.warn(unprocessable_raw_files_warning)
       end
 
       processable.map { |it| Astrophoto.new(it) }
     end
 
     def organize(dry_run: false)
-      logger.info "Preparing to move #{file_sets.sum { |set| set.files.size }} #{type} files..."
+      logger.info "Preparing to move #{file_sets.sum { |set| set.files.size }} #{type} files from #{file_sets.size} groups..."
       @file_sets.each do |fileset|
         next if fileset.already_moved?
 
         if fileset.all_unmoved?
           move = ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] == 'true' ||
                  prompt.yes?(
-                   "Preparing to move #{fileset.type} files \n  FROM #{relative_to_pwd(fileset.current_dir)} \n  TO   #{relative_to_pwd(fileset.files.first.target_dir)}\nContinue? [y/n] ",
+                   "Preparing to move #{fileset.size} #{fileset.type} file(s) \n  FROM #{relative_to_pwd(fileset.current_dir)} \n  TO   #{relative_to_pwd(fileset.files.first.target_dir)}\nContinue?",
                    default: 'y',
                  )
           next unless move

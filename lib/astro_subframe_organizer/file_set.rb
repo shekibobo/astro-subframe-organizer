@@ -25,6 +25,10 @@ module AstroSubframeOrganizer
       @files.each(&block)
     end
 
+    def size
+      @files.size
+    end
+
     def type
       files.first.type
     end

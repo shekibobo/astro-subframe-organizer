@@ -104,7 +104,7 @@ module AstroSubframeOrganizer
     end
 
     def is_dry_run?
-      dry_run&.then { |it| it } || prompt.yes?('Is this a dry run? [y/n]: ', default: 'y')
+      dry_run&.then { |it| it } || prompt.yes?('Is this a dry run?', default: 'y')
     end
 
     def rename_to_img
@@ -118,7 +118,7 @@ module AstroSubframeOrganizer
       message = 'What are we organizing?'
       message += ' (Dry Run)' if dry_run
 
-      prompt.enum_select message do |menu|
+      prompt.enum_select message, per_page: 8 do |menu|
         menu.choice('Darks') do
           organize_darks
           organize

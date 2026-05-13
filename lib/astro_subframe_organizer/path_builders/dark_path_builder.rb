@@ -41,7 +41,7 @@ module AstroSubframeOrganizer
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "CCD-TEMP_#{@metadata.rounded_ccd_temp}",
-          "CAMERA_#{@metadata.camera}",
+          "CAMERA_#{@metadata.camera || '????'}",
           "MONTH_#{@metadata.month}",
         ].compact.join('_')
       end
@@ -53,7 +53,7 @@ module AstroSubframeOrganizer
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
-          "CAMERA_#{@metadata.camera}",
+          "CAMERA_#{@metadata.camera || '????'}",
         ].compact.join('_')
       end
     end
