@@ -36,7 +36,10 @@ module AstroSubframeOrganizer
 
         if fileset.all_unmoved?
           move = ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] == 'true' ||
-                 prompt.yes?("Do you want to move the #{fileset.type} files in #{fileset.current_dir} to #{fileset.files.first.target_dir}? [y/n] ", default: 'y')
+                 prompt.yes?(
+                   "Preparing to move #{fileset.type} files \n  FROM #{relative_to_pwd(fileset.current_dir)} \n  TO   #{relative_to_pwd(fileset.files.first.target_dir)}\nContinue? [y/n] ",
+                   default: 'y',
+                 )
           next unless move
         end
 
@@ -112,6 +115,13 @@ module AstroSubframeOrganizer
       end
 
       fileset.apply_filter!(filter)
+    end
+
+    def relative_to_pwd(path)
+      relative = Pathname.new(path).relative_path_from(Dir.pwd).to_s
+      relative.start_with?('..') ? path : relative
+    rescue ArgumentError
+      path # fallback to absolute path on different drives (Windows)
     end
   end
 end
