@@ -53,9 +53,9 @@ module AstroSubframeOrganizer
         end
 
         cr2_files.each_with_index do |file, index|
-          idx         = (file.split(/[_-]/).last.to_i || index).to_s.rjust(4, '0')
-          filename    = "IMG_#{idx}.CR2"
-          target_file = File.join(File.dirname(file), filename) # rename in place
+          idx         = derive_sequence_number_from_filename(file) || (index + 1)
+          filename    = "IMG_#{idx.to_s.rjust(4, '0')}.CR2"
+          target_file = File.join(File.dirname(file), filename)
 
           logger.info "Renaming #{File.basename(file)} to #{filename}"
           FileUtils.move(file, target_file, verbose: dry_run, noop: dry_run) unless File.exist?(target_file)
@@ -78,16 +78,11 @@ module AstroSubframeOrganizer
       end
 
       def load_exif(cr2)
-        exif = MiniExiftool.new(cr2)
-        exif['SequenceNumber'] = derive_sequence_number(exif) if exif['SequenceNumber'].to_i == 0
-        exif['Artist'] = 'Joshua Kovach'
-        exif.save
-        exif.reload
-        exif
+        MiniExiftool.new(cr2)
       end
 
-      def derive_sequence_number(exif)
-        exif.filename.split('_').last.split('.').first.to_i
+      def derive_sequence_number_from_filename(path)
+        File.basename(path, '.*').split(/[_-]/).last.to_i
       end
 
       def build_filename(exif, type:, target:)
@@ -95,7 +90,7 @@ module AstroSubframeOrganizer
         exp_str    = format_exposure(data['ExposureTime'])
         created_at = data['DateTimeOriginal'].strftime(DT_FORMAT)
         ccd_temp   = format('%.1fC', data['CameraTemperature'].to_f)
-        seq_num    = data['SequenceNumber'].to_s.rjust(4, '0')
+        seq_num    = derive_sequence_number_from_filename(exif.filename).to_s.rjust(4, '0')
         camera     = resolve_camera(data['Model'])
 
         [type, target, exp_str, 'Bin1', camera, "ISO#{data['ISO']}", created_at, ccd_temp, seq_num]
