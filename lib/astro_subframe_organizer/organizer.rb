@@ -16,10 +16,17 @@ module AstroSubframeOrganizer
     end
 
     def fits_files
-      Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path)
-         .uniq
-         .map { |relative| File.join(path, relative) }
-         .map { |it| Astrophoto.new(it) }
+      all = Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path)
+      processable = all.filter { |it| !it.match?(/IMG_\d+.CR2$/) }
+                       .uniq
+                       .map { |relative| File.join(path, relative) }
+
+      if processable.size != all.size
+        unprocessable_raw_files_warning = 'Unprocessed raw images detected, but will be ignored. Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.'
+        logger.info(unprocessable_raw_files_warning)
+      end
+
+      processable.map { |it| Astrophoto.new(it) }
     end
 
     def organize(dry_run: false)
