@@ -27,8 +27,7 @@ RSpec.configure do |config|
     prepend_environment_variable 'PATH', "#{File.expand_path('../../exe', __dir__)}#{File::PATH_SEPARATOR}"
   end
 
-  config.after type: :aruba, echo: true do
-    puts "STDOUT: #{last_command_started.output}"
-    puts "STDERR: #{last_command_started.stderr}"
+  config.after type: :aruba do
+    stop_all_commands
   end
 end
