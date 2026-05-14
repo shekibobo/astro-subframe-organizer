@@ -66,7 +66,6 @@ describe 'astro-subframe-organizer bias', type: :aruba do
       copy_bias_fixtures(set: :iso, count: 2)
       copy_bias_fixtures(set: :gain, count: 2)
       run_command_and_stop "astro-subframe-organizer bias --path #{test_path} --skip-confirm"
-      puts "Files in test_path: #{Dir.glob(File.join(test_path, '**/*'))}"
     end
 
     it 'creates separate subdirectories for each camera/exposure combination' do

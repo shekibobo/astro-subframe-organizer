@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'dry-cli', '~> 1.1'
   spec.add_runtime_dependency 'exiftool_vendored', '~> 13.58'
   spec.add_runtime_dependency 'fits_parser', '~> 0.1'
+  spec.add_runtime_dependency 'tty-progressbar', '~> 0.18'
   spec.add_runtime_dependency 'tty-prompt', '~> 0.23'
 
   # Check for windows platform

@@ -499,10 +499,8 @@ module AstroSubframeOrganizer
         end
 
         it 'uses the CLI-provided telescope in the target path' do
-          puts "equipment_selector.telescope = #{equipment_selector.telescope.inspect}"
           organizer.organize
           moved_dirs = Dir.glob(File.join(test_dir, '*/'))
-          puts "moved_dirs = #{moved_dirs.inspect}"
           expect(moved_dirs.first).to include('ZhumellZ130')
         end
 

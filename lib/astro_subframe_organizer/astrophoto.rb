@@ -105,18 +105,20 @@ module AstroSubframeOrganizer
     # Performs the move. If `is_dry_run` is true, it will not move the files, but will output
     # the file's current location and target location so you can verify it is correct before
     # performing the actual move.
-    def move(is_dry_run)
-      destination = target_path # capture before path changes
+    def move(is_dry_run, bar = nil)
+      destination = target_path
       dest_dir    = target_dir
 
+      # Logic to create directory
       FileUtils.mkdir_p(dest_dir) unless is_dry_run || File.exist?(dest_dir)
 
       if File.exist?(destination)
-        logger.info "File already exists #{destination}. Skipping..."
+        # NOTE: Frequent logging can cause the progress bar to flicker or move
+        msg = "File already exists #{destination}. Skipping..."
+        bar ? bar.log(msg) : logger.warn(msg)
       else
         FileUtils.move(path, destination, verbose: is_dry_run, noop: is_dry_run)
         self.path = destination unless is_dry_run
-        print '.' unless is_dry_run
       end
     end
   end
