@@ -50,7 +50,9 @@ module AstroSubframeOrganizer
           end
 
           it 'returns absolute paths' do
-            expect(renamer.find_cr2_files).to all(start_with('/'))
+            expect(renamer.find_cr2_files).to all(
+              satisfy { |path| Pathname.new(path).absolute? },
+            )
           end
         end
 
