@@ -92,14 +92,13 @@ module AstroSubframeOrganizer
     # The current directory of the file. If this is different from the target directory,
     # you will be asked whether you want to move it or not.
     def current_dir
-      segments = File.split(path) - [filename]
-      File.join(*segments)
+      File.dirname(path)
     end
 
     # True if the path is already at the target destination. We don't need to move or ask
     # anything about these files.
     def already_moved?
-      File.basename(current_dir) == File.basename(PathBuilder.build_for(file_metadata))
+      file_metadata.already_moved?(target_path)
     end
 
     # Performs the move. If `is_dry_run` is true, it will not move the files, but will output

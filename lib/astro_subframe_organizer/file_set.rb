@@ -12,7 +12,8 @@ module AstroSubframeOrganizer
 
     def self.from_files(files, type:)
       files.select { |file| file.type == type }
-           .sort_by(&:path)
+           # Normalize path for sorting: unified separators and consistent case (for Windows)
+           .sort_by { |file| [File.dirname(file.path).tr('\\', '/').downcase, file.filename.downcase] }
            .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
            .map { |group| new(group) }
     end
