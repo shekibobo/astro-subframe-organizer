@@ -39,7 +39,6 @@ require 'logger'
 require 'fileutils'
 require 'date'
 require 'tty-prompt'
-require 'mini_exiftool'
 require 'yaml'
 
 module AstroSubframeOrganizer

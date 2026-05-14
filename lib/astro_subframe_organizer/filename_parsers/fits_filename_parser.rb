@@ -53,7 +53,7 @@ module AstroSubframeOrganizer
           result[:camera] = parts.shift if Equipment::Camera.all.include?(parts.first)
           result[:iso] = parts.shift.gsub('ISO', '') if parts.first&.start_with?('ISO')
           result[:gain] = parts.shift.gsub('gain', '') if parts.first&.start_with?('gain')
-          result[:created_at] = DateTime.strptime(parts.shift, DT_FORMAT)
+          result[:created_at] = DateTime.strptime(parts.shift, FILENAME_DT_FORMAT)
           result[:ccd_temp] = parts.shift
           result[:image_index] = parts.shift
         rescue StandardError => e

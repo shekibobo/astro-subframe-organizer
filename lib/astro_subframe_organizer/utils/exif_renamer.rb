@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'mini_exiftool'
+require 'exiftool_vendored'
 
 module AstroSubframeOrganizer
   module Utils
@@ -10,7 +10,8 @@ module AstroSubframeOrganizer
       include Logging
       include ExposureFormat
 
-      DT_FORMAT = '%Y%m%dT%H%M%S'
+      FILENAME_DT_FORMAT = '%Y%m%dT%H%M%S'
+      EXIF_DT_FORMAT = '%Y:%m:%d %H:%M:%S%z'
 
       attr_reader :path
 
@@ -27,8 +28,10 @@ module AstroSubframeOrganizer
           return
         end
 
-        cr2_files.each do |cr2|
-          rename_file(cr2, type: type, target: target, dry_run: dry_run)
+        e = Exiftool.new(cr2_files)
+        e.files_with_results.each do |cr2|
+          exif = e.result_for(cr2)
+          rename_file(cr2, exif, type: type, target: target, dry_run: dry_run)
         end
 
         logger.info 'Done'
@@ -64,8 +67,7 @@ module AstroSubframeOrganizer
 
       private
 
-      def rename_file(cr2, type:, target:, dry_run:)
-        exif = load_exif(cr2)
+      def rename_file(cr2, exif, type:, target:, dry_run:)
         target_file = File.join(File.dirname(cr2), build_filename(exif, type: type, target: target))
 
         if File.exist?(target_file)
@@ -77,23 +79,18 @@ module AstroSubframeOrganizer
         print '.' unless dry_run
       end
 
-      def load_exif(cr2)
-        MiniExiftool.new(cr2)
-      end
-
       def derive_sequence_number_from_filename(path)
         File.basename(path, '.*').split(/[_-]/).last.to_i
       end
 
       def build_filename(exif, type:, target:)
-        data       = exif.to_hash
-        exp_str    = format_exposure(data['ExposureTime'])
-        created_at = data['DateTimeOriginal'].strftime(DT_FORMAT)
-        ccd_temp   = format('%.1fC', data['CameraTemperature'].to_f)
-        seq_num    = derive_sequence_number_from_filename(exif.filename).to_s.rjust(4, '0')
-        camera     = resolve_camera(data['Model'])
+        exp_str    = format_exposure(exif[:exposure_time])
+        created_at = resolve_time(exif).strftime(FILENAME_DT_FORMAT)
+        ccd_temp   = format('%.1fC', exif[:camera_temperature].to_f)
+        seq_num    = derive_sequence_number_from_filename(exif.source_file).to_s.rjust(4, '0')
+        camera     = resolve_camera(exif[:model])
 
-        [type, target, exp_str, 'Bin1', camera, "ISO#{data['ISO']}", created_at, ccd_temp, seq_num]
+        [type, target, exp_str, 'Bin1', camera, "ISO#{exif[:iso]}", created_at, ccd_temp, seq_num]
           .compact
           .join('_') + '.CR2'
       end
@@ -106,6 +103,10 @@ module AstroSubframeOrganizer
         else
           camera
         end
+      end
+
+      def resolve_time(exif)
+        Time.strptime(exif[:date_time_original] + exif[:time_zone], EXIF_DT_FORMAT)
       end
     end
   end
