@@ -52,6 +52,7 @@ module AstroSubframeOrganizer
       before do
         allow(FitsParser).to receive(:new).and_return(fits_parser_double)
         allow(fits_parser_double).to receive(:parse_hdus).and_return([{ header: headers }])
+        allow(fits_parser_double).to receive(:close)
       end
 
       let(:fits_parser_double) { instance_double(FitsParser) }
@@ -290,6 +291,14 @@ module AstroSubframeOrganizer
             expect(parser.rotation_angle).to be_nil
           end
         end
+      end
+
+      it 'closes the parser after reading' do
+        # The critical part:
+        expect(fits_parser_double).to receive(:close)
+
+        # Trigger the code
+        parser.parse
       end
     end
   end

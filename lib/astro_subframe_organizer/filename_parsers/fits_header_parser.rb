@@ -95,8 +95,9 @@ module AstroSubframeOrganizer
       private
 
       def load_headers(path)
-        hdus = FitsParser.new(path).parse_hdus
-        hdu  = hdus.find { |h| h[:header] }
+        hdu = FitsParser.open(path) do |parser|
+          parser.parse_hdus.find { |h| h[:header] }
+        end
         raise "No HDU with headers found in #{path}" unless hdu
 
         hdu[:header]
