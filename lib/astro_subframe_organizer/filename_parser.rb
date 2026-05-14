@@ -19,7 +19,7 @@ module AstroSubframeOrganizer
   class FilenameParser
     extend Forwardable
 
-    DT_FORMAT = '%Y%m%d-%H%M%S'
+    FILENAME_DT_FORMAT = '%Y%m%d-%H%M%S'
 
     attr_reader :filename, :path, :result
 

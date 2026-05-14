@@ -136,6 +136,12 @@ module AstroSubframeOrganizer
             renamed = Dir.glob('*.CR2', base: test_dir).first
             expect(renamed).to include('M31')
           end
+
+          it 'includes the creation date in the filename' do
+            renamer.rename(type: Astrophoto::LIGHT, target: 'M31')
+            renamed = Dir.glob('*.CR2', base: test_dir).first
+            expect(renamed).to include('20210418T025548')
+          end
         end
 
         # Expects: IMG_0002.CR2 — ExposureTime < 1.0s, e.g. 1/500

@@ -2,11 +2,13 @@
 # frozen_string_literal: true
 
 require 'fits_parser'
-require 'mini_exiftool'
+require 'exiftool_vendored'
 
 module AstroSubframeOrganizer
   module Commands
     class Inspect < Dry::CLI::Command
+      include Logging
+
       desc 'Inspect FITS or RAW file headers'
 
       example [
@@ -56,7 +58,7 @@ module AstroSubframeOrganizer
 
           formatted_key   = key.ljust(10)
           formatted_value = format_fits_value(value)
-          puts "#{formatted_key}  #{formatted_value}"
+          puts "#{formatted_key}  #{formatted_value.strip}"
         end
       end
 
@@ -64,14 +66,13 @@ module AstroSubframeOrganizer
         puts "EXIF Data: #{File.basename(path)}"
         puts '─' * 60
 
-        exif = MiniExiftool.new(path)
-        exif.to_hash
-            .reject { |_, v| v.nil? }
+        exif = Exiftool.new(path).to_display_hash
+        exif.reject { |_, v| v.nil? }
             .sort_by { |k, _| k }
             .each do |key, value|
               formatted_key   = key.ljust(30)
               formatted_value = format_exif_value(value)
-              puts "#{formatted_key}  #{formatted_value}"
+              puts "#{formatted_key}  #{formatted_value.strip}"
             end
       end
 

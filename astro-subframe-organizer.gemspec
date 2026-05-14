@@ -28,8 +28,8 @@ Gem::Specification.new do |spec|
 
   # Runtime dependencies
   spec.add_runtime_dependency 'dry-cli', '~> 1.1'
+  spec.add_runtime_dependency 'exiftool_vendored', '~> 13.58'
   spec.add_runtime_dependency 'fits_parser', '~> 0.1'
-  spec.add_runtime_dependency 'mini_exiftool', '~> 2.10'
   spec.add_runtime_dependency 'tty-prompt', '~> 0.23'
 
   # Development dependencies
