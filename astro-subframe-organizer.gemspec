@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'tty-prompt', '~> 0.23'
 
   # Check for windows platform
-  spec.add_runtime_dependency 'fiddle' if Gem.win_platform?
+  spec.add_runtime_dependency 'fiddle'
 
   # Development dependencies
   spec.add_development_dependency 'aruba', '~> 2.3'
