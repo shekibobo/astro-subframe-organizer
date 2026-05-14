@@ -104,13 +104,16 @@ module AstroSubframeOrganizer
 
     # Current directory of the file
     def current_dir
-      segments = File.split(path) - [filename]
-      File.join(*segments)
+      File.dirname(path)
     end
 
     # True if the path is already at target destination
     def already_moved?(target_path)
-      path == target_path
+      p1 = File.expand_path(path)
+      p2 = File.expand_path(target_path)
+
+      # On Windows, path comparison should be case-insensitive
+      Gem.win_platform? ? p1.casecmp?(p2) : p1 == p2
     end
 
     def rounded_ccd_temp(tolerance: Config.temperature_tolerance)

@@ -139,7 +139,7 @@ module AstroSubframeOrganizer
 end
 
 class MockFile
-  attr_accessor :type, :path, :image_index, :camera, :telescope, :filter, :dark_flat, :target_path, :current_dir, :already_moved
+  attr_accessor :type, :path, :filename, :image_index, :camera, :telescope, :filter, :dark_flat, :target_path, :current_dir, :already_moved
 
   def initialize(
     type:,
@@ -155,6 +155,7 @@ class MockFile
   )
     @type = type
     @path = path
+    @filename = File.basename(path)
     @image_index = image_index
     @camera = camera
     @telescope = telescope

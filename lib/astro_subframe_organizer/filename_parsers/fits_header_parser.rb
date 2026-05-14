@@ -37,13 +37,12 @@ module AstroSubframeOrganizer
           file_format: :fits,
           path: @path,
           filename: @filename,
-          dark_flat: @path.include?('DarkFlat'),
+          dark_flat: @path.match?(/DarkFlat/i),
         }
 
         # If the file is already organized somewhere, get the information from its path.
-        result[:telescope] = path.match(%r{TELESCOPE_([^_/]+).*})&.captures&.first || header(:telescope)
-        result[:filter] = path.match(%r{FILTER_([^_/]+).*})&.captures&.first || header(:filter)
-        result[:dark_flat] = path.include?('DarkFlat')
+        result[:telescope] = path.match(%r{TELESCOPE_([^_/\\]+).*})&.captures&.first || header(:telescope)
+        result[:filter] = path.match(%r{FILTER_([^_/\\]+).*})&.captures&.first || header(:filter)
 
         result[:type]        = image_type
         result[:target]      = target if light_frame?

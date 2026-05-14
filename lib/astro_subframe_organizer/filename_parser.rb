@@ -41,7 +41,7 @@ module AstroSubframeOrganizer
 
     def initialize(path)
       @path = path
-      @filename = path.split('/').last
+      @filename = File.basename(path)
     end
 
     # Returns a hash of parsed metadata.
@@ -83,7 +83,7 @@ module AstroSubframeOrganizer
     #
     # @return [String] Filename without extension
     def extract_base_name
-      @filename.gsub(/\.(fit|FIT|cr2|CR2)$/, '')
+      File.basename(@filename, '.*')
     end
 
     # Splits filename into parts separated by underscores.
