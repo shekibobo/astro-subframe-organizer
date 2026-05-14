@@ -19,9 +19,10 @@ permissions:
 jobs:
   test:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         ruby-version: ['3.2', '4.0']
 
     steps:
@@ -35,4 +36,7 @@ jobs:
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
     - name: Run tests
-      run: bundle exec rake
+      run: bundle exec rake spec
+
+    - name: Run Rubocop
+      run: bundle exec rake rubocop
