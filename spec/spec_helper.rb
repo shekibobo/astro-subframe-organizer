@@ -106,4 +106,15 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  config.after(:each) do |example|
+    if example.exception && (example.metadata[:type] == :aruba || example.metadata[:files])
+      puts "\n--- Debug: File Tree on Failure ---"
+      # In Aruba, the working directory is usually changed to the tmp folder
+      Dir.glob('**/*').sort.each do |f|
+        puts f
+      end
+      puts '-----------------------------------'
+    end
+  end
 end
