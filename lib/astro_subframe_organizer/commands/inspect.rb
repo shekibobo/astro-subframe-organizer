@@ -63,6 +63,8 @@ module AstroSubframeOrganizer
       end
 
       def print_exif_data(path)
+        Exiftool.command = 'exiftool.exe' if Gem.win_platform?
+
         puts "EXIF Data: #{File.basename(path)}"
         puts '─' * 60
 
