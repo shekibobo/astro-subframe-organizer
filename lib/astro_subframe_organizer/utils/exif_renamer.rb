@@ -20,6 +20,8 @@ module AstroSubframeOrganizer
       end
 
       def rename(type:, target: nil, dry_run: false)
+        Exiftool.command = 'exiftool.exe' if Gem.win_platform?
+
         logger.info 'Renaming files from EXIF data...'
         cr2_files = find_cr2_files
 
