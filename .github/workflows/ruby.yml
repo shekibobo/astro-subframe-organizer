@@ -36,6 +36,17 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
+        # This step only runs on Windows
+    - name: Install ExifTool (Windows Only)
+      if: runner.os == 'Windows'
+      run: |
+        choco install exiftool
+      shell: pwsh
+
+    - name: Check ExifTool Version
+      if: runner.os == 'Windows'
+      run: exiftool -ver
+
     - name: Run tests
       run: bundle exec rake spec
 
