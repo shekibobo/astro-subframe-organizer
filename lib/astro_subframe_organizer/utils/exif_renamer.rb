@@ -22,7 +22,6 @@ module AstroSubframeOrganizer
       def rename(type:, target: nil, dry_run: false)
         Exiftool.command = 'exiftool.exe' if Gem.win_platform?
 
-        logger.info 'Renaming files from EXIF data...'
         cr2_files = find_cr2_files
 
         if cr2_files.empty?
@@ -31,12 +30,12 @@ module AstroSubframeOrganizer
         end
 
         e = Exiftool.new(cr2_files)
+        bar = TTY::ProgressBar.new('Renameing files from EXIF data [:bar] :current/:total (:percent) :eta', total: e.files_with_results.size)
+
         e.files_with_results.each do |cr2|
           exif = e.result_for(cr2)
-          rename_file(cr2, exif, type: type, target: target, dry_run: dry_run)
+          rename_file(cr2, exif, type: type, target: target, dry_run: dry_run, bar: bar)
         end
-
-        logger.info 'Done'
       end
 
       def already_named?(files)
@@ -69,16 +68,16 @@ module AstroSubframeOrganizer
 
       private
 
-      def rename_file(cr2, exif, type:, target:, dry_run:)
+      def rename_file(cr2, exif, type:, target:, dry_run:, bar: nil)
         target_file = File.join(File.dirname(cr2), build_filename(exif, type: type, target: target))
 
         if File.exist?(target_file)
-          logger.warn "Skipping #{cr2}, target #{target_file} already exists."
+          msg = "Skipping #{cr2}, target #{target_file} already exists."
+          bar ? bar.log(msg) : logger.warn(msg)
           return
         end
 
         FileUtils.mv(cr2, target_file, verbose: dry_run, noop: dry_run)
-        print '.' unless dry_run
       end
 
       def derive_sequence_number_from_filename(path)

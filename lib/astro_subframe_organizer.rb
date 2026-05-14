@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "astro_subframe_organizer/version"
+require 'astro_subframe_organizer/utils/file_utils'
 require "astro_subframe_organizer/logging"
 require "astro_subframe_organizer/utils/exposure_format"
 
@@ -38,6 +39,7 @@ require 'astro_subframe_organizer/utils/unorganizer'
 require 'logger'
 require 'fileutils'
 require 'date'
+require 'tty-progressbar'
 require 'tty-prompt'
 require 'yaml'
 
@@ -53,8 +55,6 @@ module AstroSubframeOrganizer
       @prompt ||= default_prompt
     end
 
-    private
-
     def default_logger
       logger = Logger.new($stdout)
       logger.level = Logger::INFO
@@ -68,6 +68,8 @@ module AstroSubframeOrganizer
       end
       logger
     end
+
+    private
 
     def default_prompt
       TTY::Prompt.new(

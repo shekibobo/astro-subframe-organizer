@@ -23,17 +23,17 @@ module AstroSubframeOrganizer
 
         logger.info "Preparing to move #{files.size} files to #{path}..."
 
+        bar = TTY::ProgressBar.new('Moving files [:bar] :current/:total (:percent) :eta', total: files.size)
+
         files.each do |file|
           dest = File.join(path, File.basename(file))
           if File.exist?(dest)
-            logger.warn "Skipping #{File.basename(file)}, already exists in #{path}."
+            bar.log "Skipping #{File.basename(file)}, already exists in #{path}."
             next
           end
           FileUtils.mv(file, dest, verbose: verbose || dry_run, noop: dry_run)
-          print '.' unless dry_run
+          bar.advance(1)
         end
-
-        logger.info 'Done.'
 
         cleanup_empty_dirs(dry_run: dry_run) unless dry_run
       end

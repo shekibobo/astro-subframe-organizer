@@ -49,7 +49,16 @@ module AstroSubframeOrganizer
         check_filter(fileset) if [Astrophoto::FLAT, Astrophoto::LIGHT].include?(type)
         check_camera(fileset)
 
-        fileset.each { |it| it.move(dry_run) }
+        require 'tty-progressbar'
+
+        # Initialize the bar with the size of the fileset
+        bar = TTY::ProgressBar.new('Moving files [:bar] :current/:total (:percent) :eta', total: fileset.size)
+
+        fileset.each do |it|
+          it.move(dry_run, bar)
+          bar.advance(1) # Move the bar forward by 1 for each file
+        end
+
         logger.info 'Done'
       end
     end
