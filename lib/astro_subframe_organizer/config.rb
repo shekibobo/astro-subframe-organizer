@@ -33,6 +33,10 @@ module AstroSubframeOrganizer
     end
 
     def self.load
+      # Ensure output is flushed immediately, which is critical for
+      # reliable output capture in CI environments like Windows.
+      $stdout.sync = true
+
       @load ||=
         if File.exist?(config_file)
           AstroSubframeOrganizer.logger.info "Using config file at #{config_file}"
