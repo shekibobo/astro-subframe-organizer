@@ -27,7 +27,7 @@ describe 'astro-subframe-organizer run', type: :aruba do
 
       type '8\n'
       stop_all_commands
-      expect(last_command_started).to have_output an_output_string_including "Using config file at #{custom_config}"
+      expect(last_command_started).to have_output an_output_string_including "Using config file at #{File.expand_path(custom_config)}"
     end
   end
 end

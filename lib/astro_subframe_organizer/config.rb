@@ -26,8 +26,10 @@ module AstroSubframeOrganizer
       ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG']
     end
 
+    # Returns the expanded path to the configuration file.
     def self.config_file
-      custom_config_file || File.expand_path('~/.astro_subframe_organizer.yml')
+      path = custom_config_file || '~/.astro-subframe-organizer.yml'
+      File.expand_path(path)
     end
 
     def self.load
@@ -39,7 +41,7 @@ module AstroSubframeOrganizer
           AstroSubframeOrganizer.logger.error("Unable to find #{config_file}. Check path and try again.")
           exit(1)
         else
-          AstroSubframeOrganizer.logger.info 'Using config file at ~/.astro_subframe_organizer.yml'
+          AstroSubframeOrganizer.logger.info "Using config file at #{config_file}"
           DEFAULT_CONFIG
         end
     rescue StandardError => e
