@@ -21,6 +21,9 @@ RSpec.configure do |config|
       config.command_runtime_environment = {
         'HOME' => config.home_directory,
       }
+      # Increase timeouts for Windows CI stability
+      config.exit_timeout = 15
+      config.io_wait_timeout = 1
     end
 
     setup_aruba
@@ -29,5 +32,7 @@ RSpec.configure do |config|
 
   config.after type: :aruba do
     stop_all_commands
+    # Give Windows a moment to release file locks on output capture files
+    sleep 0.1 if Gem.win_platform?
   end
 end

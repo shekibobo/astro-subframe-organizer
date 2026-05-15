@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Ensure standard streams are unbuffered for reliable output capture in CI (especially Windows)
+$stdout.sync = true
+$stderr.sync = true
+
 module AstroSubframeOrganizer
   # Configuration management for user-customizable options
   class Config
@@ -33,19 +37,16 @@ module AstroSubframeOrganizer
     end
 
     def self.load
-      # Ensure output is flushed immediately, which is critical for
-      # reliable output capture in CI environments like Windows.
-      $stdout.sync = true
-
       @load ||=
         if File.exist?(config_file)
-          AstroSubframeOrganizer.logger.info "Using config file at #{config_file}"
+          # Normalize path separators for consistent logging/testing across platforms
+          AstroSubframeOrganizer.logger.info "Using config file at #{config_file.tr('\\', '/')}"
           DEFAULT_CONFIG.merge(YAML.load_file(config_file))
         elsif custom_config_file
-          AstroSubframeOrganizer.logger.error("Unable to find #{config_file}. Check path and try again.")
+          AstroSubframeOrganizer.logger.error("Unable to find #{config_file.tr('\\', '/')}. Check path and try again.")
           exit(1)
         else
-          AstroSubframeOrganizer.logger.info "Using config file at #{config_file}"
+          AstroSubframeOrganizer.logger.info "Using config file at #{config_file.tr('\\', '/')}"
           DEFAULT_CONFIG
         end
     rescue StandardError => e
