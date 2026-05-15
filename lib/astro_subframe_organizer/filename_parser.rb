@@ -79,6 +79,17 @@ module AstroSubframeOrganizer
 
     protected
 
+    # Extracts metadata often embedded in the directory structure.
+    #
+    # @return [Hash] Metadata found in path (telescope, filter, dark_flat)
+    def extract_metadata_from_path
+      {
+        telescope: path.match(%r{TELESCOPE_([^_/\\]+).*})&.captures&.first,
+        filter: path.match(%r{FILTER_([^_/\\]+).*})&.captures&.first,
+        dark_flat: path.match?(/DarkFlat/i),
+      }
+    end
+
     # Removes file extension from filename.
     #
     # @return [String] Filename without extension
