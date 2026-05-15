@@ -16,6 +16,7 @@ module AstroSubframeOrganizer
            .sort_by { |file| [File.dirname(file.path).tr('\\', '/').downcase, file.filename.downcase] }
            .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
            .map { |group| new(group) }
+           .then { |it| FileSet.new(it) }
     end
 
     def name
