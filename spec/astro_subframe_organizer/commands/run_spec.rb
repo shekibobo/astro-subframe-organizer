@@ -23,8 +23,6 @@ describe 'astro-subframe-organizer run', type: :aruba do
     end
 
     it 'exits successfully' do
-      puts ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG']
-
       type "8\n"
       stop_all_commands
 

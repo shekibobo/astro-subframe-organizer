@@ -18,8 +18,6 @@ require 'fileutils'
 #               2026-02-18. Some files have -9.5C or -10.5C temp variations.
 
 FIXTURE_ROOT = File.expand_path('../fixtures', __dir__)
-puts FIXTURE_ROOT
-puts Dir.exist?(FIXTURE_ROOT)
 
 module FilesHelper
   # Helper method to create a temporary FITS file with the given name and content
