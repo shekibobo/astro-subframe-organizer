@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 # Ensure standard streams are unbuffered for reliable output capture in CI (especially Windows)
 $stdout.sync = true
 $stderr.sync = true
@@ -41,7 +43,7 @@ module AstroSubframeOrganizer
         if File.exist?(config_file)
           # Normalize path separators for consistent logging/testing across platforms
           AstroSubframeOrganizer.logger.info "Using config file at #{config_file.tr('\\', '/')}"
-          DEFAULT_CONFIG.merge(YAML.load_file(config_file))
+          DEFAULT_CONFIG.merge(YAML.safe_load_file(config_file, permitted_classes: [Symbol, DateTime]))
         elsif custom_config_file
           AstroSubframeOrganizer.logger.error("Unable to find #{config_file.tr('\\', '/')}. Check path and try again.")
           exit(1)

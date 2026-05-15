@@ -38,9 +38,7 @@ module AstroSubframeOrganizer
           result[:filename] = @filename
 
           # If the file is already organized somewhere, get the information from its path.
-          result[:telescope] = path.match(%r{TELESCOPE_([^_/\\]+).*})&.captures&.first
-          result[:filter] = path.match(%r{FILTER_([^_/\\]+).*})&.captures&.first
-          result[:dark_flat] = path.match?(/DarkFlat/i)
+          result.merge!(extract_metadata_from_path)
 
           result[:type] = parts.shift
           result[:target] = parts.shift if result[:type] == 'Light'
