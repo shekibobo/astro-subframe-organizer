@@ -14,7 +14,7 @@ module AstroSubframeOrganizer
         let(:path) do
           install_fixture(
             "fits/light-blanks/#{filename}",
-            aruba.config.home_directory,
+            expand_path('.'),
             dest_path: filename,
           )
         end
@@ -72,7 +72,7 @@ module AstroSubframeOrganizer
         let(:path) do
           install_fixture(
             "cr2/dark/#{filename}",
-            aruba.config.home_directory,
+            expand_path('.'),
             dest_path: filename,
           )
         end
