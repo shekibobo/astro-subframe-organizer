@@ -434,7 +434,15 @@ astro-subframe-organizer unorganize --skip-confirm
 
 If you're shooting RAW without any software to wrap them with FITS headers, you'll end up getting an image named something like `IMG_00001.CR2` (that's what my Canon T7 does, anyway). This doesn't really help you be an organized astrophotographer, so I built a tool to help!
 
-Before you can use this tool, you will need to install [`exiftool`](https://exiftool.org/):
+To use this tool uses [`exiftool`](https://exiftool.org/) for working with RAW files. For Mac and Linux users, the tool is included with the gem, but Windows users will need to install it separately.
+
+**Windows**
+
+Follow instructions at <https://exiftool.org/>, or install using Chocolatey on Windows 10. I don't use Windows, so if anyone uses it and wants to update this to be more specific, please submit a pull request.
+
+```bash
+choco install exiftool
+```
 
 **OSX**
 
@@ -448,9 +456,6 @@ brew install exiftool
 sudo apt install exiftool 
 ```
 
-**Windows**
-
-Follow instructions at <https://exiftool.org/>. I don't use Windows, so if anyone uses it and wants to update this to be more specific, please submit a pull request.
 
 #### Rename From EXIF
 
