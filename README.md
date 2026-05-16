@@ -36,7 +36,7 @@ astro-subframe-organizer init
 Or create it with your equipment list directly:
 
 ```bash
-astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro`
+astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro'
 ```
 
 Run the organizer:
@@ -80,21 +80,21 @@ temperature_tolerance: 5.0
 If you only use one set of equipment, you can create and update the config file in one shot:
 
 ```bash
-astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro`
+astro-subframe-organizer init --telescope CarbonStar200 --filter NBZ --camera 'ZWO ASI183MC Pro'
 ```
 
 When you run the organizer with only one option in each equipment category, the interactive organizer will automatically select the equipment unless there's a mismatch in the available metadata (FITS headers or EXIF data), so it may be useful to create multiple config files that include your common equipment configurations:
 
 ```bash
-astro-subframe-organizer init --config ~/galaxy-season.yml --telescope CarbonStar200 --filter BaaderMoon --camera 'ZWO ASI533MC Pro`
+astro-subframe-organizer init --config ~/galaxy-season.yml --telescope CarbonStar200 --filter BaaderMoon --camera 'ZWO ASI533MC Pro'
 ```
 
 ```bash
-astro-subframe-organizer init --config ~/nightscape.yml --telescope Rokinon135 --filter BaaderMoon --camera 'Canon T7`
+astro-subframe-organizer init --config ~/nightscape.yml --telescope Rokinon135 --filter BaaderMoon --camera 'Canon T7'
 ```
 
 ```bash
-astro-subframe-organizer init --config ~/dual-narrowband.yml --telescope Redcat51 --filter NBZ --camera 'ZWO ASI183MC Pro`
+astro-subframe-organizer init --config ~/dual-narrowband.yml --telescope Redcat51 --filter NBZ --camera 'ZWO ASI183MC Pro'
 ```
 
 If you shoot with multiple filters, you can add additional filters in the config file:
@@ -155,6 +155,8 @@ There are several ways to use `astro-subframe-organizer`.
   - [Historical Notes / Workflow](#historical-notes--workflow)
     - [Camera](#camera)
     - [Pre-ASIAir Image Data](#pre-asiair-image-data)
+      - [Exposure Time](#exposure-time)
+      - [Renaming Previously Renamed Files](#renaming-previously-renamed-files)
     - [PixInsight - WBPP](#pixinsight---wbpp)
       - [WBPP\_Darks](#wbpp_darks)
       - [WBPP\_Flats](#wbpp_flats)
@@ -165,7 +167,7 @@ There are several ways to use `astro-subframe-organizer`.
 
 ### Interactive Menu
 
-To run the interactive organizer script:
+To run the interactive organizer:
 
 ```bash
 astro-subframe-organizer run # aliases: -i, --interactive
@@ -173,7 +175,7 @@ astro-subframe-organizer run # aliases: -i, --interactive
 
 This will present you with a series of interactive menus to walk you through organizating each subframe type. Each subframe type has its own set of required inputs, which it will try to gather from FITS headers or filename patterns. If the information can't be detected automatically, the you will be prompted to choose, typically from the equipment in your [configuration file](#configuration).
 
-```
+```stdout
 $ astro-subframe-organizer run --dry-run
 Using config file at /Users/joshkovach/.astro_subframe_organizer.yml
 What are we organizing? (Dry Run)
@@ -190,8 +192,8 @@ What are we organizing? (Dry Run)
 
 Selecting a given tool will lead you through an interactive set of prompts and confirmation steps to help organize your data, for example:
 
-```
-hat are we organizing? (Dry Run) Lights
+```stdout
+What are we organizing? (Dry Run) Lights
 Using config file at ~/.astro_subframe_organizer.yml
 Preparing to move 330 Light files from 14 groups...
 Preparing to move 1 Light file(s) 
@@ -202,8 +204,8 @@ Continue? (Y/n)
 
 Note the `????` in the target path name – these are the fields that were not able to be detected automatically, and you will be prompted to select from a series of options to pick the missing fields from your configured equipment:
 
-```
-For Light Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2..Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2:
+```stdout
+For Light set Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2..Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2:
 ⚠ Telescope auto-detect failed.
 What telescope is this set for? 
   1) RedCat51
@@ -253,14 +255,14 @@ Great way to start experimenting with the tool. It will display all the `mv` com
 
 After you've become comfortable with how the tools work, you can pass override options to any command to make your workflow quicker. Passing the `--skip-confirm` option to any command will skip the `Continue?` prompts, and just assume that you know what you're doing. Especially helpful when you're using [command mode](#command-mode), where you can skip all interactions completely.
 
-```
+```stdout
 $ astro-subframe-organizer run --dry-run --skip-confirm
 Using config file at /Users/joshkovach/.astro_subframe_organizer.yml
 What are we organizing? (Dry Run) Lights
 ⚠ Unprocessed raw images detected, but will be ignored. Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.
 Using config file at ~/.astro_subframe_organizer.yml
 Preparing to move 330 Light files from 14 groups...
-For Light Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2..Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2:
+For Light set Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2..Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2:
 ⚠ Telescope auto-detect failed.
 What telescope is this set for? 
   1) RedCat51
@@ -271,7 +273,7 @@ What telescope is this set for?
   Choose 1-5 [1]: 
 ```
 
-**`---verbose`**
+**`--verbose`**
 
 Prints all logs, including debug messages. Every file moved will display its `mv` command.
 
@@ -279,13 +281,17 @@ Prints all logs, including debug messages. Every file moved will display its `mv
 
 By default, ASO will operate on the working directory (where the command is called from), and works on all sub-directories. Alternatively, you can specify a `--path` to operate on. Again, this will run recursively by default.
 
-```
+```bash
 astro-subframe-organizer light --path staged/Plan/Lights/NGC\ 2264/
 ```
 
 The above command will organize only the light files in the `NGC 2264` directory.
 
 ### Equipment Options
+
+> [!TIP]
+>
+> Use the [`unorganize`](#unorganize) command if you need to undo an organization that didn't work as you expected.
 
 **`--telescope`**
 
@@ -294,10 +300,6 @@ Automatically sets the telescope field for any command that uses it. When using 
 > [!NOTE]
 >
 > ASIAir sets the `TELESCOP` header to your *mount*, not your telescope, so you will likely see the warning a lot if your capture software does the same.
-
-> [!TIP]
->
-> Use the [`unorganize`](#unorganize) command if you need to undo an organization that didn't work as you expected.
 
 **`--camera`**
 
@@ -324,7 +326,7 @@ If you want to skip the interactive menu, or you know what you're doing without 
 > By default, all image types that get grouped by `CCD-TEMP` will be grouped together with the temperature rounded to the nearest 5°C. See the following example table for rounding ranges:
 >
 > | Actual Temp | Rounded Temp | Notes |
-> |---|---|---|
+> | --- | --- | --- |
 > | -10.0C | -10.0C | exactly on boundary |
 > | -9.5C | -10.0C | 0.5 below boundary, rounds to -10 |
 > | -10.5C | -10.0C | 0.5 above boundary, rounds to -10 |
@@ -347,7 +349,7 @@ Darks will be grouped in a folder by `CCD-TEMP` (rounded to nearest 5°C), `ISO`
 
 ```bash
 # run without interactive steps
-astro-subframe-organizer darks --camera 'ZWO ASI183MC Pro` --skip-confirm
+astro-subframe-organizer darks --camera 'ZWO ASI183MC Pro' --skip-confirm
 ```
 
 > [!TIP]
@@ -363,7 +365,6 @@ These files will be grouped into a folder prefixed with `DarkFlat` instead of ju
 > I don't actually use the DarkFlat capability anymore. This is a relic of when I had less control over operating conditions, so I've left it for beginners who may find it useful. The keywords used make it easier to match flats to flat-darks when dumping raw subframes into WBPP instead of using masters from a calibration library.
 >
 > Instead, I always shoot my flats at a fixed exposure time (5.0s), adjusting my flat panel to give the desired brightness for the equipment and exposure time I'm using. Whenever I create my Dark library for the season, I capture a set matching the exposure time of my flats. I use that master dark to separately calibrate my flats for the season.
-
 
 #### Flats
 
@@ -449,7 +450,7 @@ sudo apt install exiftool
 
 **Windows**
 
-Follow instructions at https://exiftool.org/. I don't use Windows, so if anyone uses it and wants to update this to be more specific, please submit a pull request.
+Follow instructions at <https://exiftool.org/>. I don't use Windows, so if anyone uses it and wants to update this to be more specific, please submit a pull request.
 
 #### Rename From EXIF
 
@@ -509,7 +510,7 @@ This will remove any directory that completely empty, recursively. Mac users may
 If you want to see FITS headers or EXIF data that's on your images, use `inspect`:
 
 ```bash
-astro-subframe-organizer inspect IMG_0001.CR2
+astro-subframe-organizer inspect dark/IMG_0001.CR2
 ```
 
 This will print out all the metadata on your RAW images, or all the FITS headers on a `.fit` image.
@@ -566,11 +567,11 @@ To rename your older `IMG_XXXX.CR2` files, you can use the `Rename files with EX
 
 **IMPORTANT** you must have `exiftool` installed and in your system path in order to run this renaming process.
 
-**Exposure Time**
+#### Exposure Time
 
 When the EXIF data includes `ExposureTime` less than 1 second, the value is formatted as a fraction, e.g. `1/250`, which then gets interpreted by most file systems as a directory separator. In order to handle this appropriately to match the decimal exposure formatting that the ASIAir generates, we need to do a few workarounds. First, we need to replace the `/` character with `-` so that the files don't get misplaced in a new directory. Second, we need to take the file that `exiftool` generates and parse it to recalculate that fraction value as a decimal at an appropriate time scale. So we parse the `1-250`, convert that to a `Rational` in Ruby, `Rational(1, 250)`, and then change the scale from seconds to milliseconds to nanoseconds until we have the exposure time represented as a number equal to or greater than 1.0.
 
-**Renaming Previously Renamed Files**
+#### Renaming Previously Renamed Files
 
 This operation also lets you rename files that you renamed with an older naming format and convert it automatically to use the consistent naming pattern. If the script finds files that are not named `IMG_XXXX.CR2`, it will prompt you to choose whether to skip or rename them. It will then rename them all to `IMG_XXXX.CR2`, where `XXXX` is the last 4 characters of the filename (usually the sequence number). It will then run the script as normal on the now normallized files.
 

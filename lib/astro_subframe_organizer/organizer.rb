@@ -43,7 +43,7 @@ module AstroSubframeOrganizer
           next unless move
         end
 
-        logger.info "For #{type} #{fileset.files.first.filename}..#{fileset.files.last.filename}:"
+        logger.info "For #{type} set #{fileset.files.first.filename}..#{fileset.files.last.filename}:"
 
         check_telescope(fileset) if [Astrophoto::FLAT, Astrophoto::LIGHT].include?(type)
         check_filter(fileset) if [Astrophoto::FLAT, Astrophoto::LIGHT].include?(type)
