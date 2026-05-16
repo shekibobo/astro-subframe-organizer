@@ -8,10 +8,6 @@ module AstroSubframeOrganizer
     describe ExifRenamer, :files do
       subject(:renamer) { described_class.new(test_dir) }
 
-      let(:test_dir) { Dir.mktmpdir }
-
-      after { FileUtils.rm_rf(test_dir) }
-
       # Fixtures expected in spec/fixtures/cr2/:
       #
       # dark/IMG_0001.CR2 - A standard Canon CR2 with SequenceNumber == 0 in EXIF.

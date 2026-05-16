@@ -1,13 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'tmpdir'
 
 module AstroSubframeOrganizer
   describe PathBuilder, :files do
-    let(:test_dir) { Dir.mktmpdir }
-    after { FileUtils.rm_rf(test_dir) }
-
     it 'builds correct path for dark frames' do
       path = install_fixture(
         'fits/dark-blanks/Dark_30.0s_Bin1_183MC_gain111_20260411-204203_-10.0C_0022.fit',

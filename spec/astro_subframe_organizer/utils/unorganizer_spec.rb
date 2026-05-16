@@ -5,12 +5,8 @@ require 'astro_subframe_organizer/utils/unorganizer'
 
 module AstroSubframeOrganizer
   module Utils
-    describe Unorganizer do
+    describe Unorganizer, :files do
       subject(:unorganizer) { described_class.new(test_dir) }
-
-      let(:test_dir) { Dir.mktmpdir }
-
-      after { FileUtils.rm_rf(test_dir) }
 
       def create_organized_file(*path_parts)
         path = File.join(test_dir, *path_parts)

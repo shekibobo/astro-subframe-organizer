@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'tmpdir'
 
 module AstroSubframeOrganizer
   describe Astrophoto, :files do
-    let(:tmpdir) { Dir.mktmpdir }
-    after        { FileUtils.rm_rf(tmpdir) }
-
     def create_fit(filename, headers: {})
-      FitsFactory.create(File.join(tmpdir, filename), headers: headers)
+      FitsFactory.create(File.join(test_dir, filename), headers: headers)
     end
 
     def create_dark(filename, ccd_temp:, **extra_headers)
@@ -38,7 +34,7 @@ module AstroSubframeOrganizer
         dest_path = 'Flat_FLATSET_20220508_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/Flat_0001.fit'
         path = install_fixture(
           'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111516_-10.0C_0003.fit',
-          tmpdir,
+          test_dir,
           dest_path: dest_path,
         )
 
@@ -62,7 +58,7 @@ module AstroSubframeOrganizer
           },
         )
 
-        expect(Astrophoto.new(path).current_dir).to eq(tmpdir)
+        expect(Astrophoto.new(path).current_dir).to eq(test_dir)
       end
     end
 
@@ -199,7 +195,7 @@ module AstroSubframeOrganizer
 
           expect(photo.target_dir).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Light_68 Cygni_FLATSET_20250908_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC',
             ),
           )
@@ -227,7 +223,7 @@ module AstroSubframeOrganizer
 
           expect(photo.target_path).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
               'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
             ),
@@ -307,7 +303,7 @@ module AstroSubframeOrganizer
           photo = Astrophoto.new(dark_path)
 
           expect(photo.target_dir).to eq(
-            File.join(tmpdir, 'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05'),
+            File.join(test_dir, 'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05'),
           )
         end
 
@@ -328,7 +324,7 @@ module AstroSubframeOrganizer
           photo.dark_flat = true
 
           expect(photo.target_dir).to eq(
-            File.join(tmpdir, 'DarkFlat_FLATSET_20220508_ISO_100_EXP_5.0s_Bin_1_CAMERA_T7'),
+            File.join(test_dir, 'DarkFlat_FLATSET_20220508_ISO_100_EXP_5.0s_Bin_1_CAMERA_T7'),
           )
         end
       end
@@ -339,7 +335,7 @@ module AstroSubframeOrganizer
 
           expect(photo.target_path).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05/' \
               'Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
             ),
@@ -476,7 +472,7 @@ module AstroSubframeOrganizer
 
           expect(photo.target_dir).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7',
             ),
           )
@@ -491,7 +487,7 @@ module AstroSubframeOrganizer
 
           expect(photo.target_path).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Flat_FLATSET_20220508_GAIN_111_EXP_5.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
               'Flat_5.0s_Bin1_T7_GAIN111_20220508-120000_-10.0C_0001.fit',
             ),
@@ -527,7 +523,7 @@ module AstroSubframeOrganizer
       describe 'target_dir' do
         it 'builds target dir with bias keywords' do
           expect(Astrophoto.new(bias_path).target_dir).to eq(
-            File.join(tmpdir, 'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05'),
+            File.join(test_dir, 'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05'),
           )
         end
       end
@@ -536,7 +532,7 @@ module AstroSubframeOrganizer
         it 'moves the file without renaming it' do
           expect(Astrophoto.new(bias_path).target_path).to eq(
             File.join(
-              tmpdir,
+              test_dir,
               'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05/' \
               'Bias_250.0us_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
             ),
@@ -586,7 +582,7 @@ module AstroSubframeOrganizer
         photo.move(true)
 
         expect(File).to     exist(move_path)
-        expect(File).not_to exist(File.join(tmpdir, photo.target_path))
+        expect(File).not_to exist(File.join(test_dir, photo.target_path))
       end
 
       it 'moves the file to the target directory' do

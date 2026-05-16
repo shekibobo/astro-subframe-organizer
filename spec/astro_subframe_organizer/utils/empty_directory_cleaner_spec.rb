@@ -5,12 +5,8 @@ require 'astro_subframe_organizer/utils/empty_directory_cleaner'
 
 module AstroSubframeOrganizer
   module Utils
-    describe EmptyDirectoryCleaner do
+    describe EmptyDirectoryCleaner, :files do
       subject(:cleaner) { described_class.new(test_dir) }
-
-      let(:test_dir) { Dir.mktmpdir }
-
-      after { FileUtils.rm_rf(test_dir) }
 
       def create_dir(*path_parts)
         path = File.join(test_dir, *path_parts)
