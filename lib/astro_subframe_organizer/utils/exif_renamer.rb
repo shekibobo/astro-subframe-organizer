@@ -10,7 +10,6 @@ module AstroSubframeOrganizer
       include Logging
       include ExposureFormat
 
-      FILENAME_DT_FORMAT = '%Y%m%dT%H%M%S'
       EXIF_DT_FORMAT = '%Y:%m:%d %H:%M:%S%z'
 
       attr_reader :path

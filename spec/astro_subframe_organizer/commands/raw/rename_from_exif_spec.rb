@@ -55,7 +55,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
 
   context 'with already-renamed files' do
     before do
-      touch 'Dark_300.0s_Bin1_T7_ISO800_20240101T120000_-10.0C_0001.CR2'
+      touch 'Dark_300.0s_Bin1_T7_ISO800_20240101-120000_-10.0C_0001.CR2'
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --path #{test_path}"
     end
 
@@ -97,7 +97,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     end
 
     it 'renames the file in place within its subdirectory' do
-      expect(File.join(subdir_name, 'Dark_4.0s_Bin1_T7_ISO6400_20210418T025548_21.0C_0001.CR2')).to be_an_existing_file
+      expect(File.join(subdir_name, 'Dark_4.0s_Bin1_T7_ISO6400_20210418-025548_21.0C_0001.CR2')).to be_an_existing_file
     end
 
     it 'does not move the file to the root directory' do

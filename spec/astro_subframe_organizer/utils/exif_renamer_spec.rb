@@ -131,7 +131,7 @@ module AstroSubframeOrganizer
           it 'includes the creation date in the filename' do
             renamer.rename(type: Astrophoto::LIGHT, target: 'M31')
             renamed = Dir.glob('**/*.CR2', base: test_dir).first
-            expect(renamed).to include('20210418T025548')
+            expect(renamed).to include('20210418-025548')
           end
         end
 
