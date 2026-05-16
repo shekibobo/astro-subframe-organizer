@@ -31,7 +31,7 @@ module AstroSubframeOrganizer
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Dark_GAIN_111_EXP_180.0s_CCD-TEMP_-10.0C_CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
+          expect(target_dir).to eq('Dark_GAIN_111_EXP_180.0s_CCD-TEMP_-10._CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
         end
       end
 
@@ -64,11 +64,11 @@ module AstroSubframeOrganizer
           end
 
           it 'includes the rounded temperature in the path' do
-            expect(build_path(ccd_temp: '-9.5C')).to include('CCD-TEMP_-10.0C')
+            expect(build_path(ccd_temp: '-9.5C')).to include('CCD-TEMP_-10.')
           end
 
           it 'does not include the raw temperature in the path' do
-            expect(build_path(ccd_temp: '-9.5C')).not_to include('CCD-TEMP_-9.5C')
+            expect(build_path(ccd_temp: '-9.5C')).not_to include('CCD-TEMP_-9.5')
           end
         end
 

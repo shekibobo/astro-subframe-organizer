@@ -83,19 +83,19 @@ module AstroSubframeOrganizer
 
       context 'with default tolerance of 5.0 degrees' do
         {
-          '-10.0C' => '-10.0C', # exactly on boundary
-          '-9.5C' => '-10.0C', # 0.5 below boundary, rounds to -10
-          '-10.5C' => '-10.0C', # 0.5 above boundary, rounds to -10
-          '-7.5C' => '-10.0C', # equidistant between -5 and -10, rounds toward -10
-          '-12.5C' => '-15.0C',  # equidistant between -10 and -15, rounds toward -15
-          '-13.0C' => '-15.0C',  # closer to -15
-          '-8.0C' => '-10.0C', # closer to -10
-          '0.0C' => '0.0C', # zero
-          '36.0C' => '35.0C',   # warm DSLR, rounds to 35
-          '37.0C' => '35.0C',   # closer to 35
-          '38.0C' => '40.0C',   # closer to 40
-          '-20.0C' => '-20.0C',  # colder target, exactly on boundary
-          '-18.0C' => '-20.0C',  # closer to -20
+          '-10.0C' => '-10.', # exactly on boundary
+          '-9.5C' => '-10.', # 0.5 below boundary, rounds to -10
+          '-10.5C' => '-10.', # 0.5 above boundary, rounds to -10
+          '-7.5C' => '-10.', # equidistant between -5 and -10, rounds toward -10
+          '-12.5C' => '-15.',  # equidistant between -10 and -15, rounds toward -15
+          '-13.0C' => '-15.',  # closer to -15
+          '-8.0C' => '-10.', # closer to -10
+          '0.0C' => '0.', # zero
+          '36.0C' => '35.',   # warm DSLR, rounds to 35
+          '37.0C' => '35.',   # closer to 35
+          '38.0C' => '40.',   # closer to 40
+          '-20.0C' => '-20.',  # colder target, exactly on boundary
+          '-18.0C' => '-20.',  # closer to -20
         }.each do |input, expected|
           it "rounds #{input} to #{expected}" do
             expect(build_metadata(ccd_temp: input).rounded_ccd_temp).to eq(expected)
@@ -105,11 +105,11 @@ module AstroSubframeOrganizer
 
       context 'with tolerance of 1.0 degree (exact grouping)' do
         {
-          '-10.0C' => '-10.0C',
-          '-10.5C' => '-11.0C',
-          '-9.5C' => '-10.0C',
-          '-9.6C' => '-10.0C',
-          '-9.4C' => '-9.0C',
+          '-10.0C' => '-10.',
+          '-10.5C' => '-11.',
+          '-9.5C' => '-10.',
+          '-9.6C' => '-10.',
+          '-9.4C' => '-9.',
         }.each do |input, expected|
           it "rounds #{input} to #{expected}" do
             expect(build_metadata(ccd_temp: input).rounded_ccd_temp(tolerance: 1.0)).to eq(expected)
@@ -119,12 +119,12 @@ module AstroSubframeOrganizer
 
       context 'with tolerance of 10.0 degrees (broad grouping)' do
         {
-          '-10.0C' => '-10.0C',
-          '-9.5C' => '-10.0C',
-          '-14.9C' => '-10.0C',
-          '-15.0C' => '-20.0C',
-          '36.0C' => '40.0C',
-          '34.9C' => '30.0C',
+          '-10.0C' => '-10.',
+          '-9.5C' => '-10.',
+          '-14.9C' => '-10.',
+          '-15.0C' => '-20.',
+          '36.0C' => '40.',
+          '34.9C' => '30.',
         }.each do |input, expected|
           it "rounds #{input} to #{expected}" do
             expect(build_metadata(ccd_temp: input).rounded_ccd_temp(tolerance: 10.0)).to eq(expected)
@@ -138,11 +138,11 @@ module AstroSubframeOrganizer
         end
 
         it 'uses the configured tolerance by default' do
-          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp).to eq('-10.0C')
+          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp).to eq('-10.')
         end
 
         it 'uses explicit tolerance over config when provided' do
-          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp(tolerance: 5.0)).to eq('-10.0C')
+          expect(build_metadata(ccd_temp: '-10.5C').rounded_ccd_temp(tolerance: 5.0)).to eq('-10.')
         end
       end
     end

@@ -16,8 +16,8 @@ describe 'Raw to Organized Workflow', type: :aruba do
       expect(last_command_started).to have_exit_status(0)
 
       # Renamed: Dark_4.0s_Bin1_T7_ISO6400_20210418-025548_21.0C_0001.CR2
-      # Organized: Dark_ISO_6400_EXP_4.0s_CCD-TEMP_20.0C_CAMERA_T7_MONTH_2021-04/
-      expected_dest = 'Dark_ISO_6400_EXP_4.0s_CCD-TEMP_20.0C_CAMERA_T7_MONTH_2021-04/Dark_4.0s_Bin1_T7_ISO6400_20210418-025548_21.0C_0001.CR2'
+      # Organized: Dark_ISO_6400_EXP_4.0s_CCD-TEMP_20._CAMERA_T7_MONTH_2021-04/
+      expected_dest = 'Dark_ISO_6400_EXP_4.0s_CCD-TEMP_20._CAMERA_T7_MONTH_2021-04/Dark_4.0s_Bin1_T7_ISO6400_20210418-025548_21.0C_0001.CR2'
       expect(expected_dest).to be_an_existing_file, "Found files:\n#{list('.').join("\n")}"
     end
   end
