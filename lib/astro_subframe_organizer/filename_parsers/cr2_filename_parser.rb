@@ -28,7 +28,7 @@ module AstroSubframeOrganizer
         result = {}
 
         if @filename.start_with? 'IMG_'
-          logger.error('Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.')
+          logger.error('Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename`, then try again.')
           exit(1)
         end
 
