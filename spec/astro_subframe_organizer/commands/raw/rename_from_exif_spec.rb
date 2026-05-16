@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'astro-subframe-organizer raw rename', type: :aruba do
-  let(:test_path) { aruba.config.home_directory }
+  let(:test_path) { expand_path('.') }
 
   context 'with a dark frame' do
     before do
@@ -16,7 +16,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     end
 
     it 'renames the file' do
-      expect(Dir.glob('*.CR2', base: test_path).first).to start_with('Dark_')
+      expect(Dir.glob('Dark_*.{CR2,cr2}', base: test_path)).not_to be_empty
     end
   end
 
@@ -33,7 +33,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     end
 
     it 'includes the target in the filename' do
-      expect(Dir.glob('*.CR2', base: test_path).first).to include('M31')
+      expect(Dir.glob('*M31*.{CR2,cr2}', base: test_path)).not_to be_empty
     end
   end
 
@@ -55,7 +55,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
 
   context 'with already-renamed files' do
     before do
-      FileUtils.touch(File.join(test_path, 'Dark_300.0s_Bin1_T7_ISO800_20240101T120000_-10.0C_0001.CR2'))
+      touch 'Dark_300.0s_Bin1_T7_ISO800_20240101T120000_-10.0C_0001.CR2'
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --path #{test_path}"
     end
 
@@ -79,15 +79,16 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     end
 
     it 'does not rename the file' do
-      expect(File).to exist(File.join(test_path, 'IMG_0001.CR2'))
+      expect('IMG_0001.CR2').to be_an_existing_file
     end
   end
 
   context 'with a file in a subdirectory' do
-    let(:subdir) { File.join(test_path, 'subdirectory') }
+    let(:subdir_name) { 'subdirectory' }
+    let(:subdir_path) { expand_path(subdir_name) }
 
     before do
-      install_fixture('cr2/dark/IMG_0001.CR2', subdir, dest_path: 'IMG_0001.CR2')
+      install_fixture('cr2/dark/IMG_0001.CR2', subdir_path, dest_path: 'IMG_0001.CR2')
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --path #{test_path}"
     end
 
@@ -96,15 +97,15 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     end
 
     it 'renames the file in place within its subdirectory' do
-      expect(Dir.glob('*.CR2', base: subdir).first).to eq('Dark_4.0s_Bin1_T7_ISO6400_20210418T025548_21.0C_0001.CR2')
+      expect(File.join(subdir_name, 'Dark_4.0s_Bin1_T7_ISO6400_20210418T025548_21.0C_0001.CR2')).to be_an_existing_file
     end
 
     it 'does not move the file to the root directory' do
-      expect(Dir.glob('*.CR2', base: test_path)).to be_empty
+      expect(Dir.glob('*.{CR2,cr2}', base: test_path)).to be_empty
     end
 
     it 'leaves the subdirectory intact' do
-      expect(File).to exist(subdir)
+      expect(subdir_name).to be_an_existing_directory
     end
   end
 end
