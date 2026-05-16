@@ -120,7 +120,7 @@ To adapt for different cameras or ASIAir configurations:
 - `organize_biases` - Group by ISO, BIN, CCD-TEMP; prompt for camera
 - `organize_darks` - Group by ISO, BIN, CCD-TEMP, EXPOSURE, MONTH; offer dark flat classification
 - `organize_flats` - Group by FLATSET, ISO, BIN, EXPOSURE; prompt for telescope, filter, camera
-- `organize_lights` - Group by FLATSET, ISO, BIN, EXPOSURE; prompt for telescope, filter, camera, target
+- `organize_lights` - Group by FLATSET, ISO, BIN, EXP, CCD-TEMP; prompt for telescope, filter, camera, target
 
 **Grouping Strategy**
 Files are grouped by `image_index` (sequential numbering per capture session). Within each group:

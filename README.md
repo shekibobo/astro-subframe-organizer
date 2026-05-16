@@ -327,19 +327,19 @@ If you want to skip the interactive menu, or you know what you're doing without 
 >
 > | Actual Temp | Rounded Temp | Notes |
 > | --- | --- | --- |
-> | -10.0C | -10.0C | exactly on boundary |
-> | -9.5C | -10.0C | 0.5 below boundary, rounds to -10 |
-> | -10.5C | -10.0C | 0.5 above boundary, rounds to -10 |
-> | -7.5C | -10.0C | equidistant between -5 and -10, rounds toward -10 |
-> | -12.5C | -15.0C | equidistant between -10 and -15, rounds toward -15 |
-> | -13.0C | -15.0C | closer to -15 |
-> | -8.0C | -10.0C | closer to -10 |
-> | 0.0C | 0.0C | zero |
-> | 36.0C | 35.0C | warm DSLR, rounds to 35 |
-> | 37.0C | 35.0C | closer to 35 |
-> | 38.0C | 40.0C | closer to 40 |
-> | -20.0C | -20.0C | colder target, exactly on boundary |
-> | -18.0C | -20.0C | closer to -20 |
+> | -10.0C | -10. | exactly on boundary |
+> | -9.5C | -10. | 0.5 below boundary, rounds to -10 |
+> | -10.5C | -10. | 0.5 above boundary, rounds to -10 |
+> | -7.5C | -10. | equidistant between -5 and -10, rounds toward -10 |
+> | -12.5C | -15. | equidistant between -10 and -15, rounds toward -15 |
+> | -13.0C | -15. | closer to -15 |
+> | -8.0C | -10. | closer to -10 |
+> | 0.0C | 0. | zero |
+> | 36.0C | 35. | warm DSLR, rounds to 35 |
+> | 37.0C | 35. | closer to 35 |
+> | 38.0C | 40. | closer to 40 |
+> | -20.0C | -20. | colder target, exactly on boundary |
+> | -18.0C | -20. | closer to -20 |
 >
 > Override `temperature_tolerance` in your config files to change the rounding.
 
