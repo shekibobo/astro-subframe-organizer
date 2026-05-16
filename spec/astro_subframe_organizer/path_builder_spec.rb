@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'tmpdir'
 
 module AstroSubframeOrganizer
   describe PathBuilder, :files do
+    let(:test_dir) { Dir.mktmpdir }
+    after { FileUtils.rm_rf(test_dir) }
+
     it 'builds correct path for dark frames' do
-      photo = FilenameParser.for_file(fixture('fits/dark-blanks/Dark_30.0s_Bin1_183MC_gain111_20260411-204203_-10.0C_0022.fit')).parse
+      path = install_fixture(
+        'fits/dark-blanks/Dark_30.0s_Bin1_183MC_gain111_20260411-204203_-10.0C_0022.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
 
       target_dir = PathBuilder.build_for(photo)
 
@@ -13,7 +21,11 @@ module AstroSubframeOrganizer
     end
 
     it 'builds correct path for flat frames' do
-      photo = FilenameParser.for_file(fixture('fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111516_-10.0C_0003.fit')).parse
+      path = install_fixture(
+        'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111516_-10.0C_0003.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
@@ -24,7 +36,11 @@ module AstroSubframeOrganizer
     end
 
     it 'builds correct path for light frames' do
-      photo = FilenameParser.for_file(fixture('/fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
+      path = install_fixture(
+        'fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
@@ -34,7 +50,11 @@ module AstroSubframeOrganizer
     end
 
     it 'builds correct path for bias frames' do
-      photo = FilenameParser.for_file(fixture('/fits/bias-blanks/Bias_32.0us_Bin1_183MC_gain111_20221229-095800_-10.0C_0093.fit')).parse
+      path = install_fixture(
+        'fits/bias-blanks/Bias_32.0us_Bin1_183MC_gain111_20221229-095800_-10.0C_0093.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
 
       target_dir = PathBuilder.build_for(photo)
 
@@ -42,7 +62,11 @@ module AstroSubframeOrganizer
     end
 
     it 'builds target path that includes filename' do
-      photo = FilenameParser.for_file(fixture('/fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
+      path = install_fixture(
+        'fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
@@ -52,14 +76,22 @@ module AstroSubframeOrganizer
     end
 
     it 'raises error for unsupported type' do
-      photo = FilenameParser.for_file(fixture('fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')).parse
+      path = install_fixture(
+        'fits/light-blanks/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
       photo.type = 'Unknown'
 
       expect { PathBuilder.build_for(photo) }.to raise_error(ArgumentError)
     end
 
     it 'builds correct path for flat dark frames' do
-      photo = FilenameParser.for_file(fixture('fits/dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit')).parse
+      path = install_fixture(
+        'fits/dark-blanks/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit',
+        test_dir,
+      )
+      photo = FilenameParser.for_file(path).parse
       photo.dark_flat = true
 
       target_dir = PathBuilder.target_path_for(photo)

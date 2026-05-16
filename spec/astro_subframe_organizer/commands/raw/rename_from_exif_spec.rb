@@ -5,17 +5,9 @@ require 'spec_helper'
 describe 'astro-subframe-organizer raw rename', type: :aruba do
   let(:test_path) { aruba.config.home_directory }
 
-  # Expects: IMG_0001.CR2 in spec/fixtures/cr2/ — a standard unprocessed
-  #          Canon CR2 with ExposureTime >= 1.0s and a known camera model.
-  def copy_fixture(fixture_name, dest_dir: test_path)
-    src = File.expand_path('../../../fixtures/cr2', __dir__)
-    FileUtils.mkdir_p(dest_dir)
-    FileUtils.cp(File.join(src, fixture_name), File.join(dest_dir, fixture_name))
-  end
-
   context 'with a dark frame' do
     before do
-      copy_fixture('IMG_0001.CR2')
+      install_fixture('cr2/dark/IMG_0001.CR2', test_path, dest_path: 'IMG_0001.CR2')
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --path #{test_path}"
     end
 
@@ -30,7 +22,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
 
   context 'with a light frame and target' do
     before do
-      copy_fixture('IMG_0001.CR2')
+      install_fixture('cr2/dark/IMG_0001.CR2', test_path, dest_path: 'IMG_0001.CR2')
       run_command_and_stop(
         "astro-subframe-organizer raw rename --type Light --target M31 --path #{test_path}",
       )
@@ -47,7 +39,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
 
   context 'with a light frame and no target' do
     before do
-      copy_fixture('IMG_0001.CR2')
+      install_fixture('cr2/dark/IMG_0001.CR2', test_path, dest_path: 'IMG_0001.CR2')
       run_command "astro-subframe-organizer raw rename --type Light --path #{test_path}"
     end
 
@@ -78,7 +70,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
 
   context 'with --dry-run' do
     before do
-      copy_fixture('IMG_0001.CR2')
+      install_fixture('cr2/dark/IMG_0001.CR2', test_path, dest_path: 'IMG_0001.CR2')
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --dry-run --path #{test_path}"
     end
 
@@ -95,7 +87,7 @@ describe 'astro-subframe-organizer raw rename', type: :aruba do
     let(:subdir) { File.join(test_path, 'subdirectory') }
 
     before do
-      copy_fixture('IMG_0001.CR2', dest_dir: subdir)
+      install_fixture('cr2/dark/IMG_0001.CR2', subdir, dest_path: 'IMG_0001.CR2')
       run_command_and_stop "astro-subframe-organizer raw rename --type Dark --path #{test_path}"
     end
 

@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'tmpdir'
 
 module AstroSubframeOrganizer
-  describe Astrophoto do
+  describe Astrophoto, :files do
     let(:tmpdir) { Dir.mktmpdir }
     after        { FileUtils.rm_rf(tmpdir) }
 
@@ -33,21 +33,13 @@ module AstroSubframeOrganizer
 
     describe 'initialization' do
       it 'reads telescope and filter from an already-organized path' do
-        subdir = File.join(
+        # Install a fixture into a path that mimics an organized directory structure
+        # to test if metadata can be extracted from the directory names.
+        dest_path = 'Flat_FLATSET_20220508_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/Flat_0001.fit'
+        path = install_fixture(
+          'fits/flat-blanks/Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111516_-10.0C_0003.fit',
           tmpdir,
-          'Flat_FLATSET_20220508_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7',
-        )
-        FileUtils.mkdir_p(subdir)
-        path = FitsFactory.create(
-          File.join(subdir, 'Flat_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'),
-          headers: {
-            'IMAGETYP' => 'Flat',
-            'EXPOSURE' => 1.0,
-            'INSTRUME' => 'T7',
-            'DATE-OBS' => '2022-05-08T12:00:00.000000',
-            'CCD-TEMP' => -10.0,
-            'XBINNING' => 1,
-          },
+          dest_path: dest_path,
         )
 
         photo = Astrophoto.new(path)

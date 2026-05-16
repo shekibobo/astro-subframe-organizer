@@ -10,7 +10,14 @@ module AstroSubframeOrganizer
       end
 
       context 'with a fits file' do
-        let(:path) { fixture('fits/light-blanks/Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit') }
+        let(:filename) { 'Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit' }
+        let(:path) do
+          install_fixture(
+            "fits/light-blanks/#{filename}",
+            aruba.config.home_directory,
+            dest_path: filename,
+          )
+        end
 
         it 'exits successfully' do
           expect(last_command_started.exit_status).to eq(0)
@@ -61,7 +68,14 @@ module AstroSubframeOrganizer
       end
 
       context 'with a raw cr2 file' do
-        let(:path) { fixture('cr2/IMG_0001.CR2') }
+        let(:filename) { 'IMG_0001.CR2' }
+        let(:path) do
+          install_fixture(
+            "cr2/dark/#{filename}",
+            aruba.config.home_directory,
+            dest_path: filename,
+          )
+        end
 
         it 'exits successfully' do
           expect(last_command_started.exit_status).to eq(0)
