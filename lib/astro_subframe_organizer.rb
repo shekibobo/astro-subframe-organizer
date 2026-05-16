@@ -43,6 +43,8 @@ require 'tty-progressbar'
 require 'tty-prompt'
 require 'yaml'
 
+FILENAME_DT_FORMAT = '%Y%m%d-%H%M%S'
+
 module AstroSubframeOrganizer
   class << self
     attr_writer :logger

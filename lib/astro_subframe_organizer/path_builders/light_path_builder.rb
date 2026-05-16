@@ -69,6 +69,7 @@ module AstroSubframeOrganizer
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
+          # Master darks output by PixInsight have CCD-TEMP formatted `CCD-TEMP_-10.` for some reason.
           "CCD-TEMP_#{@metadata.rounded_ccd_temp.gsub('0C', '')}",
           "TELESCOPE_#{@metadata.telescope || '????'}",
           "FILTER_#{@metadata.filter || '????'}",

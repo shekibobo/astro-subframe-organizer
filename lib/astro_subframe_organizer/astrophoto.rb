@@ -15,8 +15,6 @@ module AstroSubframeOrganizer
     include Logging
     extend Forwardable
 
-    FILENAME_DT_FORMAT = '%Y%m%d-%H%M%S'
-
     def_delegators :file_metadata,
                    :bin,
                    :camera,
