@@ -200,6 +200,111 @@ module AstroSubframeOrganizer
             ),
           )
         end
+
+        it 'groups light frames with slightly different temperatures into the same rounded directory' do
+          path_a = create_fit(
+            'Light_M42_300.0s_Bin1_T7_ISO100_20220508-120000_-9.5C_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M42',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'INSTRUME' => 'T7',
+              'ISO' => 100,
+              'DATE-OBS' => '2022-05-08T12:00:00.000000',
+              'CCD-TEMP' => -9.5,
+            },
+          )
+          path_b = create_fit(
+            'Light_M42_300.0s_Bin1_T7_ISO100_20220508-120000_-10.5C_0002.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'M42',
+              'EXPOSURE' => 300.0,
+              'XBINNING' => 1,
+              'INSTRUME' => 'T7',
+              'ISO' => 100,
+              'DATE-OBS' => '2022-05-08T12:00:00.000000',
+              'CCD-TEMP' => -10.5,
+            },
+          )
+
+          photo_a = Astrophoto.new(path_a)
+          photo_b = Astrophoto.new(path_b)
+          [photo_a, photo_b].each do |p|
+            p.telescope = 'RedCat51'
+            p.filter = 'BaaderMoon'
+          end
+
+          expect(photo_a.target_dir).to eq(photo_b.target_dir)
+          expect(photo_a.target_dir).to include('CCD-TEMP_-10.')
+        end
+
+        it 'groups renamed CR2 light frames with slightly different temperatures' do
+          path_a = File.join(test_dir, 'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-9.5C_0001.cr2')
+          path_b = File.join(test_dir, 'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.5C_0002.cr2')
+          [path_a, path_b].each { |p| FileUtils.touch(p) }
+
+          photo_a = Astrophoto.new(path_a)
+          photo_b = Astrophoto.new(path_b)
+          [photo_a, photo_b].each do |p|
+            p.telescope = 'RedCat51'
+            p.filter = 'BaaderMoon'
+          end
+
+          expect(photo_a.target_dir).to eq(photo_b.target_dir)
+          expect(photo_a.target_dir).to include('CCD-TEMP_-10.')
+        end
+
+        context 'with a custom temperature tolerance from config' do
+          before do
+            # Simulate a config override for tolerance
+            allow(Config).to receive(:load).and_return(
+              Config::DEFAULT_CONFIG.merge('temperature_tolerance' => 1.0),
+            )
+          end
+
+          it 'respects the narrower tolerance and separates frames accordingly' do
+            path_a = create_fit(
+              'Light_M42_300.0s_Bin1_T7_ISO100_20220508-120000_-9.5C_0001.fit',
+              headers: {
+                'IMAGETYP' => 'Light',
+                'OBJECT' => 'M42',
+                'EXPOSURE' => 300.0,
+                'XBINNING' => 1,
+                'INSTRUME' => 'T7',
+                'ISO' => 100,
+                'DATE-OBS' => '2022-05-08T12:00:00.000000',
+                'CCD-TEMP' => -9.5,
+              },
+            )
+            path_b = create_fit(
+              'Light_M42_300.0s_Bin1_T7_ISO100_20220508-120000_-10.5C_0002.fit',
+              headers: {
+                'IMAGETYP' => 'Light',
+                'OBJECT' => 'M42',
+                'EXPOSURE' => 300.0,
+                'XBINNING' => 1,
+                'INSTRUME' => 'T7',
+                'ISO' => 100,
+                'DATE-OBS' => '2022-05-08T12:00:00.000000',
+                'CCD-TEMP' => -10.5,
+              },
+            )
+
+            photo_a = Astrophoto.new(path_a)
+            photo_b = Astrophoto.new(path_b)
+            [photo_a, photo_b].each do |p|
+              p.telescope = 'RedCat51'
+              p.filter = 'BaaderMoon'
+            end
+
+            # With 1.0 tolerance, -9.5 rounds to -10.0 and -10.5 rounds to -11.0
+            expect(photo_a.target_dir).not_to eq(photo_b.target_dir)
+            expect(photo_a.target_dir).to include('CCD-TEMP_-10.')
+            expect(photo_b.target_dir).to include('CCD-TEMP_-11.')
+          end
+        end
       end
 
       describe 'target_path' do
@@ -303,7 +408,7 @@ module AstroSubframeOrganizer
           photo = Astrophoto.new(dark_path)
 
           expect(photo.target_dir).to eq(
-            File.join(test_dir, 'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05'),
+            File.join(test_dir, 'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10._CAMERA_T7_MONTH_2022-05'),
           )
         end
 
@@ -336,7 +441,7 @@ module AstroSubframeOrganizer
           expect(photo.target_path).to eq(
             File.join(
               test_dir,
-              'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10.0C_CAMERA_T7_MONTH_2022-05/' \
+              'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10._CAMERA_T7_MONTH_2022-05/' \
               'Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
             ),
           )
@@ -347,17 +452,17 @@ module AstroSubframeOrganizer
         context 'with default tolerance of 5 degrees' do
           it 'groups -9.5C into the -10.0C directory' do
             photo = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            expect(photo.target_dir).to include('CCD-TEMP_-10.0C')
+            expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'groups -10.5C into the -10.0C directory' do
             photo = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.5))
-            expect(photo.target_dir).to include('CCD-TEMP_-10.0C')
+            expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'groups -10.0C into the -10.0C directory' do
             photo = Astrophoto.new(create_dark('dark_c.fit', ccd_temp: -10.0))
-            expect(photo.target_dir).to include('CCD-TEMP_-10.0C')
+            expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'produces the same target_dir for -9.5C and -10.0C' do
@@ -380,7 +485,7 @@ module AstroSubframeOrganizer
 
           it 'does not include the raw temperature in target_dir' do
             photo = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            expect(photo.target_dir).not_to include('CCD-TEMP_-9.5C')
+            expect(photo.target_dir).not_to include('CCD-TEMP_-9.5')
           end
         end
 

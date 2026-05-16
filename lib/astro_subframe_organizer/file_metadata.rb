@@ -121,7 +121,8 @@ module AstroSubframeOrganizer
 
       temp_value = ccd_temp.to_f
       rounded    = (temp_value / tolerance).round * tolerance
-      format('%.1fC', rounded)
+      # Master darks output by PixInsight have CCD-TEMP formatted `CCD-TEMP_-10.` for some reason.
+      format('%.1fC', rounded).gsub('0C', '')
     end
 
     def normalized_rotation
