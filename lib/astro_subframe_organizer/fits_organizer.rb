@@ -64,8 +64,8 @@ module AstroSubframeOrganizer
     # properties, update Astrophoto#target_dir for the LIGHT type. The TELESCOPE and FILTER keywords are
     # for matching LIGHTS which will have the same keywords set when organized using this script.
     #
-    # CCD-TEMP is ignored in the group naming because each individual fits file contains that information
-    # in its fits header.
+    # CCD-TEMP is included in the group naming using a rounded value to facilitate consistent keyword matching
+    # in PixInsight WBPP, ensuring frames captured within a temperature range are grouped together.
     #
     # You can run WBPP with just your master biases, master darks, and master flats using the grouping
     # keywords FLATSET, BIN, EXP, CCD-TEMP, and ISO.

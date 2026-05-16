@@ -7,11 +7,8 @@ module AstroSubframeOrganizer
     # Light frames are organized by the following keywords, which allow WBPP to
     # automatically match lights to calibration frames (darks and flats) during integration:
     #
-    # **FITS files:**
-    #   Light_<target>_PANE_<pane>_FLATSET_<date>_ISO_<value>_EXP_<value>_Bin_<value>_TELESCOPE_<name>_FILTER_<name>_CAMERA_<model>
-    #
-    # **CR2 (Canon RAW) files:**
-    #   Light_<target>_PANE_<pane>_FLATSET_<date>_ISO_<value>_EXP_<value>_Bin_<value>_CCD-TEMP_<value>_TELESCOPE_<name>_FILTER_<name>_CAMERA_<model>
+    # **Pattern:**
+    #   Light_<target>_PANE_<pane>_FLATSET_<date>_ROTATION_<angle>deg_ISO_<value>_EXP_<value>_Bin_<value>_CCD-TEMP_<value>_TELESCOPE_<name>_FILTER_<name>_CAMERA_<model>
     #
     # **Keyword meanings:**
     # - Target: Object being imaged (e.g., M42, NGC1977)
@@ -21,7 +18,7 @@ module AstroSubframeOrganizer
     # - ISO/GAIN: Camera ISO or GAIN setting (must match darks and flats)
     # - EXP: Exposure time (must match darks and flats)
     # - Bin: Binning mode (must match darks and flats)
-    # - CCD-TEMP: CCD temperature (CR2 only; WBPP matches +/- 1°C for darks)
+    # - CCD-TEMP: Rounded CCD temperature (used to group frames for calibration consistency)
     # - TELESCOPE: Optical equipment used
     # - FILTER: Filter used
     # - CAMERA: Camera model
