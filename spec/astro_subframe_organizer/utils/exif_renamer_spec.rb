@@ -5,36 +5,29 @@ require 'astro_subframe_organizer/utils/exif_renamer'
 
 module AstroSubframeOrganizer
   module Utils
-    describe ExifRenamer do
+    describe ExifRenamer, :files do
       subject(:renamer) { described_class.new(test_dir) }
 
       let(:test_dir) { Dir.mktmpdir }
 
       after { FileUtils.rm_rf(test_dir) }
 
-      def copy_fixture(fixture_name, filename: fixture_name, path: nil)
-        src  = File.expand_path("../../fixtures/cr2/#{fixture_name}", __dir__)
-        dest = File.join(test_dir, *[path, filename].compact)
-        FileUtils.cp(src, dest)
-        dest
-      end
-
       # Fixtures expected in spec/fixtures/cr2/:
       #
-      # IMG_0001.CR2 - A standard Canon CR2 with SequenceNumber == 0 in EXIF.
-      #                ExposureTime should be >= 1.0s (e.g. a dark or light frame).
-      #                CameraTemperature should be present (e.g. -10.0).
-      #                DateTimeOriginal should be present.
-      #                Model should match a known camera in Equipment::Camera.all.
+      # dark/IMG_0001.CR2 - A standard Canon CR2 with SequenceNumber == 0 in EXIF.
+      #                     ExposureTime should be >= 1.0s (e.g. a dark or light frame).
+      #                     CameraTemperature should be present (e.g. -10.0).
+      #                     DateTimeOriginal should be present.
+      #                     Model should match a known camera in Equipment::Camera.all.
       #
-      # IMG_0002.CR2 - A CR2 with ExposureTime < 1.0s (e.g. a flat or bias frame)
-      #                to exercise millisecond exposure formatting.
+      # flat/IMG_0002.CR2 - A CR2 with ExposureTime < 1.0s (e.g. a flat or bias frame)
+      #                     to exercise millisecond exposure formatting.
       #
-      # IMG_0003.CR2 - A CR2 with ExposureTime < 0.001s to exercise microsecond
-      #                exposure formatting.
+      # bias/IMG_0003.CR2 - A CR2 with ExposureTime < 0.001s to exercise microsecond
+      #                     exposure formatting.
       #
-      # IMG_0004.CR2 - A CR2 with a Model that does not match any known camera in
-      #                Equipment::Camera.all, to exercise the fallback behavior.
+      # light/IMG_0442.CR2 - A CR2 with ExposureTime > 1.0s (a light frame) to exercise light
+      #                      renaming.
       #
       # Light_Aurora_4.0s_Bin1_ISO6400_20210418-025606_20.0C_0441.CR2 -
       #                 A CR2 whose filename does not start with IMG_, simulating
@@ -43,7 +36,7 @@ module AstroSubframeOrganizer
 
       describe '#find_cr2_files' do
         context 'with CR2 files present' do
-          before { copy_fixture('IMG_0001.CR2') }
+          before { install_fixture('cr2/dark/IMG_0001.CR2', test_dir) }
 
           it 'finds CR2 files in the directory' do
             expect(renamer.find_cr2_files).not_to be_empty
@@ -72,10 +65,10 @@ module AstroSubframeOrganizer
           end
         end
 
-        # Expects: IMG_0001.CR2 — a standard unprocessed Canon CR2
+        # Expects: dark/IMG_0001.CR2 — a standard unprocessed Canon CR2
         context 'with unprocessed IMG_ files' do
           it 'returns false' do
-            files = [File.join(test_dir, 'IMG_0001.CR2')]
+            files = [File.join(test_dir, 'dark/IMG_0001.CR2')]
             expect(renamer.already_named?(files)).to be false
           end
         end
@@ -94,14 +87,14 @@ module AstroSubframeOrganizer
           end
         end
 
-        # Expects: IMG_0001.CR2 — ExposureTime >= 1.0s, known camera model,
+        # Expects: dark/IMG_0001.CR2 — ExposureTime >= 1.0s, known camera model,
         #          CameraTemperature present, DateTimeOriginal present
         context 'with a standard dark frame' do
-          before { copy_fixture('IMG_0001.CR2') }
+          before { install_fixture('cr2/dark/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2') }
 
           it 'renames the file with the correct type prefix' do
             renamer.rename(type: Astrophoto::DARK)
-            renamed = Dir.glob('*.CR2', base: test_dir)
+            renamed = Dir.glob('**/*.CR2', base: test_dir)
             expect(renamed.first).to start_with('Dark_')
           end
 
@@ -112,65 +105,65 @@ module AstroSubframeOrganizer
 
           it 'includes Bin1 in the filename' do
             renamer.rename(type: Astrophoto::DARK)
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to include('Bin1')
           end
 
           it 'includes the ISO in the filename' do
             renamer.rename(type: Astrophoto::DARK)
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to match(/ISO\d+/)
           end
 
           it 'includes the temperature in the filename' do
             renamer.rename(type: Astrophoto::DARK)
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to match(/-?\d+\.\d+C/)
           end
         end
 
-        # Expects: IMG_0001.CR2 — a light frame needs a target name
+        # Expects: dark/IMG_0001.CR2 — a light frame needs a target name
         context 'with a light frame and target' do
-          before { copy_fixture('IMG_0001.CR2') }
+          before { install_fixture('cr2/dark/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2') }
 
           it 'includes the target name in the filename' do
             renamer.rename(type: Astrophoto::LIGHT, target: 'M31')
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to include('M31')
           end
 
           it 'includes the creation date in the filename' do
             renamer.rename(type: Astrophoto::LIGHT, target: 'M31')
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to include('20210418T025548')
           end
         end
 
-        # Expects: IMG_0002.CR2 — ExposureTime < 1.0s, e.g. 1/500
+        # Expects: flat/IMG_0002.CR2 — ExposureTime < 1.0s, e.g. 1/500
         context 'with a short exposure (milliseconds)' do
-          before { copy_fixture('IMG_0002.CR2') }
+          before { install_fixture('cr2/flat/IMG_0002.CR2', test_dir, dest_path: 'IMG_0002.CR2') }
 
           it 'formats the exposure time in milliseconds' do
             renamer.rename(type: Astrophoto::FLAT)
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to match(/\d+\.\d+ms/)
           end
         end
 
-        # Expects: IMG_0003.CR2 — ExposureTime < 0.001s
+        # Expects: bias/IMG_0003.CR2 — ExposureTime < 0.001s
         context 'with a very short exposure (microseconds)' do
-          before { copy_fixture('IMG_0003.CR2') }
+          before { install_fixture('cr2/bias/IMG_0003.CR2', test_dir, dest_path: 'IMG_0003.CR2') }
 
           it 'formats the exposure time in microseconds' do
             renamer.rename(type: Astrophoto::FLAT)
-            renamed = Dir.glob('*.CR2', base: test_dir).first
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
             expect(renamed).to match(/\d+\.\d+us/)
           end
         end
 
-        # Expects: IMG_0001.CR2 — any valid CR2
+        # Expects: dark/IMG_0001.CR2 — any valid CR2
         context 'with dry_run: true' do
-          before { copy_fixture('IMG_0001.CR2') }
+          before { install_fixture('cr2/dark/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2') }
 
           it 'does not rename the file' do
             renamer.rename(type: Astrophoto::DARK, dry_run: true)
@@ -178,12 +171,12 @@ module AstroSubframeOrganizer
           end
         end
 
-        # Expects: IMG_0001.CR2 — any valid CR2; run rename twice
+        # Expects: dark/IMG_0001.CR2 — any valid CR2; run rename twice
         context 'when target file already exists' do
           before do
-            copy_fixture('IMG_0001.CR2')
+            install_fixture('cr2/dark/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2')
             renamer.rename(type: Astrophoto::DARK)
-            copy_fixture('IMG_0001.CR2')
+            install_fixture('cr2/dark/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2')
           end
 
           it 'does not raise an error' do
@@ -194,16 +187,22 @@ module AstroSubframeOrganizer
 
       describe '#revert' do
         context 'with a usefully named image' do
-          before { copy_fixture('IMG_0003.CR2', filename: 'FLAT_FLATSET_20250223_OTHER_STUFF_0003.CR2') }
+          before do
+            install_fixture(
+              'cr2/bias/IMG_0003.CR2',
+              test_dir,
+              dest_path: 'bias/FLAT_FLATSET_20250223_OTHER_STUFF_0003.CR2',
+            )
+          end
 
           it 'returns it to its default name' do
-            original = Dir.glob('*.CR2', base: test_dir).first
-            expect(original).to eq('FLAT_FLATSET_20250223_OTHER_STUFF_0003.CR2')
+            original = Dir.glob('**/*.CR2', base: test_dir).first
+            expect(original).to eq('bias/FLAT_FLATSET_20250223_OTHER_STUFF_0003.CR2')
 
             renamer.revert
 
-            renamed = Dir.glob('*.CR2', base: test_dir).first
-            expect(renamed).to eq('IMG_0003.CR2')
+            renamed = Dir.glob('**/*.CR2', base: test_dir).first
+            expect(renamed).to eq('bias/IMG_0003.CR2')
           end
         end
       end

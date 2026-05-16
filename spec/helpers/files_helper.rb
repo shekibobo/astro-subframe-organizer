@@ -24,6 +24,14 @@ module FilesHelper
     File.join(FIXTURE_ROOT, relative_path)
   end
 
+  def install_fixture(source, dest_dir, dest_path: nil)
+    src = fixture(source)
+    target = File.join(dest_dir, dest_path || source)
+    FileUtils.mkdir_p(File.dirname(target))
+    FileUtils.cp(src, target)
+    target
+  end
+
   def skip_unless_fixture_exists(path)
     skip "Fixture not found: #{path}" unless File.exist?(path)
   end
@@ -31,4 +39,5 @@ end
 
 RSpec.configure  do |config|
   config.include FilesHelper, files: true
+  config.include FilesHelper, type: :aruba
 end
