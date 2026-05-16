@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'tmpdir'
 
 module AstroSubframeOrganizer
   describe Organizer, :files do
@@ -14,12 +13,9 @@ module AstroSubframeOrganizer
       )
     end
 
-    let(:test_dir)           { Dir.mktmpdir }
     let(:prompt)             { instance_double(TTY::Prompt) }
     let(:equipment_selector) { instance_double(AstroSubframeOrganizer::EquipmentSelector) }
     let(:type)               { AstroSubframeOrganizer::Astrophoto::DARK }
-
-    after { FileUtils.rm_rf(test_dir) }
 
     # ---------------------------------------------------------------------------
     # Helpers

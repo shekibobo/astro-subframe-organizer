@@ -2,6 +2,7 @@
 
 require 'tempfile'
 require 'fileutils'
+require 'tmpdir'
 
 # Fixtures in spec/fixtures/fits/ are header-only FITS files stripped with
 # bin/strip_fits. One representative file from each set is used per frame type.
@@ -20,6 +21,10 @@ require 'fileutils'
 FIXTURE_ROOT = File.expand_path('../fixtures', __dir__)
 
 module FilesHelper
+  def test_dir
+    @test_dir
+  end
+
   def fixture(relative_path)
     File.join(FIXTURE_ROOT, relative_path)
   end
@@ -40,4 +45,11 @@ end
 RSpec.configure  do |config|
   config.include FilesHelper, files: true
   config.include FilesHelper, type: :aruba
+
+  config.around(:each, files: true) do |example|
+    Dir.mktmpdir do |dir|
+      @test_dir = dir
+      example.run
+    end
+  end
 end
