@@ -97,7 +97,7 @@ module AstroSubframeOrganizer
     # Renames CR2 Raw files to match the same name pattern as ASIAir does based on EXIF data.
     def rename_from_exif
       renamer = Utils::ExifRenamer.new(path)
-      type = prompt.select('What is the file type?', Astrophoto::TYPES)
+      type = prompt.enum_select('What is the file type?', Astrophoto::TYPES)
       target = prompt.ask('What is the target name?') if type == Astrophoto::LIGHT
 
       renamer.rename(type: type, target: target, dry_run: is_dry_run?)
@@ -115,39 +115,31 @@ module AstroSubframeOrganizer
     # Prompts the user to choose which organizing task to run. This is the main entry point of
     # this script.
     def organize
-      message = 'What are we organizing?'
-      message += ' (Dry Run)' if dry_run
+      loop do
+        message = 'What are we organizing?'
+        message += ' (Dry Run)' if dry_run
 
-      prompt.enum_select message, per_page: 8 do |menu|
-        menu.choice('Darks') do
-          organize_darks
-          organize
+        choice = prompt.enum_select message, per_page: 8 do |menu|
+          menu.choice 'Darks', :darks
+          menu.choice 'Flats', :flats
+          menu.choice 'Lights', :lights
+          menu.choice 'Biases', :biases
+          menu.choice 'Remove empty directories', :empty_dirs
+          menu.choice 'Remove jpg thumbnails', :thumbnails
+          menu.choice 'Rename files from EXIF data', :rename
+          menu.choice 'Quit', :quit
         end
-        menu.choice('Flats') do
-          organize_flats
-          organize
+
+        case choice
+        when :darks      then organize_darks
+        when :flats      then organize_flats
+        when :lights     then organize_lights
+        when :biases     then organize_biases
+        when :empty_dirs then remove_empty_directories
+        when :thumbnails then remove_jpg_thumbnails
+        when :rename     then rename_from_exif
+        when :quit       then break
         end
-        menu.choice('Lights') do
-          organize_lights
-          organize
-        end
-        menu.choice('Biases') do
-          organize_biases
-          organize
-        end
-        menu.choice('Remove empty directories') do
-          remove_empty_directories
-          organize
-        end
-        menu.choice('Remove jpg thumbnails') do
-          remove_jpg_thumbnails
-          organize
-        end
-        menu.choice('Rename files from EXIF data') do
-          rename_from_exif
-          organize
-        end
-        menu.choice('Quit') { exit }
       end
     end
 
