@@ -57,7 +57,7 @@ describe 'astro-subframe-organizer light', type: :aruba do
     it 'groups all files into a single flatset directory' do
       subdirs = Dir.glob(File.join(test_path, '*/'))
       expect(subdirs.size).to eq(1)
-      expect(subdirs.first).to end_with('Light_C 1_FLATSET_20260411_ROTATION_108deg_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_William Optics RedCat51_FILTER_Baader Moon & Skyglow_CAMERA_ZWO ASI183MC Pro/')
+      expect(subdirs.first).to end_with('Light_C 1_FLATSET_20260411_ROTATION_108deg_GAIN_111_EXP_300.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_William Optics RedCat51_FILTER_Baader Moon & Skyglow_CAMERA_ZWO ASI183MC Pro/')
     end
   end
 

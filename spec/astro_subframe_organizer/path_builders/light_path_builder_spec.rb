@@ -17,7 +17,7 @@ module AstroSubframeOrganizer
 
             target_dir = builder.build
 
-            expect(target_dir).to eq('Light_IC 63_FLATSET_20251114_GAIN_111_EXP_600.0s_Bin_1_TELESCOPE_RedCat51_FILTER_NBZ_CAMERA_ZWO ASI183MC Pro')
+            expect(target_dir).to eq('Light_IC 63_FLATSET_20251114_GAIN_111_EXP_600.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_NBZ_CAMERA_ZWO ASI183MC Pro')
           end
         end
 
@@ -32,7 +32,7 @@ module AstroSubframeOrganizer
 
             target_dir = builder.build
 
-            expect(target_dir).to eq('Light_NGC 2264_FLATSET_20260113_ROTATION_113deg_GAIN_111_EXP_600.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
+            expect(target_dir).to eq('Light_NGC 2264_FLATSET_20260113_ROTATION_113deg_GAIN_111_EXP_600.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
           end
         end
       end
@@ -62,7 +62,7 @@ module AstroSubframeOrganizer
 
           target_dir = builder.build
 
-          expect(target_dir).to eq('Light_M16_PANE_1-1_FLATSET_20240713_GAIN_0_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
+          expect(target_dir).to eq('Light_M16_PANE_1-1_FLATSET_20240713_GAIN_0_EXP_300.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro')
         end
       end
     end

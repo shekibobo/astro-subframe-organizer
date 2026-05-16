@@ -196,7 +196,7 @@ module AstroSubframeOrganizer
           expect(photo.target_dir).to eq(
             File.join(
               test_dir,
-              'Light_68 Cygni_FLATSET_20250908_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC',
+              'Light_68 Cygni_FLATSET_20250908_GAIN_111_EXP_300.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_183MC',
             ),
           )
         end
@@ -224,7 +224,7 @@ module AstroSubframeOrganizer
           expect(photo.target_path).to eq(
             File.join(
               test_dir,
-              'Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
+              'Light_M42_FLATSET_20220509_ISO_100_EXP_1.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_T7/' \
               'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
             ),
           )
