@@ -36,36 +36,10 @@ module AstroSubframeOrganizer
         pane_segment = @metadata.mosaic_pane ? "_PANE_#{@metadata.mosaic_pane}" : ''
         prefix = "Light_#{@metadata.target}#{pane_segment}"
 
-        case @metadata.file_format
-        when :fits
-          build_fits_path(prefix)
-        when :cr2
-          build_cr2_path(prefix)
-        else
-          raise ArgumentError, "Unsupported format: #{@metadata.file_format}"
-        end
-      end
-
-      private
-
-      def build_fits_path(prefix)
         [
           prefix,
           "FLATSET_#{@metadata.flatset_id}",
           @metadata.normalized_rotation&.then { |r| "ROTATION_#{r}deg" },
-          iso_or_gain,
-          "EXP_#{@metadata.exposure}",
-          "Bin_#{@metadata.bin}",
-          "TELESCOPE_#{@metadata.telescope || '????'}",
-          "FILTER_#{@metadata.filter || '????'}",
-          "CAMERA_#{@metadata.camera || '????'}",
-        ].compact.join('_')
-      end
-
-      def build_cr2_path(prefix)
-        [
-          prefix,
-          "FLATSET_#{@metadata.flatset_id}",
           iso_or_gain,
           "EXP_#{@metadata.exposure}",
           "Bin_#{@metadata.bin}",
