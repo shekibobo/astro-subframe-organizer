@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Ensure standard streams are unbuffered for reliable output capture in CI and Aruba tests
+$stdout.sync = true
+$stderr.sync = true
+
 require "astro_subframe_organizer/version"
 require 'astro_subframe_organizer/utils/file_utils'
 require "astro_subframe_organizer/logging"
@@ -75,16 +79,41 @@ module AstroSubframeOrganizer
 
     def default_prompt
       TTY::Prompt.new(
+        input: $stdin,
+        output: $stdout,
         active_color: :bright_cyan,
         help_color: :bright_white,
         error_color: :bright_red,
+        # Disable colors and interactive features in RSpec to make output matching reliable
+        enable_color: !ENV['RSPEC_RUNNING'].nil? ? false : true,
+        interrupt: :exit,
       )
     end
   end
 
-  def self.run(dry_run: nil)
-    logger.info "Using config file at #{Config.config_file}" if Config.config_file
-    organizer = FitsOrganizer.new(dry_run: dry_run)
-    organizer.organize
+  def self.run(dry_run: nil, path: Dir.pwd, stdin: $stdin, stdout: $stdout, stderr: $stderr)
+    # Redirect streams immediately to capture initialization logs
+    original_stdin = $stdin
+    original_stdout = $stdout
+    original_stderr = $stderr
+    $stdin  = stdin
+    $stdout = stdout
+    $stderr = stderr
+
+    @logger = nil # Force logger to re-initialize with the redirected $stdout
+    @prompt = nil # Clear cached prompt so it picks up the new $stdin/$stdout
+
+    begin
+      logger.info "Using config file at #{Config.config_file}" if Config.config_file
+
+      # The prompt will now be initialized with the injected streams
+      organizer = FitsOrganizer.new(path, dry_run: dry_run)
+      organizer.organize
+    ensure
+      # Restore original streams
+      $stdin = original_stdin
+      $stdout = original_stdout
+      $stderr = original_stderr
+    end
   end
 end

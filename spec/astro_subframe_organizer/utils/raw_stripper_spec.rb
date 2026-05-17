@@ -33,8 +33,7 @@ describe AstroSubframeOrganizer::Utils::RawStripper, :files do
   describe '#strip' do
     it 'successfully creates a smaller MIE-based file if exiftool is present' do
       # Check if exiftool is available on the host system
-      executable = Gem.win_platform? ? 'exiftool.exe' : 'exiftool'
-      has_exiftool = system("#{executable} -ver > /dev/null 2>&1")
+      has_exiftool = system('exiftool', '-ver', out: File::NULL, err: File::NULL)
 
       if has_exiftool
         original_size = File.size(input_path)

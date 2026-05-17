@@ -14,8 +14,7 @@ describe 'bin/strip_raw', type: :aruba do
 
   it 'executes the stripping process via CLI' do
     # Skip if exiftool isn't available to avoid breaking build environments
-    executable = Gem.win_platform? ? 'exiftool.exe' : 'exiftool'
-    skip 'exiftool not installed on this system' unless system("#{executable} -ver > /dev/null 2>&1")
+    skip 'exiftool not installed on this system' unless system('exiftool', '-ver', out: File::NULL, err: File::NULL)
 
     original_size = File.size(File.join(test_path, input_file))
 
