@@ -14,7 +14,12 @@ module AstroSubframeOrganizer
       files.select { |file| file.type == type }
            # Normalize path for sorting: unified separators and consistent case (for Windows)
            .sort_by { |file| [File.dirname(file.path).tr('\\', '/').downcase, file.filename.downcase] }
-           .slice_when { |a, b| a.image_index.to_i > b.image_index.to_i }
+           .slice_when do |a, b|
+             a.image_index.to_i > b.image_index.to_i ||
+               a.camera != b.camera ||
+               a.telescope != b.telescope ||
+               a.filter != b.filter
+           end
            .map { |group| new(group) }
            .then { |it| FileSet.new(it) }
     end

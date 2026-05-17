@@ -226,12 +226,12 @@ module AstroSubframeOrganizer
             )
           end
           allow(equipment_selector).to receive(:camera).and_return(nil)
-          allow(equipment_selector).to receive(:choose_camera).and_return('ZWO ASI183MC Pro')
+          allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return('ZWO ASI183MC Pro')
         end
 
-        it 'prompts for a camera' do
+        it 'automatically identifies the camera for each set' do
           organizer.organize
-          expect(equipment_selector).to have_received(:choose_camera)
+          expect(equipment_selector).to have_received(:choose_camera_or_confirm).twice
         end
       end
 
@@ -375,6 +375,37 @@ module AstroSubframeOrganizer
         it 'does not move the file' do
           organizer.organize(dry_run: true)
           expect(File).to exist(File.join(test_dir, filename))
+        end
+      end
+
+      context 'when user declines confirmation' do
+        before do
+          ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] = 'false'
+          create_fit(
+            'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit',
+            headers: {
+              'IMAGETYP' => 'Light',
+              'OBJECT' => 'C 1',
+              'EXPOSURE' => 300.0,
+              'INSTRUME' => 'ZWO ASI183MC Pro',
+              'DATE-OBS' => '2026-04-10T23:06:51.000000',
+              'CCD-TEMP' => -10.0,
+            },
+          )
+          allow(prompt).to receive(:yes?).and_return(false)
+          # Reset mocks to ensure we are starting fresh for this test
+          allow(equipment_selector).to receive(:telescope)
+          allow(equipment_selector).to receive(:filter)
+          allow(equipment_selector).to receive(:camera)
+        end
+
+        it 'skips the entire process including equipment selection' do
+          organizer.organize
+
+          expect(prompt).to have_received(:yes?)
+          expect(equipment_selector).not_to have_received(:telescope)
+          expect(equipment_selector).not_to have_received(:filter)
+          expect(File).to exist(File.join(test_dir, 'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit'))
         end
       end
     end
@@ -625,6 +656,98 @@ module AstroSubframeOrganizer
           expect(equipment_selector).not_to receive(:choose_filter)
           organizer.organize
         end
+      end
+    end
+
+    describe 'ambiguous equipment detection' do
+      let(:type) { AstroSubframeOrganizer::Astrophoto::LIGHT }
+      let(:mock_file) do
+        instance_double(
+          AstroSubframeOrganizer::Astrophoto,
+          filename: 'f.fit',
+          target_dir: 'dir',
+          path: 'p',
+          target_path: 'tp',
+        )
+      end
+      let(:mock_fileset) do
+        instance_double(
+          AstroSubframeOrganizer::FileSet,
+          size: 1,
+          type: 'Light',
+          files: [mock_file],
+          already_moved?: false,
+          all_unmoved?: true,
+          each: nil,
+        )
+      end
+
+      before do
+        # Stub from_files here because it is called in initialize
+        allow(AstroSubframeOrganizer::FileSet).to receive(:from_files).and_return([mock_fileset])
+        allow(AstroSubframeOrganizer.logger).to receive(:warn)
+        stub_equipment(telescope: nil, camera: nil, filter: nil)
+
+        allow(mock_fileset).to receive(:apply_telescope!)
+        allow(mock_fileset).to receive(:apply_camera!)
+        allow(mock_fileset).to receive(:apply_filter!)
+
+        # Default detection stubs
+        allow(mock_fileset).to receive(:telescope_candidates).and_return(['Scope1'])
+        allow(mock_fileset).to receive(:camera_candidates).and_return(['Cam1'])
+        allow(mock_fileset).to receive(:filter_candidates).and_return(['Filter1'])
+
+        allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('Scope1')
+        allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return('Cam1')
+        allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return('Filter1')
+      end
+
+      it 'logs a warning when multiple cameras are detected' do
+        allow(mock_fileset).to receive(:camera_candidates).and_return(%w[Cam1 Cam2])
+        allow(equipment_selector).to receive(:choose_camera).and_return('Cam1')
+
+        organizer.organize
+        expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Multiple cameras detected: \["Cam1", "Cam2"\]/)
+      end
+
+      it 'logs a warning when multiple telescopes are detected' do
+        allow(mock_fileset).to receive(:telescope_candidates).and_return(%w[Scope1 Scope2])
+        allow(equipment_selector).to receive(:choose_telescope).and_return('Scope1')
+
+        organizer.organize
+        expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Multiple telescopes detected: \["Scope1", "Scope2"\]/)
+      end
+
+      it 'logs a warning when multiple filters are detected' do
+        allow(mock_fileset).to receive(:filter_candidates).and_return(%w[Filter1 Filter2])
+        allow(equipment_selector).to receive(:choose_filter).and_return('Filter1')
+
+        organizer.organize
+        expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Multiple filters detected: \["Filter1", "Filter2"\]/)
+      end
+    end
+
+    describe 'equipment overrides' do
+      it 'logs a warning when CLI camera overrides a different detected camera' do
+        create_fit(
+          'Dark_300.0s.fit',
+          headers: {
+            'IMAGETYP' => 'Dark',
+            'EXPOSURE' => 300.0,
+            'INSTRUME' => 'Header-Cam',
+            'DATE-OBS' => '2026-01-01T00:00:00',
+          },
+        )
+        allow(AstroSubframeOrganizer.logger).to receive(:warn)
+        # Mocking the selector to simulate the warning it would normally produce
+        allow(equipment_selector).to receive(:choose_camera_or_confirm).with(detected: 'Header-Cam') do
+          AstroSubframeOrganizer.logger.warn 'Using camera CLI-Cam, but detected Header-Cam'
+          'CLI-Cam'
+        end
+
+        organizer.organize
+
+        expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Using camera CLI-Cam, but detected Header-Cam/)
       end
     end
   end
