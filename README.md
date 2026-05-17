@@ -305,17 +305,9 @@ Automatically sets the telescope field for any command that uses it. When using 
 
 Automatically sets the camera field for any command that uses it. When using `--camera`, it will override the `INSTRUME` FITS header, and does not need to be one of the cameras in your config file. If the auto-detected camera is different from the `--camera`, a warning will be printed, but the move will continue anyway.
 
-> **TODO**
->
-> Actually make this print a warning or confirm like `telescope` does.
-
 **`--filter`**
 
 Automatically sets the filter field for any command that uses it. When using `--filter`, it will override the `FILTER` FITS header, and does not need to be one of the filters in your config file. If the auto-detected filter is different from the `--filter`, a warning will be printed, but the move will continue anyway.
-
-> **TODO**
->
-> Actually make this print a warning or confirm like `telescope` does.
 
 ### Command Mode
 
