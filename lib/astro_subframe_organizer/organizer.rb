@@ -75,13 +75,12 @@ module AstroSubframeOrganizer
       unless camera
         cameras = fileset.camera_candidates
         camera = if cameras.empty?
-                   logger.warn 'Camera auto-detect.'
-                   equipment_selector.choose_camera
+                   equipment_selector.choose_camera_or_confirm(detected: nil)
                  elsif cameras.size > 1
                    logger.warn "Multiple cameras detected: #{cameras}"
                    equipment_selector.choose_camera
                  else
-                   cameras.first
+                   equipment_selector.choose_camera_or_confirm(detected: cameras.first)
                  end
       end
 
@@ -112,13 +111,12 @@ module AstroSubframeOrganizer
       unless filter
         filters = fileset.filter_candidates
         filter = if filters.empty?
-                   logger.warn 'Filter auto-detect failed.'
-                   equipment_selector.choose_filter
+                   equipment_selector.choose_filter_or_confirm(detected: nil)
                  elsif filters.size > 1
                    logger.warn "Multiple filters detected: #{filters}"
                    equipment_selector.choose_filter
                  else
-                   filters.first
+                   equipment_selector.choose_filter_or_confirm(detected: filters.first)
                  end
       end
 

@@ -203,12 +203,12 @@ module AstroSubframeOrganizer
             },
           )
           allow(equipment_selector).to receive(:camera).and_return(nil)
-          allow(equipment_selector).to receive(:choose_camera).and_return('ZWO ASI183MC Pro')
+          allow(equipment_selector).to receive(:choose_camera_or_confirm).with(detected: nil).and_return('ZWO ASI183MC Pro')
         end
 
         it 'prompts for a camera' do
           organizer.organize
-          expect(equipment_selector).to have_received(:choose_camera)
+          expect(equipment_selector).to have_received(:choose_camera_or_confirm).with(detected: nil)
         end
       end
 
@@ -346,12 +346,12 @@ module AstroSubframeOrganizer
             },
           )
           stub_equipment(telescope: 'RedCat51', camera: 'ZWO ASI183MC Pro', filter: nil)
-          allow(equipment_selector).to receive(:choose_filter).and_return('NoFilter')
+          allow(equipment_selector).to receive(:choose_filter_or_confirm).with(detected: nil).and_return('NoFilter')
         end
 
         it 'prompts for a filter' do
           organizer.organize
-          expect(equipment_selector).to have_received(:choose_filter)
+          expect(equipment_selector).to have_received(:choose_filter_or_confirm).with(detected: nil)
         end
       end
 
