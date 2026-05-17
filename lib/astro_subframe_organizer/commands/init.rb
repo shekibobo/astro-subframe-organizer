@@ -4,12 +4,12 @@ require 'dry/cli'
 
 module AstroSubframeOrganizer
   module Commands
-    # Create default config file at ~/.astro-subframe-organizer.yml
+    # Create default config file at ~/astro-subframe-organizer-config.yml
     class Init < Dry::CLI::Command
       include SharedOptions
       include EquipmentOptions
 
-      desc 'Create default config file at ~/.astro-subframe-organizer.yml'
+      desc 'Create default config file at ~/astro-subframe-organizer-config.yml'
 
       example [
         '# Basic usage, creates default file with sample equipment',
@@ -22,7 +22,7 @@ module AstroSubframeOrganizer
       def call(force: false, **options)
         setup(**options.slice(:config, :verbose, :skip_confirm))
 
-        config_file = options[:config] || File.join(ENV['HOME'], '.astro-subframe-organizer.yml')
+        config_file = options[:config] || File.join(ENV['HOME'], 'astro-subframe-organizer-config.yml')
 
         if File.exist?(config_file) && !force
           puts "Config file #{config_file} already exists. Use --force to overwrite anyway."
@@ -33,7 +33,7 @@ module AstroSubframeOrganizer
           if options[:config]
             puts "Created config file at #{config_file}"
           else
-            puts 'Created default config file at ~/.astro-subframe-organizer.yml'
+            puts 'Created default config file at ~/astro-subframe-organizer-config.yml'
           end
         end
 
@@ -42,22 +42,9 @@ module AstroSubframeOrganizer
 
       def default_config(telescope: nil, filter: nil, camera: nil)
         {
-          'telescopes' => telescope&.then { |it| [it] } || %w[
-            RedCat51
-            ZhumellZ130
-            AperturaAD8
-            MeadeDS90
-            CanonEFS1855
-          ],
-          'filters' => filter&.then { |it| [it] } || %w[
-            BaaderMoon
-            NBZ
-            NoFilter
-          ],
-          'cameras' => camera&.then { |it| [it] } || %w[
-            T7
-            183MC
-          ],
+          'telescopes' => telescope&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('telescopes'),
+          'filters' => filter&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('filters'),
+          'cameras' => camera&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('cameras'),
           'temperature_tolerance' => 5.0,
         }
       end

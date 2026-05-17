@@ -28,6 +28,7 @@ module AstroSubframeOrganizer
         'ZWO ASI183MC Pro',
         'Canon EOS 1500D',
       ],
+      'temperature_tolerance' => 5.0,
     }.freeze
 
     def self.custom_config_file
@@ -36,7 +37,7 @@ module AstroSubframeOrganizer
 
     # Returns the expanded path to the configuration file.
     def self.config_file
-      path = custom_config_file || '~/.astro-subframe-organizer.yml'
+      path = custom_config_file || '~/astro-subframe-organizer-config.yml'
       File.expand_path(path)
     end
 
