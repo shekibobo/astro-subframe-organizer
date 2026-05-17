@@ -5,10 +5,12 @@ require 'spec_helper'
 module AstroSubframeOrganizer
   describe EquipmentSelector do
     let(:telescopes) { %w[RedCat51 ZhumellZ130] }
+    let(:cameras) { %w[T7 183MC] }
+    let(:filters) { %w[BaaderMoon NBZ] }
     let(:prompt) { instance_double(TTY::Prompt) }
 
     subject(:selector) do
-      described_class.new(prompt, telescopes: telescopes)
+      described_class.new(prompt, telescopes: telescopes, cameras: cameras, filters: filters)
     end
 
     before do
@@ -125,6 +127,74 @@ module AstroSubframeOrganizer
             allow(prompt).to receive(:enum_select).and_return('EQMod Mount')
             expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('EQMod Mount')
           end
+        end
+      end
+    end
+
+    describe '#choose_camera_or_confirm' do
+      context 'when camera is already set' do
+        before { selector.camera = 'T7' }
+        it 'returns the preset camera' do
+          expect(selector.choose_camera_or_confirm(detected: 'ASI183')).to eq('T7')
+        end
+      end
+
+      context 'when detected matches configured list' do
+        it 'returns detected directly' do
+          expect(selector.choose_camera_or_confirm(detected: '183MC')).to eq('183MC')
+        end
+      end
+
+      context 'when detected is unknown' do
+        it 'prompts to confirm or select' do
+          allow(prompt).to receive(:enum_select).and_return('183MC')
+          selector.choose_camera_or_confirm(detected: 'Unknown Cam')
+          expect(prompt).to have_received(:enum_select).with(
+            a_string_including('Unknown Cam'),
+            ['Unknown Cam', 'T7', '183MC'],
+          )
+        end
+      end
+
+      context 'when nothing is detected' do
+        it 'falls back to standard prompt' do
+          allow(prompt).to receive(:enum_select).and_return('T7')
+          selector.choose_camera_or_confirm(detected: nil)
+          expect(prompt).to have_received(:enum_select).with('What camera is used with this set?', cameras)
+        end
+      end
+    end
+
+    describe '#choose_filter_or_confirm' do
+      context 'when filter is already set' do
+        before { selector.filter = 'NBZ' }
+        it 'returns the preset filter' do
+          expect(selector.choose_filter_or_confirm(detected: 'L-Pro')).to eq('NBZ')
+        end
+      end
+
+      context 'when detected matches configured list' do
+        it 'returns detected directly' do
+          expect(selector.choose_filter_or_confirm(detected: 'NBZ')).to eq('NBZ')
+        end
+      end
+
+      context 'when detected is unknown' do
+        it 'prompts to confirm or select' do
+          allow(prompt).to receive(:enum_select).and_return('NBZ')
+          selector.choose_filter_or_confirm(detected: 'Unknown Filter')
+          expect(prompt).to have_received(:enum_select).with(
+            a_string_including('Unknown Filter'),
+            ['Unknown Filter', 'BaaderMoon', 'NBZ'],
+          )
+        end
+      end
+
+      context 'when nothing is detected' do
+        it 'falls back to standard prompt' do
+          allow(prompt).to receive(:enum_select).and_return('NBZ')
+          selector.choose_filter_or_confirm(detected: nil)
+          expect(prompt).to have_received(:enum_select).with('What filter is used with this set?', filters)
         end
       end
     end

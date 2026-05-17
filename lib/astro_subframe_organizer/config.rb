@@ -22,9 +22,10 @@ module AstroSubframeOrganizer
         NBZ
         NoFilter
       ],
-      'cameras' => %w[
-        T7
-        183MC
+      'cameras' => [
+        'T7',
+        '183MC',
+        'ZWO ASI183MC Pro',
       ],
     }.freeze
 

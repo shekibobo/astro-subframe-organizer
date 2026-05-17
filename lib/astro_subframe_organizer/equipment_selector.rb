@@ -49,6 +49,26 @@ module AstroSubframeOrganizer
       end
     end
 
+    def choose_camera_or_confirm(detected:)
+      if camera
+        logger.warn "Using camera #{camera}, but detected #{detected}" if detected && camera != detected
+        return camera
+      end
+
+      if detected && @cameras.include?(detected)
+        detected
+      elsif detected
+        logger.warn "INSTRUME header '#{detected}' is not in the configured camera list."
+        choose(
+          "INSTRUME is '#{detected}' — select the actual camera or confirm:",
+          [detected] + @cameras,
+        ).tap { |it| logger.info("Selected Camera: #{it}") }
+      else
+        logger.warn 'Camera auto-detect failed.'
+        choose_camera
+      end
+    end
+
     def choose_filter(index = nil)
       return filter if filter
 
@@ -59,6 +79,26 @@ module AstroSubframeOrganizer
       else
         choose('What filter is used with this set?', @filters)
       end.tap { |it| logger.info("Selected Filter: #{it}") }
+    end
+
+    def choose_filter_or_confirm(detected:)
+      if filter
+        logger.warn "Using filter #{filter}, but detected #{detected}" if detected && filter != detected
+        return filter
+      end
+
+      if detected && @filters.include?(detected)
+        detected
+      elsif detected
+        logger.warn "FILTER header '#{detected}' is not in the configured filter list."
+        choose(
+          "FILTER is '#{detected}' — select the actual filter or confirm:",
+          [detected] + @filters,
+        ).tap { |it| logger.info("Selected Filter: #{it}") }
+      else
+        logger.warn 'Filter auto-detect failed.'
+        choose_filter
+      end
     end
 
     def choose_camera(index = nil)
