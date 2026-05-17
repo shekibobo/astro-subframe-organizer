@@ -15,6 +15,7 @@ module AstroSubframeOrganizer
 
     before do
       allow(prompt).to receive(:enum_select).and_return(telescopes.first)
+      allow(AstroSubframeOrganizer.logger).to receive(:info)
     end
 
     it 'chooses telescope using configured options' do
@@ -196,6 +197,43 @@ module AstroSubframeOrganizer
           selector.choose_filter_or_confirm(detected: nil)
           expect(prompt).to have_received(:enum_select).with('What filter is used with this set?', filters)
         end
+      end
+    end
+
+    describe 'logging' do
+      it 'logs the selection for telescope' do
+        selector.choose_telescope
+        expect(AstroSubframeOrganizer.logger).to have_received(:info).with('Selected Telescope: RedCat51')
+      end
+
+      it 'logs the selection for camera' do
+        allow(prompt).to receive(:enum_select).and_return('T7')
+        selector.choose_camera
+        expect(AstroSubframeOrganizer.logger).to have_received(:info).with('Selected Camera: T7')
+      end
+
+      it 'logs the selection for filter' do
+        allow(prompt).to receive(:enum_select).and_return('BaaderMoon')
+        selector.choose_filter
+        expect(AstroSubframeOrganizer.logger).to have_received(:info).with('Selected Filter: BaaderMoon')
+      end
+
+      it 'logs when prompting for confirmation of unknown equipment' do
+        allow(prompt).to receive(:enum_select).and_return('ConfirmedValue')
+        selector.choose_camera_or_confirm(detected: 'Unknown')
+        expect(AstroSubframeOrganizer.logger).to have_received(:info).with('Selected Camera: ConfirmedValue')
+      end
+
+      it 'does not log if the value was already set on the selector' do
+        selector.camera = 'T7'
+        selector.choose_camera
+        expect(AstroSubframeOrganizer.logger).not_to have_received(:info).with(/Selected Camera/)
+      end
+
+      it 'logs the selection even when auto-selecting a single option' do
+        single_selector = described_class.new(prompt, telescopes: ['SingleScope'], cameras: [], filters: [])
+        single_selector.choose_telescope
+        expect(AstroSubframeOrganizer.logger).to have_received(:info).with('Selected Telescope: SingleScope')
       end
     end
   end
