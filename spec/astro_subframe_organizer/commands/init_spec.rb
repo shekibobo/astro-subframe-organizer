@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'yaml'
 
 describe 'astro-subframe-organizer init', type: :aruba do
-  let(:config_path) { File.join(aruba.config.home_directory, '.astro-subframe-organizer.yml') }
+  let(:config_path) { File.join(aruba.config.home_directory, 'astro-subframe-organizer-config.yml') }
   let(:custom_config_path) { File.join(aruba.config.home_directory, 'custom.yml') }
 
   let(:config) { YAML.load_file(config_path) }
@@ -44,7 +44,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
         end
 
         it 'includes cameras' do
-          expect(config['cameras']).to include('T7', '183MC')
+          expect(config['cameras']).to include('Canon EOS 1500D', 'ZWO ASI183MC Pro')
         end
       end
     end
@@ -101,7 +101,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
           end
 
           it 'includes cameras' do
-            expect(config['cameras']).to include('T7', '183MC')
+            expect(config['cameras']).to include('Canon EOS 1500D', 'ZWO ASI183MC Pro')
           end
         end
       end
@@ -140,7 +140,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
         end
 
         it 'includes cameras' do
-          expect(custom_config['cameras']).to include('T7', '183MC')
+          expect(custom_config['cameras']).to include('Canon EOS 1500D', 'ZWO ASI183MC Pro')
         end
       end
     end
@@ -196,7 +196,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
           end
 
           it 'includes cameras' do
-            expect(custom_config['cameras']).to include('T7', '183MC')
+            expect(custom_config['cameras']).to include('Canon EOS 1500D', 'ZWO ASI183MC Pro')
           end
         end
       end

@@ -27,7 +27,7 @@ bundle exec rake install
 
 ### Initialize your equipment set
 
-Create a default config file with sample equipment and settings (~/.astro-subframe-organizer.yml) and edit it to include your equipment:
+Create a default config file with sample equipment and settings (~/astro-subframe-organizer-config.yml) and edit it to include your equipment:
 
 ```bash
 astro-subframe-organizer init
@@ -59,7 +59,7 @@ To create a default configuration file:
 astro-subframe-organizer init
 ```
 
-This creates `~/.astro-subframe-organizer.yml` with default values. Edit this file to customize your equipment or change configurations:
+This creates `~/astro-subframe-organizer-config.yml` with default values. Edit this file to customize your equipment or change configurations:
 
 ```yaml
 telescopes:
