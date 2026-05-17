@@ -111,18 +111,18 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
 
     # 1. Initial configuration and Main Menu.
     # Match config and menu in sequence to ensure buffer is properly consumed.
-    expect_output(/Using config file at.*What are we organizing\?/m, cli_thread)
+    expect_output(/Using config file at.*Choose 1-8/m, cli_thread)
     send_input '7'
 
     # 2. Select 'Dark' from Rename Sub-menu (Choice 1)
-    expect_output(/What is the file type/i, cli_thread)
+    expect_output(/Choose 1-4/i, cli_thread)
     send_input '1'
 
     # 3. Action Layer: Verify the utility processed the file.
     expect_output(/(Renaming|mv).*IMG_0001/i, cli_thread)
 
     # 4. Recursion Layer: Verify return to main menu.
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
 
     # 5. Exit Layer: Select 'Quit' (Choice 8)
     send_input '8'
@@ -135,14 +135,14 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
   it 'navigates to the "Remove empty directories" utility and returns to menu' do
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/Using config file at.*What are we organizing\?/m, cli_thread)
+    expect_output(/Using config file at.*Choose 1-8/m, cli_thread)
     send_input '5'
 
     # Verify utility output and return to menu
     expect_output(/Cleaning up empty directories/, cli_thread)
 
     # 3. Verify return to main menu.
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
 
     # 4. Exit Layer: Select 'Quit' (Choice 8)
     send_input '8'
@@ -160,14 +160,14 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
     )
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
     send_input '1' # Select Darks
 
     expect_output(/Continue\?/, cli_thread)
     send_input 'y'
 
     expect_output(/mv.*dark\.fit/i, cli_thread)
-    expect_output(/Done.*What are we organizing\?/m, cli_thread)
+    expect_output(/Done.*Choose 1-8/m, cli_thread)
 
     send_input '8' # Quit
     cli_thread.join(aruba.config.exit_timeout)
@@ -178,27 +178,27 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
     # Create a flat frame with missing headers to trigger prompts
     FitsFactory.create(
       File.join(test_path, 'flat.fit'),
-      headers: { 'IMAGETYP' => 'Flat', 'EXPOSURE' => 5.0, 'INSTRUME' => nil },
+      headers: { 'IMAGETYP' => 'Flat', 'EXPOSURE' => 5.0, 'INSTRUME' => nil, 'TELESCOP' => nil },
     )
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
     send_input '2' # Select Flats
 
     expect_output(/Continue\?/, cli_thread)
     send_input 'y'
 
-    expect_output(/telescope/i, cli_thread)
+    expect_output(/Choose 1-5/i, cli_thread)
     send_input '1' # Select first option (RedCat51)
 
-    expect_output(/What filter/i, cli_thread)
+    expect_output(/Choose 1-3/i, cli_thread)
     send_input '1' # Select first option (BaaderMoon)
 
-    expect_output(/What camera/i, cli_thread)
+    expect_output(/Choose 1-2/i, cli_thread)
     send_input '2' # Select second option (183MC)
 
     expect_output(/mv.*flat\.fit/i, cli_thread)
-    expect_output(/Done.*What are we organizing\?/m, cli_thread)
+    expect_output(/Done.*Choose 1-8/m, cli_thread)
 
     send_input '8'
     cli_thread.join(aruba.config.exit_timeout)
@@ -212,20 +212,20 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
     )
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
     send_input '3' # Select Lights
 
     expect_output(/Continue\?/, cli_thread)
     send_input 'y'
 
-    expect_output(/telescope/i, cli_thread)
+    expect_output(/Choose 1-6/i, cli_thread)
     send_input '1'
 
-    expect_output(/What filter/i, cli_thread)
+    expect_output(/Choose 1-3/i, cli_thread)
     send_input '1'
 
     expect_output(/mv.*PANE_1-1/i, cli_thread)
-    expect_output(/Done.*What are we organizing\?/m, cli_thread)
+    expect_output(/Done.*Choose 1-8/m, cli_thread)
 
     send_input '8'
     cli_thread.join(aruba.config.exit_timeout)
@@ -235,7 +235,7 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
     FitsFactory.create(File.join(test_path, 'bias.fit'), headers: { 'IMAGETYP' => 'Bias', 'EXPOSURE' => 0.000032 })
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
     send_input '4' # Select Biases
 
     expect_output(/Continue\?/, cli_thread)
@@ -243,7 +243,7 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
 
     # 183MC is auto-detected from the FitsFactory default INSTRUME
     expect_output(/mv.*bias\.fit/i, cli_thread)
-    expect_output(/Done.*What are we organizing\?/m, cli_thread)
+    expect_output(/Done.*Choose 1-8/m, cli_thread)
 
     send_input '8'
     cli_thread.join(aruba.config.exit_timeout)
@@ -253,10 +253,10 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
     FileUtils.touch(File.join(test_path, 'sample_thn.jpg'))
     cli_thread = run_interactive_cli(dry_run: true)
 
-    expect_output(/What are we organizing\?/, cli_thread)
+    expect_output(/Choose 1-8/, cli_thread)
     send_input '6' # Select Remove thumbnails
 
-    expect_output(/Removing jpg thumbnails.*What are we organizing\?/m, cli_thread)
+    expect_output(/Removing jpg thumbnails.*Choose 1-8/m, cli_thread)
 
     send_input '8'
     cli_thread.join(aruba.config.exit_timeout)
