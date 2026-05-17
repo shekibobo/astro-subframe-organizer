@@ -54,9 +54,9 @@ module AstroSubframeOrganizer
             NBZ
             NoFilter
           ],
-          'cameras' => camera&.then { |it| [it] } || %w[
-            T7
-            183MC
+          'cameras' => camera&.then { |it| [it] } || [
+            'CanonEOS1500D',
+            'ZWO ASI183MC Pro',
           ],
           'temperature_tolerance' => 5.0,
         }
