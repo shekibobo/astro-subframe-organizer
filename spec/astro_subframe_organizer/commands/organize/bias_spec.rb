@@ -89,4 +89,28 @@ describe 'astro-subframe-organizer bias', type: :aruba do
       expect(File).to exist(original)
     end
   end
+
+  context 'when detected camera is not in the configured list' do
+    let(:custom_config) { File.join(test_path, 'limited_config.yml') }
+
+    before do
+      File.write(
+        custom_config,
+        {
+          'cameras' => ['T7'],
+          'telescopes' => ['RedCat51'],
+          'filters' => ['NoFilter'],
+        }.to_yaml,
+      )
+      copy_bias_fixtures(set: :gain, count: 1)
+      run_command(
+        "astro-subframe-organizer bias --path #{test_path} --config #{custom_config} --skip-confirm",
+      )
+    end
+
+    it 'logs a warning and prompts for confirmation' do
+      expect(last_command_started).to have_output(/INSTRUME header 'ZWO ASI183MC Pro' is not in the configured camera list/)
+      expect(last_command_started).to have_output(/select the actual camera or confirm/)
+    end
+  end
 end

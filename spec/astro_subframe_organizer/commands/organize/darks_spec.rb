@@ -33,7 +33,7 @@ describe 'astro-subframe-organizer dark', type: :aruba do
         custom_config,
         {
           'telescopes' => ['RedCat51'],
-          'cameras' => ['183MC'],
+          'cameras' => ['ZWO ASI183MC Pro'],
           'filters' => ['NoFilter'],
         }.to_yaml,
       )

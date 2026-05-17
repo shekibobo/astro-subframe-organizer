@@ -70,55 +70,37 @@ module AstroSubframeOrganizer
     end
 
     def check_camera(fileset)
-      camera = equipment_selector.camera
-
-      unless camera
-        cameras = fileset.camera_candidates
-        camera = if cameras.empty?
-                   equipment_selector.choose_camera_or_confirm(detected: nil)
-                 elsif cameras.size > 1
-                   logger.warn "Multiple cameras detected: #{cameras}"
-                   equipment_selector.choose_camera
-                 else
-                   equipment_selector.choose_camera_or_confirm(detected: cameras.first)
-                 end
-      end
+      candidates = fileset.camera_candidates
+      camera = if candidates.size > 1
+                 logger.warn "Multiple cameras detected: #{candidates}"
+                 equipment_selector.choose_camera
+               else
+                 equipment_selector.choose_camera_or_confirm(detected: candidates.first)
+               end
 
       fileset.apply_camera!(camera)
     end
 
     def check_telescope(fileset)
-      telescope = equipment_selector.telescope
-
-      unless telescope
-        telescopes = fileset.telescope_candidates
-        telescope = if telescopes.empty?
-                      equipment_selector.choose_telescope_or_confirm(detected: nil)
-                    elsif telescopes.size > 1
-                      logger.warn "Multiple telescopes detected: #{telescopes}"
-                      equipment_selector.choose_telescope
-                    else
-                      equipment_selector.choose_telescope_or_confirm(detected: telescopes.first)
-                    end
-      end
+      candidates = fileset.telescope_candidates
+      telescope = if candidates.size > 1
+                    logger.warn "Multiple telescopes detected: #{candidates}"
+                    equipment_selector.choose_telescope
+                  else
+                    equipment_selector.choose_telescope_or_confirm(detected: candidates.first)
+                  end
 
       fileset.apply_telescope!(telescope)
     end
 
     def check_filter(fileset)
-      filter = equipment_selector.filter
-
-      unless filter
-        filters = fileset.filter_candidates
-        filter = if filters.empty?
-                   equipment_selector.choose_filter_or_confirm(detected: nil)
-                 elsif filters.size > 1
-                   logger.warn "Multiple filters detected: #{filters}"
-                   equipment_selector.choose_filter
-                 else
-                   equipment_selector.choose_filter_or_confirm(detected: filters.first)
-                 end
-      end
+      candidates = fileset.filter_candidates
+      filter = if candidates.size > 1
+                 logger.warn "Multiple filters detected: #{candidates}"
+                 equipment_selector.choose_filter
+               else
+                 equipment_selector.choose_filter_or_confirm(detected: candidates.first)
+               end
 
       fileset.apply_filter!(filter)
     end
