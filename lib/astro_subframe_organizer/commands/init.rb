@@ -42,22 +42,9 @@ module AstroSubframeOrganizer
 
       def default_config(telescope: nil, filter: nil, camera: nil)
         {
-          'telescopes' => telescope&.then { |it| [it] } || %w[
-            RedCat51
-            ZhumellZ130
-            AperturaAD8
-            MeadeDS90
-            CanonEFS1855
-          ],
-          'filters' => filter&.then { |it| [it] } || %w[
-            BaaderMoon
-            NBZ
-            NoFilter
-          ],
-          'cameras' => camera&.then { |it| [it] } || [
-            'CanonEOS1500D',
-            'ZWO ASI183MC Pro',
-          ],
+          'telescopes' => telescope&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('telescopes'),
+          'filters' => filter&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('filters'),
+          'cameras' => camera&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('cameras'),
           'temperature_tolerance' => 5.0,
         }
       end

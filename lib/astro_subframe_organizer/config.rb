@@ -23,9 +23,12 @@ module AstroSubframeOrganizer
         NoFilter
       ],
       'cameras' => [
+        'T7',
+        '183MC',
         'ZWO ASI183MC Pro',
         'Canon EOS 1500D',
       ],
+      'temperature_tolerance' => 5.0,
     }.freeze
 
     def self.custom_config_file
