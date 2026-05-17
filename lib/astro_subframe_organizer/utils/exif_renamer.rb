@@ -19,7 +19,10 @@ module AstroSubframeOrganizer
       end
 
       def rename(type:, target: nil, dry_run: false)
-        Exiftool.command = 'exiftool.exe' if Gem.win_platform?
+        # On Windows, the vendored exiftool is a Perl script without an extension.
+        # The exiftool gem version 1.4.3 tries to execute it directly, which causes ENOEXEC.
+        # We force the command to 'exiftool' to let Windows resolve it via PATH (e.g., from Choco).
+        Exiftool.command = 'exiftool' if Gem.win_platform?
 
         cr2_files = find_cr2_files
 

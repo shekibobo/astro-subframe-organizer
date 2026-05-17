@@ -35,6 +35,6 @@ RSpec.configure do |config|
   config.after type: :aruba do
     stop_all_commands
     # Give Windows a moment to release file locks on output capture files
-    sleep 0.1 if Gem.win_platform?
+    sleep 0.5 if Gem.win_platform?
   end
 end
