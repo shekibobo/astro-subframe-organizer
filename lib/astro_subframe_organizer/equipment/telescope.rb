@@ -2,7 +2,7 @@
 
 module AstroSubframeOrganizer
   module Equipment
-    # Add your telescopes to `~/.astro-subframe-organizer.yml`. If there is more
+    # Add your telescopes to `~/astro-subframe-organizer-config.yml`. If there is more
     # than one, you will be prompted to choose one of them when organizing flats
     # and lights.
     class Telescope

@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'yaml'
 
 describe 'astro-subframe-organizer init', type: :aruba do
-  let(:config_path) { File.join(aruba.config.home_directory, '.astro-subframe-organizer.yml') }
+  let(:config_path) { File.join(aruba.config.home_directory, 'astro-subframe-organizer-config.yml') }
   let(:custom_config_path) { File.join(aruba.config.home_directory, 'custom.yml') }
 
   let(:config) { YAML.load_file(config_path) }

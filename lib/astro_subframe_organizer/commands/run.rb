@@ -10,7 +10,7 @@ module AstroSubframeOrganizer
       desc 'Run the subframe organizer interactively'
 
       example [
-        '                             # Basic usage, using default values or values from default config file at ~/.astro-subframe-organizer.yml',
+        '                             # Basic usage, using default values or values from default config file at ~/astro-subframe-organizer-config.yml',
         '--config ~/.custom-setup.yml # Uses alternative setup with specific equipment',
         '--verbose                    # Log more details while running',
         '--skip-confirm               # Skip confirmation step before moving files',

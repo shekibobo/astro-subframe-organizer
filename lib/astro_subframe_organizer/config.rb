@@ -23,8 +23,6 @@ module AstroSubframeOrganizer
         NoFilter
       ],
       'cameras' => [
-        'T7',
-        '183MC',
         'ZWO ASI183MC Pro',
         'Canon EOS 1500D',
       ],
@@ -36,7 +34,7 @@ module AstroSubframeOrganizer
 
     # Returns the expanded path to the configuration file.
     def self.config_file
-      path = custom_config_file || '~/.astro-subframe-organizer.yml'
+      path = custom_config_file || '~/astro-subframe-organizer-config.yml'
       File.expand_path(path)
     end
 
