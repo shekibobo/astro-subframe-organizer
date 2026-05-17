@@ -79,6 +79,8 @@ module AstroSubframeOrganizer
 
     def default_prompt
       TTY::Prompt.new(
+        input: $stdin,
+        output: $stdout,
         active_color: :bright_cyan,
         help_color: :bright_white,
         error_color: :bright_red,
