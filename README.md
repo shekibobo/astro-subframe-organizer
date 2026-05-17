@@ -73,6 +73,8 @@ filters:
 cameras:
   - T7
   - 183MC
+  - ZWO ASI183MC Pro
+  - Canon EOS 1500D
   - YourCamera
 temperature_tolerance: 5.0
 ```
@@ -243,7 +245,7 @@ Preparing to move 62 Light file(s)
 Continue? (Y/n) 
 ```
 
-For each new set of files (typically split by index number overflow) within the target directory, you'll be guided through the same set of prompts until all files have been organized into descriptive, keyword-based directories.
+For each new set of files (split by index number overflow or when detected equipment changes) within the target directory, you'll be guided through the same set of prompts until all files have been organized into descriptive, keyword-based directories.
 
 ### Global Options
 
@@ -295,7 +297,7 @@ The above command will organize only the light files in the `NGC 2264` directory
 
 **`--telescope`**
 
-Automatically sets the telescope field for any command that uses it. When using `--telescope`, it will override the `TELESCOP` FITS header, and does not need to be one of the telescopes in your config file. If the auto-detected telescope is different from the `--telescope`, a warning will be printed, but the move will continue anyway.
+Automatically sets the telescope field for any command that uses it. When using `--telescope`, it will override the `TELESCOP` FITS header, and does not need to be one of the telescopes in your config file. If the auto-detected telescope is different from the `--telescope` value, a warning will be logged (e.g., `Using telescope RedCat51, but detected EQMod Mount`), but the move will continue using your override.
 
 > [!NOTE]
 >
@@ -303,11 +305,11 @@ Automatically sets the telescope field for any command that uses it. When using 
 
 **`--camera`**
 
-Automatically sets the camera field for any command that uses it. When using `--camera`, it will override the `INSTRUME` FITS header, and does not need to be one of the cameras in your config file. If the auto-detected camera is different from the `--camera`, a warning will be printed, but the move will continue anyway.
+Automatically sets the camera field for any command that uses it. When using `--camera`, it will override the `INSTRUME` FITS header. If the auto-detected camera differs from your override, a warning will be logged, but the move will continue.
 
 **`--filter`**
 
-Automatically sets the filter field for any command that uses it. When using `--filter`, it will override the `FILTER` FITS header, and does not need to be one of the filters in your config file. If the auto-detected filter is different from the `--filter`, a warning will be printed, but the move will continue anyway.
+Automatically sets the filter field for any command that uses it. When using `--filter`, it will override the `FILTER` FITS header. If the auto-detected filter differs from your override, a warning will be logged, but the move will continue.
 
 ### Command Mode
 
