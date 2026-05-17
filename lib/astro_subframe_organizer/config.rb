@@ -26,6 +26,7 @@ module AstroSubframeOrganizer
         'T7',
         '183MC',
         'ZWO ASI183MC Pro',
+        'Canon EOS 1500D',
       ],
     }.freeze
 

@@ -31,6 +31,16 @@ module AstroSubframeOrganizer
       allow(equipment_selector).to receive(:telescope).and_return(telescope)
       allow(equipment_selector).to receive(:camera).and_return(camera)
       allow(equipment_selector).to receive(:filter).and_return(filter)
+
+      # Allow the confirmation methods to return the stubbed values by default
+      allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return(telescope)
+      allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return(camera)
+      allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return(filter)
+
+      # Allow the direct choose methods (used for ambiguity) to return the stubbed values
+      allow(equipment_selector).to receive(:choose_telescope).and_return(telescope)
+      allow(equipment_selector).to receive(:choose_camera).and_return(camera)
+      allow(equipment_selector).to receive(:choose_filter).and_return(filter)
     end
 
     def skip_confirm
@@ -140,7 +150,7 @@ module AstroSubframeOrganizer
 
         it 'applies the camera from equipment_selector' do
           organizer.organize
-          expect(equipment_selector).to have_received(:camera).at_least(:once)
+          expect(equipment_selector).to have_received(:choose_camera_or_confirm).at_least(:once)
         end
       end
 
@@ -298,17 +308,17 @@ module AstroSubframeOrganizer
 
         it 'checks telescope' do
           organizer.organize
-          expect(equipment_selector).to have_received(:telescope).at_least(:once)
+          expect(equipment_selector).to have_received(:choose_telescope_or_confirm).at_least(:once)
         end
 
         it 'checks filter' do
           organizer.organize
-          expect(equipment_selector).to have_received(:filter).at_least(:once)
+          expect(equipment_selector).to have_received(:choose_filter_or_confirm).at_least(:once)
         end
 
         it 'checks camera' do
           organizer.organize
-          expect(equipment_selector).to have_received(:camera).at_least(:once)
+          expect(equipment_selector).to have_received(:choose_camera_or_confirm).at_least(:once)
         end
       end
 
@@ -440,12 +450,12 @@ module AstroSubframeOrganizer
 
       it 'checks telescope' do
         organizer.organize
-        expect(equipment_selector).to have_received(:telescope).at_least(:once)
+        expect(equipment_selector).to have_received(:choose_telescope_or_confirm).at_least(:once)
       end
 
       it 'checks filter' do
         organizer.organize
-        expect(equipment_selector).to have_received(:filter).at_least(:once)
+        expect(equipment_selector).to have_received(:choose_filter_or_confirm).at_least(:once)
       end
     end
 
@@ -539,7 +549,7 @@ module AstroSubframeOrganizer
 
         it 'does not prompt for telescope' do
           expect(equipment_selector).not_to receive(:choose_telescope)
-          expect(equipment_selector).not_to receive(:choose_telescope_or_confirm)
+          expect(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('ZhumellZ130')
           organizer.organize
         end
       end
@@ -578,7 +588,7 @@ module AstroSubframeOrganizer
 
         it 'does not prompt for telescope' do
           expect(equipment_selector).not_to receive(:choose_telescope)
-          expect(equipment_selector).not_to receive(:choose_telescope_or_confirm)
+          expect(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('RedCat51')
           organizer.organize
         end
       end
@@ -602,6 +612,7 @@ module AstroSubframeOrganizer
 
         it 'does not prompt for camera' do
           expect(equipment_selector).not_to receive(:choose_camera)
+          expect(equipment_selector).to receive(:choose_camera_or_confirm).and_return('ZWO ASI294MC Pro')
           organizer.organize
         end
       end
@@ -625,6 +636,7 @@ module AstroSubframeOrganizer
 
         it 'does not prompt for filter' do
           expect(equipment_selector).not_to receive(:choose_filter)
+          expect(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
           organizer.organize
         end
       end
@@ -654,6 +666,7 @@ module AstroSubframeOrganizer
 
         it 'does not prompt for filter' do
           expect(equipment_selector).not_to receive(:choose_filter)
+          expect(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
           organizer.organize
         end
       end
