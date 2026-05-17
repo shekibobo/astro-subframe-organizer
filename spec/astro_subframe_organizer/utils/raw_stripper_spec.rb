@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'exiftool_vendored'
 require 'astro_subframe_organizer/utils/raw_stripper'
 
 describe AstroSubframeOrganizer::Utils::RawStripper, :files do
@@ -32,8 +33,9 @@ describe AstroSubframeOrganizer::Utils::RawStripper, :files do
 
   describe '#strip' do
     it 'successfully creates a smaller MIE-based file if exiftool is present' do
-      # Check if exiftool is available on the host system
-      executable = Gem.win_platform? ? 'exiftool.exe' : 'exiftool'
+      Exiftool.command = 'exiftool.exe' if Gem.win_platform?
+      executable = Exiftool.command
+
       has_exiftool = system("#{executable} -ver > /dev/null 2>&1")
 
       if has_exiftool

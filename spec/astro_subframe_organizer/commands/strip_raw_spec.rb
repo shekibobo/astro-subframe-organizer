@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'exiftool_vendored'
 
 describe 'bin/strip_raw', type: :aruba do
   let(:test_path) { expand_path('.') }
@@ -13,8 +14,9 @@ describe 'bin/strip_raw', type: :aruba do
   end
 
   it 'executes the stripping process via CLI' do
-    # Skip if exiftool isn't available to avoid breaking build environments
-    executable = Gem.win_platform? ? 'exiftool.exe' : 'exiftool'
+    Exiftool.command = 'exiftool.exe' if Gem.win_platform?
+    executable = Exiftool.command
+
     skip 'exiftool not installed on this system' unless system("#{executable} -ver > /dev/null 2>&1")
 
     original_size = File.size(File.join(test_path, input_file))

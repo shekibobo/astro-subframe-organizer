@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'exiftool_vendored'
 
 module AstroSubframeOrganizer
   module Utils
@@ -23,11 +24,11 @@ module AstroSubframeOrganizer
         # This contains all metadata but zero image data.
         # We then save it with the original extension so the parsers recognize it.
         tmp_mie = "#{@output}.mie"
-        executable = Gem.win_platform? ? 'exiftool.exe' : 'exiftool'
+        Exiftool.command = 'exiftool.exe' if Gem.win_platform?
 
         # -o specifies the output file. exiftool creates a MIE file if the extension is .mie
         # -all:all ensures we copy all metadata blocks (EXIF, MakerNotes, etc.)
-        success = system("#{executable} -o \"#{tmp_mie}\" -all:all \"#{@input}\" > /dev/null 2>&1")
+        success = system("#{Exiftool.command} -o \"#{tmp_mie}\" -all:all \"#{@input}\" > /dev/null 2>&1")
 
         if success && File.exist?(tmp_mie)
           FileUtils.mkdir_p(File.dirname(@output))
