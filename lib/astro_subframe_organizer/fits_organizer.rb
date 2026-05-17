@@ -98,12 +98,9 @@ module AstroSubframeOrganizer
     def rename_from_exif
       renamer = Utils::ExifRenamer.new(path)
       type = prompt.enum_select('What is the file type?', Astrophoto::TYPES)
-      $stdout.flush
       target = prompt.ask('What is the target name?') if type == Astrophoto::LIGHT
-      $stdout.flush
 
       renamer.rename(type: type, target: target, dry_run: is_dry_run?)
-      $stdout.flush
     end
 
     def is_dry_run?
@@ -121,7 +118,6 @@ module AstroSubframeOrganizer
       loop do
         message = 'What are we organizing?'
         message += ' (Dry Run)' if dry_run
-        $stdout.flush
 
         choice = prompt.enum_select message, per_page: 8 do |menu|
           menu.choice 'Darks', :darks
@@ -144,8 +140,6 @@ module AstroSubframeOrganizer
         when :rename     then rename_from_exif
         when :quit       then break
         end
-
-        $stdout.flush
       end
     end
 
