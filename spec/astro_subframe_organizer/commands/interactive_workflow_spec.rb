@@ -17,8 +17,8 @@ describe 'Interactive CLI Workflow (In-Process)', type: :aruba do
   # This allows TTY tools to fall back to environment variables or defaults.
   def stub_io(io)
     io.define_singleton_method(:ioctl) { |*| -1 }
-    io.define_singleton_method(:tty?) { true }
-    io.define_singleton_method(:isatty) { true }
+    io.define_singleton_method(:tty?) { false }
+    io.define_singleton_method(:isatty) { false }
     io
   end
 
