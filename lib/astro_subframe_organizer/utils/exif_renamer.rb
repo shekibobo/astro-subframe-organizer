@@ -10,6 +10,8 @@ module AstroSubframeOrganizer
       include Logging
       include ExposureFormat
 
+      RAW_NAME_PATTERN = /^(IMG_|DSC_|_DSC|DSCN)/
+
       EXIF_DT_FORMAT = '%Y:%m:%d %H:%M:%S%z'
 
       attr_reader :path
@@ -38,12 +40,13 @@ module AstroSubframeOrganizer
       end
 
       def already_named?(files)
-        files.none? { |cr2| File.basename(cr2).start_with?('IMG_') }
+        files.none? { |file| File.basename(file).match?(RAW_NAME_PATTERN) }
       end
 
       def find_cr2_files
-        Dir.glob(['**/*.cr2', '**/*.CR2'], base: path)
-           .map { |f| File.join(path, f) }
+        exts = Config.raw_extensions.flat_map { |ext| [ext.downcase, ext.upcase] }
+        Dir.glob(exts.map { |e| "**/*#{e}" }, base: path)
+           .map { |f| File.expand_path(File.join(path, f)) }
            .uniq
       end
 
@@ -106,7 +109,11 @@ module AstroSubframeOrganizer
       end
 
       def resolve_time(exif)
-        Time.strptime(exif[:date_time_original] + exif[:time_zone], EXIF_DT_FORMAT)
+        dt = exif[:date_time_original]
+        tz = exif[:time_zone] || '+00:00'
+        Time.strptime("#{dt}#{tz}", EXIF_DT_FORMAT)
+      rescue ArgumentError
+        Time.parse(dt)
       end
     end
   end

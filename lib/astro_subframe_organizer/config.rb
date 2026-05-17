@@ -29,6 +29,8 @@ module AstroSubframeOrganizer
         'Canon EOS 1500D',
       ],
       'temperature_tolerance' => 5.0,
+      'fits_extensions' => %w[.fit .fits .fts],
+      'raw_extensions' => %w[.cr2 .cr3 .nef .arw .orf .raf .dng],
     }.freeze
 
     def self.custom_config_file
@@ -72,6 +74,14 @@ module AstroSubframeOrganizer
 
     def self.temperature_tolerance
       load['temperature_tolerance']&.to_f || 5.0
+    end
+
+    def self.fits_extensions
+      load['fits_extensions'] || DEFAULT_CONFIG['fits_extensions']
+    end
+
+    def self.raw_extensions
+      load['raw_extensions'] || DEFAULT_CONFIG['raw_extensions']
     end
 
     def self.create_default_config

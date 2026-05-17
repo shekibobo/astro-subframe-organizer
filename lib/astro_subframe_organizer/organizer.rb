@@ -16,8 +16,9 @@ module AstroSubframeOrganizer
     end
 
     def fits_files
-      all = Dir.glob(['**/*.fit', '**/*.FIT', '**/*.cr2', '**/*.CR2'], base: path)
-      processable = all.filter { |it| !it.match?(/IMG_\d+.CR2$/) }
+      exts = (Config.fits_extensions + Config.raw_extensions).flat_map { |e| [e.downcase, e.upcase] }
+      all = Dir.glob(exts.map { |e| "**/*#{e}" }, base: path)
+      processable = all.filter { |it| !File.basename(it).match?(Utils::ExifRenamer::RAW_NAME_PATTERN) }
                        .uniq
                        .map { |relative| File.join(path, relative) }
 

@@ -19,10 +19,10 @@ module AstroSubframeOrganizer
         gain: 'GAIN',
         iso: 'ISO',
         date_obs: 'DATE-OBS',
-        ccd_temp: 'CCD-TEMP',
       }.freeze
 
       ROTATION_HEADERS = %w[ROTATANG ANGLE POSANGLE ROTATOR ROTAT OBJCTROT CCDROTSA].freeze
+      TEMP_HEADERS = %w[CCD-TEMP SENSOR-TEMP].freeze
 
       def headers
         @headers ||= load_headers(path)
@@ -53,7 +53,7 @@ module AstroSubframeOrganizer
         result[:gain]        = header(:gain)
         result[:iso]         = header(:iso)
         result[:created_at]  = parse_date(header(:date_obs))
-        result[:ccd_temp]    = format_temp(header(:ccd_temp))
+        result[:ccd_temp]    = format_temp(ccd_temperature)
         result[:image_index] = parse_parts(extract_base_name).last
         result[:rotation]    = rotation_angle
         result[:mosaic_pane] = mosaic_pane
@@ -90,6 +90,10 @@ module AstroSubframeOrganizer
 
       def rotation_angle
         ROTATION_HEADERS.lazy.filter_map { |key| headers[key] }.first
+      end
+
+      def ccd_temperature
+        TEMP_HEADERS.lazy.filter_map { |key| headers[key] }.first
       end
 
       private

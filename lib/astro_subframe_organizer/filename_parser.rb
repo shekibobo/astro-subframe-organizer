@@ -61,14 +61,14 @@ module AstroSubframeOrganizer
     # @return [FitsFilenameParser, CR2FilenameParser] Appropriate parser instance
     # @raise [ArgumentError] If file format is not supported
     def self.for_file(path, use_headers: true)
-      case File.extname(path).downcase
-      when '.fit'
+      ext = File.extname(path).downcase
+      if Config.fits_extensions.include?(ext)
         if use_headers
           FilenameParsers::FitsHeaderParser.new(path)
         else
           FilenameParsers::FitsFilenameParser.new(path)
         end
-      when '.cr2'
+      elsif Config.raw_extensions.include?(ext)
         FilenameParsers::CR2FilenameParser.new(path)
       else
         raise ArgumentError, "Unsupported file format: #{path}"
