@@ -108,25 +108,22 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   config.before(:each) do |example|
-    # 1. Determine if we want to see logs
-    # Aruba needs real STDOUT; DEBUG_LOGS lets you see them manually
-    show_logs = example.metadata[:type] == :aruba || ENV['DEBUG_LOGS']
+    setup_test_logger(example)
+  end
+end
 
-    if show_logs
-      # Use the default logger pointing to $stdout
-      AstroSubframeOrganizer.logger = AstroSubframeOrganizer.default_logger
-    else
-      # 2. Create a fresh, writable buffer for this specific test
-      @log_buffer = StringIO.new
+# Configures the AstroSubframeOrganizer logger for test isolation.
+# Aruba tests use real STDOUT, while others use a StringIO buffer.
+def setup_test_logger(example)
+  show_logs = example.metadata[:type] == :aruba || ENV['DEBUG_LOGS']
 
-      # 3. Create the logger pointing to that buffer
-      test_logger = Logger.new(@log_buffer)
-
-      # 4. Manually copy the formatter from your default_logger
-      # so the log format stays consistent in tests
-      test_logger.formatter = AstroSubframeOrganizer.default_logger.formatter
-
-      AstroSubframeOrganizer.logger = test_logger
-    end
+  if show_logs
+    AstroSubframeOrganizer.logger = AstroSubframeOrganizer.default_logger
+  else
+    @log_buffer = StringIO.new
+    test_logger = Logger.new(@log_buffer)
+    # Copy the default formatter for consistency
+    test_logger.formatter = AstroSubframeOrganizer.default_logger.formatter
+    AstroSubframeOrganizer.logger = test_logger
   end
 end
