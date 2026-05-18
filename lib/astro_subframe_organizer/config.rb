@@ -127,7 +127,14 @@ module AstroSubframeOrganizer
     end
 
     def self.create_default_config
-      File.write(config_file, DEFAULT_CONFIG.to_yaml)
+      # Only include basic equipment and settings in the generated template.
+      # Advanced mappings and ignore patterns are handled via application defaults
+      # unless explicitly overridden by the user.
+      template = DEFAULT_CONFIG.slice(
+        'telescopes', 'filters', 'cameras', 'temperature_tolerance'
+      )
+
+      File.write(config_file, template.to_yaml)
     end
   end
 end

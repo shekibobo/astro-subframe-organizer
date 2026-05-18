@@ -12,17 +12,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-manufacturer RAW support: Added default support for `.cr3`, `.nef`, `.arw`, `.orf`, `.raf`, and `.dng` files.
 - Flexible Metadata Mapping: Added `fits_header_mappings` and `exif_tag_mappings` to configuration, allowing support for various capture software (N.I.N.A., SGP, etc.) and different DSLR manufacturers.
 - Configurable file extensions: Added `fits_extensions` and `raw_extensions` to the configuration file, allowing users to define which file types the tool should process.
+- Telescope Ignore Patterns: Added `telescope_ignore_patterns` to configuration to automatically skip known mount names (e.g., "EQMod", "AM5") often found in ASIAir `TELESCOP` headers.
 
 ### Changed
 
 - Generalized RAW renaming: Updated `ExifRenamer` to recognize common manufacturer filename prefixes beyond Canon (e.g., Sony's `DSC_`, Nikon's `_DSC` and `DSCN`).
 - Robustified EXIF parsing: Improved timezone handling when extracting metadata from RAW files to handle cases where time offset data is missing.
 - Refactored `FilenameParser` factory to dynamically use extensions defined in the configuration.
+- Improved Equipment Selection: The tool now provides "honest" feedback during organization, identifying ignored mount names and suggesting configuration updates for unknown equipment.
+- Refined Telescope Detection: Removed the camera model fallback for telescopes to prevent incorrect equipment identification.
 
 ### Fixed
 
 - Fixed an issue where non-Canon RAW files were ignored by the file discovery logic.
 - Resolved a potential crash in `ExifRenamer` when encountering unexpected date formats in metadata.
+- Fixed FITS header detection for cameras by ensuring the `camera` mapping is correctly used in the parser.
+- Resolved test regressions caused by more accurate metadata detection and fallback logic.
 
 ## [0.0.1] - 2025-02-24
 

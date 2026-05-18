@@ -116,6 +116,64 @@ temperature_tolerance: 5.0
 
 Note: if you have an automatic filter wheel and your software records the filter name in FITS headers, ASO will automatically select the assigned filter for organization.
 
+### Advanced Configuration
+
+You can further customize how metadata is extracted and how equipment is identified by adding these optional sections to your configuration file.
+
+#### Telescope Ignore Patterns
+
+ASIAir and other software often populate the TELESCOP header with the name of your mount rather than your telescope. You can define case-insensitive partial match strings to ignore these values and force a manual selection or use a CLI override.
+
+```yaml
+telescope_ignore_patterns:
+  - Mount
+  - EQMod
+  - AM5
+  - AM3
+  - $ST-135
+```
+
+#### Custom Metadata Mappings
+
+If your capture software uses non-standard FITS headers or your DSLR uses unusual EXIF tags, you can map them to the fields the organizer expects. The tool will check tags in the order they are listed.
+
+```yaml
+temperature:
+  - CCD-TEMP
+  - SET-TEMP
+  - SENSOR-TEMP
+exposure:
+  - EXPOSURE
+  - EXPTIME
+target:
+  - OBJECT
+  - TARGET
+exif_tag_mappings:
+  temperature:
+    - camera_temperature
+    - sensor_temperature
+  iso:
+    - iso
+    - base_iso
+```
+
+#### Custom File Extensions
+
+If you use file extensions not supported by default, you can add them here:
+
+```yaml
+fits_extensions:
+  - .fit
+  - .fits
+  - .fts
+raw_extensions:
+  - .cr2
+  - .cr3
+  - .nef
+  - .arw
+  - .dng
+```
+
 #### Using a Custom Config File
 
 You can specify a custom config file in all subcommands, and that config will be used for the duration of that run session:
@@ -134,6 +192,10 @@ There are several ways to use `astro-subframe-organizer`.
     - [Initialize your equipment set](#initialize-your-equipment-set)
     - [Configuration](#configuration)
       - [Creating a Config File](#creating-a-config-file)
+    - [Advanced Configuration](#advanced-configuration)
+      - [Telescope Ignore Patterns](#telescope-ignore-patterns)
+      - [Custom Metadata Mappings](#custom-metadata-mappings)
+      - [Custom File Extensions](#custom-file-extensions)
       - [Using a Custom Config File](#using-a-custom-config-file)
   - [Organization Tools](#organization-tools)
     - [Interactive Menu](#interactive-menu)
@@ -449,7 +511,6 @@ brew install exiftool
 ```bash
 sudo apt install exiftool 
 ```
-
 
 #### Rename From EXIF
 
