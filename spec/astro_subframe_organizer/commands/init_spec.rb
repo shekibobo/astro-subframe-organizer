@@ -15,7 +15,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
   context 'with no config option' do
     let(:command) { 'astro-subframe-organizer init' }
 
-    context 'no config file exists yet' do
+    context 'when no config file exists yet' do
       before { run_command_and_stop command }
 
       it 'exits successfully' do

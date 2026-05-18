@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'astro-subframe-organizer run', type: :aruba do
   context 'with no options' do
-    let!(:command) { run_command 'astro-subframe-organizer run' }
+    before { run_command 'astro-subframe-organizer run' }
 
     it 'exits successfully' do
       type "8\n"

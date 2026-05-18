@@ -74,10 +74,10 @@ module AstroSubframeOrganizer
 
     describe '#rounded_ccd_temp' do
       context 'when ccd_temp is nil' do
-        subject { build_metadata(ccd_temp: nil) }
+        subject(:metadata) { build_metadata(ccd_temp: nil) }
 
         it 'returns nil' do
-          expect(subject.rounded_ccd_temp).to be_nil
+          expect(metadata.rounded_ccd_temp).to be_nil
         end
       end
 

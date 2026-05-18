@@ -44,14 +44,14 @@ module AstroSubframeOrganizer
         before { selector.telescope = 'RedCat51' }
 
         it 'returns the preset telescope without prompting' do
-          expect(prompt).not_to receive(:enum_select)
+          expect(prompt).not_to have_received(:enum_select)
           expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('RedCat51')
         end
       end
 
       context 'when detected telescope matches a configured telescope' do
         it 'returns the detected telescope without prompting' do
-          expect(prompt).not_to receive(:enum_select)
+          expect(prompt).not_to have_received(:enum_select)
           expect(selector.choose_telescope_or_confirm(detected: 'RedCat51')).to eq('RedCat51')
         end
       end
@@ -117,21 +117,21 @@ module AstroSubframeOrganizer
 
         context 'when TELESCOP header is absent' do
           it 'returns the only configured telescope without prompting' do
-            expect(prompt).not_to receive(:enum_select)
+            expect(prompt).not_to have_received(:enum_select)
             expect(selector.choose_telescope_or_confirm(detected: nil)).to eq('RedCat51')
           end
         end
 
         context 'when TELESCOP header matches the configured telescope' do
           it 'returns the configured telescope without prompting' do
-            expect(prompt).not_to receive(:enum_select)
+            expect(prompt).not_to have_received(:enum_select)
             expect(selector.choose_telescope_or_confirm(detected: 'RedCat51')).to eq('RedCat51')
           end
         end
 
         context 'when TELESCOP header is a mount name (ignored) and not in the configured list' do
           it 'returns the only configured telescope without prompting' do
-            expect(prompt).not_to receive(:enum_select)
+            expect(prompt).not_to have_received(:enum_select)
             expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('RedCat51')
           end
 

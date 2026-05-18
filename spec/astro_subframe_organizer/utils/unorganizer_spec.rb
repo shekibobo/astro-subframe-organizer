@@ -110,6 +110,7 @@ module AstroSubframeOrganizer
           it 'moves files from nested directories' do
             unorganizer.unorganize
             expect(File).to exist(File.join(test_dir, 'Light_M42_300.0s_0001.fit'))
+            expect(File).not_to exist(deep_file)
           end
         end
 

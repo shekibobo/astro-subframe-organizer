@@ -53,6 +53,7 @@ module AstroSubframeOrganizer
           it 'does not remove the directory' do
             cleaner.cleanup
             expect(File).to exist(populated_dir)
+            expect(File).to exist(fit_file)
           end
         end
 
@@ -79,11 +80,13 @@ module AstroSubframeOrganizer
           it 'removes the empty child directory' do
             cleaner.cleanup
             expect(File).not_to exist(child)
+            expect(File).to exist(fit_file)
           end
 
           it 'does not remove the parent directory' do
             cleaner.cleanup
             expect(File).to exist(parent)
+            expect(File).to exist(fit_file)
           end
         end
 

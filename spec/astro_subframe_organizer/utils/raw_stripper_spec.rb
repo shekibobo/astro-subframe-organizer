@@ -32,7 +32,7 @@ describe AstroSubframeOrganizer::Utils::RawStripper, :files do
   end
 
   describe '#strip' do
-    it 'successfully creates a smaller MIE-based file if exiftool is present' do
+    it 'successfully creates a smaller MIE-based file if exiftool is present' do # rubocop:disable RSpec/MultipleExpectations
       Exiftool.command = 'exiftool.exe' if Gem.win_platform?
       executable = Exiftool.command
 

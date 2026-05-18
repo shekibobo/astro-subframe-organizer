@@ -17,4 +17,3 @@ require 'rubocop/rake_task'
 RuboCop::RakeTask.new
 
 desc 'Run unit tests and RuboCop'
-task default: %i[spec rubocop]

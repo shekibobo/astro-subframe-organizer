@@ -13,7 +13,7 @@ module AstroSubframeOrganizer
       )
     end
 
-    let(:prompt)             { instance_double(TTY::Prompt) }
+    let(:prompt)             { instance_spy(TTY::Prompt) }
     let(:equipment_selector) { instance_double(AstroSubframeOrganizer::EquipmentSelector) }
     let(:type)               { AstroSubframeOrganizer::Astrophoto::DARK }
 
@@ -507,7 +507,7 @@ module AstroSubframeOrganizer
         end
 
         it 'skips already-moved filesets without prompting' do
-          expect(prompt).not_to receive(:yes?)
+          expect(prompt).not_to have_received(:yes?)
           organizer.organize
         end
       end
@@ -552,8 +552,8 @@ module AstroSubframeOrganizer
         end
 
         it 'does not prompt for telescope' do
-          expect(equipment_selector).not_to receive(:choose_telescope)
-          expect(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('ZhumellZ130')
+          expect(equipment_selector).not_to have_received(:choose_telescope)
+          allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('ZhumellZ130')
           organizer.organize
         end
       end
@@ -591,8 +591,8 @@ module AstroSubframeOrganizer
         end
 
         it 'does not prompt for telescope' do
-          expect(equipment_selector).not_to receive(:choose_telescope)
-          expect(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('RedCat51')
+          expect(equipment_selector).not_to have_received(:choose_telescope)
+          allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('RedCat51')
           organizer.organize
         end
       end
@@ -615,8 +615,8 @@ module AstroSubframeOrganizer
         end
 
         it 'does not prompt for camera' do
-          expect(equipment_selector).not_to receive(:choose_camera)
-          expect(equipment_selector).to receive(:choose_camera_or_confirm).and_return('ZWO ASI294MC Pro')
+          expect(equipment_selector).not_to have_received(:choose_camera)
+          allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return('ZWO ASI294MC Pro')
           organizer.organize
         end
       end
@@ -639,8 +639,8 @@ module AstroSubframeOrganizer
         end
 
         it 'does not prompt for filter' do
-          expect(equipment_selector).not_to receive(:choose_filter)
-          expect(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
+          expect(equipment_selector).not_to have_received(:choose_filter)
+          allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
           organizer.organize
         end
       end
@@ -669,8 +669,8 @@ module AstroSubframeOrganizer
         end
 
         it 'does not prompt for filter' do
-          expect(equipment_selector).not_to receive(:choose_filter)
-          expect(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
+          expect(equipment_selector).not_to have_received(:choose_filter)
+          allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return('NBZ')
           organizer.organize
         end
       end

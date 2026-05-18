@@ -23,7 +23,7 @@ module AstroSubframeOrganizer
           expect(last_command_started.exit_status).to eq(0)
         end
 
-        it 'prints the fits headers for the file' do
+        it 'prints the fits headers for the file' do # rubocop:disable RSpec/ExampleLength
           expect(last_command_started).to have_output eq(<<~OUTPUT.strip)
             FITS Headers: Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit
             ────────────────────────────────────────────────────────────

@@ -37,11 +37,8 @@ module AstroSubframeOrganizer
           test_dir,
           dest_path: dest_path,
         )
-
         photo = described_class.new(path)
-
-        expect(photo.telescope).to eq('RedCat51')
-        expect(photo.filter).to eq('BaaderMoon')
+        expect(photo).to have_attributes(telescope: 'RedCat51', filter: 'BaaderMoon')
       end
 
       it 'returns the current directory correctly' do
@@ -103,8 +100,8 @@ module AstroSubframeOrganizer
           telescope: nil,
           filter: nil,
           dark_flat: false,
+          path: light_path,
         )
-        expect(photo.path).to eq(light_path)
       end
 
       it 'parses mosaic pane correctly' do
@@ -137,9 +134,7 @@ module AstroSubframeOrganizer
 
         photo = described_class.new(path)
 
-        expect(photo.camera).to eq('183MC')
-        expect(photo.iso).to be_nil
-        expect(photo.gain).to eq(100)
+        expect(photo).to have_attributes(camera: '183MC', gain: 100, iso: nil)
       end
 
       describe 'flatset_id' do

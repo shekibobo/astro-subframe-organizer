@@ -21,14 +21,13 @@ describe 'astro-subframe-organizer unorganize', type: :aruba do
   end
 
   context 'with organized FITS files' do
-    let!(:organized_file) do
+    before do
       create_organized_file(
         'Light_M42_FLATSET_20220508_GAIN_111_EXP_300.0s_Bin_1_TELESCOPE_RedCat51_FILTER_NoFilter_CAMERA_183MC',
         'Light_M42_300.0s_Bin1_183MC_gain111_20220508-120000_-10.0C_0001.fit',
       )
+      run_command_and_stop "astro-subframe-organizer unorganize --path #{test_path}"
     end
-
-    before { run_command_and_stop "astro-subframe-organizer unorganize --path #{test_path}" }
 
     it 'exits successfully' do
       expect(last_command_started.exit_status).to eq(0)
