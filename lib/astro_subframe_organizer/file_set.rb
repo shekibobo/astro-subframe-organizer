@@ -61,7 +61,7 @@ module AstroSubframeOrganizer
     end
 
     def camera_candidates
-      files.map(&:camera).compact.uniq
+      files.filter_map(&:camera).uniq
     end
 
     def camera
@@ -73,7 +73,7 @@ module AstroSubframeOrganizer
     end
 
     def telescope_candidates
-      files.map(&:telescope).compact.uniq
+      files.filter_map(&:telescope).uniq
     end
 
     def telescope
@@ -85,7 +85,7 @@ module AstroSubframeOrganizer
     end
 
     def filter_candidates
-      files.map(&:filter).compact.uniq
+      files.filter_map(&:filter).uniq
     end
 
     def filter

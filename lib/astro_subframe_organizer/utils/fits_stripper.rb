@@ -41,7 +41,7 @@ module AstroSubframeOrganizer
             block = f.read(BLOCK_SIZE)
             return false unless block&.length == BLOCK_SIZE
 
-            cards = block.scan(/.{#{CARD_SIZE}}/m)
+            cards = block.scan(/.{#{CARD_SIZE}}/mo)
             naxis_card = cards.find { |c| c.start_with?('NAXIS   =') }
             return naxis_card.match?(/=\s+0\b/) if naxis_card
 
@@ -80,7 +80,7 @@ module AstroSubframeOrganizer
       end
 
       def strip_location_headers(header_data)
-        cards = header_data.scan(/.{#{CARD_SIZE}}/m)
+        cards = header_data.scan(/.{#{CARD_SIZE}}/mo)
         cards.map do |card|
           if location_header?(card)
             blank_card
@@ -101,7 +101,7 @@ module AstroSubframeOrganizer
       end
 
       def header_end?(block)
-        block.scan(/.{#{CARD_SIZE}}/m).any? { |card| card.start_with?('END ') }
+        block.scan(/.{#{CARD_SIZE}}/mo).any? { |card| card.start_with?('END ') }
       end
 
       def stripped_path(input_path)

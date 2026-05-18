@@ -1,6 +1,7 @@
 plugins:
   - rubocop-rspec
   - rubocop-rake
+  - rubocop-performance
 AllCops:
   NewCops: enable
 Metrics/BlockLength:
