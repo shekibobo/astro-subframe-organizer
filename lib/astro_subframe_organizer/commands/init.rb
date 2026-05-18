@@ -10,12 +10,13 @@ module AstroSubframeOrganizer
       include EquipmentOptions
 
       desc 'Create default config file at ~/astro-subframe-organizer-config.yml'
-
+      # rubocop:disable Layout/LineLength
       example [
         '# Basic usage, creates default file with sample equipment',
         '--config ~/custom_config.yml # Creates a config file with sample equipment in custom file',
         '--config ~/galaxy-season.yml --telescope CarbonStar200 --filter BaaderMoon --camera 183MC # Creates a config file with sample equipment in custom file',
       ]
+      # rubocop:enable Layout/LineLength
 
       option :force, type: :boolean, default: false, required: false, desc: 'Overwrite existing file'
 
@@ -42,9 +43,9 @@ module AstroSubframeOrganizer
 
       def default_config(telescope: nil, filter: nil, camera: nil)
         {
-          'telescopes' => telescope&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('telescopes'),
-          'filters' => filter&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('filters'),
-          'cameras' => camera&.then { |it| [it] } || Config::DEFAULT_CONFIG.fetch('cameras'),
+          'telescopes' => telescope ? [telescope] : Config::DEFAULT_CONFIG.fetch('telescopes'),
+          'filters' => filter ? [filter] : Config::DEFAULT_CONFIG.fetch('filters'),
+          'cameras' => camera ? [camera] : Config::DEFAULT_CONFIG.fetch('cameras'),
           'temperature_tolerance' => 5.0,
         }
       end

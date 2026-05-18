@@ -105,13 +105,13 @@ module AstroSubframeOrganizer
         seq_num    = derive_sequence_number_from_filename(exif.source_file).to_s.rjust(4, '0')
         camera     = resolve_camera(get_exif_value(exif, 'model'))
 
-        [type, target, exp_str, 'Bin1', camera, "ISO#{get_exif_value(exif, 'iso')}", created_at, ccd_temp, seq_num]
+        [type, target, exp_str, 'Bin1', camera, "ISO#{get_exif_value(exif, 'iso')}", created_at, ccd_temp, seq_num] # rubocop:disable Style/StringConcatenation
           .compact
           .join('_') + '.CR2'
       end
 
       def resolve_camera(cam_model)
-        camera = Equipment::Camera.all.find { |it| cam_model.include?(it) }
+        camera = Equipment::Camera.all.find { |c| cam_model.include?(c) }
         if camera.nil?
           logger.warn "Camera #{cam_model} did not match any expected models."
           cam_model

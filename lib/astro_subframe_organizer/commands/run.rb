@@ -9,6 +9,7 @@ module AstroSubframeOrganizer
 
       desc 'Run the subframe organizer interactively'
 
+      # rubocop:disable Layout/LineLength
       example [
         '                             # Basic usage, using default values or values from default config file at ~/astro-subframe-organizer-config.yml',
         '--config ~/.custom-setup.yml # Uses alternative setup with specific equipment',
@@ -16,6 +17,7 @@ module AstroSubframeOrganizer
         '--skip-confirm               # Skip confirmation step before moving files',
         '--dry-run                    # Run interactively, dry-run only',
       ]
+      # rubocop:enable Layout/LineLength
 
       def call(**options)
         setup(**options.slice(:config, :verbose, :skip_confirm))

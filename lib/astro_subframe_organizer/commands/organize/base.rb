@@ -10,6 +10,7 @@ module AstroSubframeOrganizer
 
         def self.inherited(subclass)
           super
+          # rubocop:disable Layout/LineLength
           subclass.example [
             '# Default - interactive menu using default configuration file in the current directory',
             '--path /Volumes/Sirius/staging/ # organize files under specified directory',
@@ -17,6 +18,7 @@ module AstroSubframeOrganizer
             '--telescope RedCat51 --camera 183MC --filter BaaderMoon --skip-confirm # organize using the specified equipment, no confirmation prompts',
             "--telescope 'William Optics RedCat51' --camera 'ZWO ASI183MC Pro' --filter 'Baader Moon & Skyglow' --skip-confirm # equipment with spaces or special characters require quotes",
           ]
+          # rubocop:enable Layout/LineLength
         end
 
         def call(dry_run: false, path: Dir.pwd, **options)

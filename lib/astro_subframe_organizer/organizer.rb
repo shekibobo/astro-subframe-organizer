@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module AstroSubframeOrganizer
+  # Main class responsible for organizing astrophotography subframes based on metadata and user input.
   class Organizer
     include Logging
 
@@ -15,32 +16,38 @@ module AstroSubframeOrganizer
       @equipment_selector = equipment_selector || EquipmentSelector.new(prompt)
     end
 
-    def fits_files
+    def fits_files # rubocop:disable Metrics/AbcSize
       exts = (Config.fits_extensions + Config.raw_extensions).flat_map { |e| [e.downcase, e.upcase] }
       all = Dir.glob(exts.map { |e| "**/*#{e}" }, base: path)
-      processable = all.filter { |it| !File.basename(it).match?(Utils::ExifRenamer::RAW_NAME_PATTERN) }
+      processable = all.filter { |f| !File.basename(f).match?(Utils::ExifRenamer::RAW_NAME_PATTERN) }
                        .uniq
                        .map { |relative| File.join(path, relative) }
 
       if processable.size != all.size
-        unprocessable_raw_files_warning = 'Unprocessed raw images detected, but will be ignored. Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, then try again.'
+        unprocessable_raw_files_warning = 'Unprocessed raw images detected, but will be ignored. " +
+        "Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename_from_exif`, " +
+        "then try again.'
         logger.warn(unprocessable_raw_files_warning)
       end
 
-      processable.map { |it| Astrophoto.new(it) }
+      processable.map { |f| Astrophoto.new(f) }
     end
 
-    def organize(dry_run: false)
-      logger.info "Preparing to move #{file_sets.sum do |set|
-        set.files.size
-      end} #{type} files from #{file_sets.size} groups..."
+    def organize(dry_run: false) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+      logger.info "Preparing to move #{file_sets.sum { |set| set.files.size }} #{type} files " \
+                  "from #{file_sets.size} groups..."
       @file_sets.each do |fileset|
         next if fileset.already_moved?
 
         if fileset.all_unmoved?
           move = ENV['ASTRO_SUBFRAME_SKIP_CONFIRM'] == 'true' ||
                  prompt.yes?(
-                   "Preparing to move #{fileset.size} #{fileset.type} file(s) \n  FROM #{relative_to_pwd(fileset.current_dir)} \n  TO   #{relative_to_pwd(fileset.files.first.target_dir)}\nContinue?",
+                   <<~MSG,
+                     Preparing to move #{fileset.size} #{fileset.type} file(s)
+                        FROM #{relative_to_pwd(fileset.current_dir)}
+                        TO   #{relative_to_pwd(fileset.files.first.target_dir)}
+                     Continue?
+                   MSG
                    default: 'y',
                  )
           next unless move
@@ -57,8 +64,8 @@ module AstroSubframeOrganizer
         # Initialize the bar with the size of the fileset
         bar = TTY::ProgressBar.new('Moving files [:bar] :current/:total (:percent) :eta', total: fileset.size)
 
-        fileset.each do |it|
-          it.move(dry_run, bar)
+        fileset.each do |file|
+          file.move(dry_run, bar)
           bar.advance(1) # Move the bar forward by 1 for each file
         end
 

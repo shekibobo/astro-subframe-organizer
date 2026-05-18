@@ -45,6 +45,19 @@ require 'yaml'
 
 FILENAME_DT_FORMAT = '%Y%m%d-%H%M%S'
 
+# The main module for the AstroSubframeOrganizer gem, which provides functionality to organize astrophotography
+# FITS and RAW files based on their metadata.
+#
+# This module includes:
+# - Configuration management for user preferences and settings.
+# - Equipment classes representing cameras, filters, and telescopes.
+# - Filename parsers for extracting metadata from FITS headers and RAW filenames.
+# - Path builders that construct folder paths based on image metadata for use with PixInsight's WBPP script.
+# - The main Organizer class that orchestrates the file organization process.
+# - Utility classes for tasks like renaming files based on EXIF data, cleaning thumbnails, and reverting organization.
+#
+# The gem is designed to be used as a command-line tool, but its components can also be used programmatically in
+# other Ruby applications.
 module AstroSubframeOrganizer
   class << self
     attr_writer :logger

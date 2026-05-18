@@ -1,12 +1,36 @@
-inherit_from: .rubocop_todo.yml
+# inherit_from: .rubocop_todo.yml
 AllCops:
   NewCops: enable
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+    - '*.gemspec'
+    - 'bin/**/*'
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*'
+Metrics/ClassLength:
+  Max: 120
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/astro_subframe_organizer/config.rb'
+Metrics/MethodLength:
+  Max: 25
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/astro_subframe_organizer/commands/inspect.rb'
+Metrics/ParameterLists:
+  Max: 10
+  Exclude:
+    - 'spec/**/*'
+Metrics/AbcSize:
+  Max: 25
+  Exclude:
+    - 'spec/**/*'
+Metrics/CyclomaticComplexity:
+  Max: 10
+Metrics/PerceivedComplexity:
+  Max: 10
 Layout/LineLength:
   Exclude:
     - 'spec/**/*'
@@ -14,6 +38,10 @@ Layout/MultilineMethodArgumentLineBreaks:
   Enabled: true
 Layout/FirstMethodArgumentLineBreak:
   Enabled: true
+Style/Documentation:
+  Exclude:
+    - 'lib/astro_subframe_organizer/commands/**/*.rb'
+    - 'spec/**/*.rb'
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
   Enabled: true

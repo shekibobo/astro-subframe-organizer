@@ -22,13 +22,16 @@ module AstroSubframeOrganizer
       include Logging
 
       # @return [Hash] Parsed metadata from CR2 filename
-      def parse
+      def parse # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
         base_name = extract_base_name
         parts = parse_parts(base_name)
         result = {}
 
         if @filename.start_with? 'IMG_'
-          logger.error('Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename`, then try again.')
+          logger.error(
+            'Raw images must be renamed before organizing. Run `astro-subframe-organizer raw rename`, ' \
+            'then try again.',
+          )
           exit(1)
         end
 

@@ -20,6 +20,18 @@ require 'astro_subframe_organizer/commands/cleanup/empty_directories'
 require 'astro_subframe_organizer/commands/cleanup/unorganize'
 
 module AstroSubframeOrganizer
+  # The main command registry for the AstroSubframeOrganizer CLI, using Dry::CLI to define and
+  # organize commands and their aliases. This module registers all the available commands for
+  # the CLI, including:
+  #
+  # - Version display
+  # - Initialization of configuration
+  # - Running the organizer in interactive mode
+  # - Inspecting file metadata
+  # - Organizing different types of subframes (lights, darks, flats, biases)
+  # - Renaming RAW files based on EXIF data
+  # - Cleaning up thumbnails and empty directories
+  # - Reverting organization changes
   module Commands
     extend Dry::CLI::Registry
 

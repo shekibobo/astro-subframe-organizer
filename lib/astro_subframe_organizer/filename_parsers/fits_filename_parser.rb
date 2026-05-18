@@ -30,7 +30,7 @@ module AstroSubframeOrganizer
       include Logging
 
       # @return [Hash] Parsed metadata from FITS filename
-      def parse
+      def parse # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
         base_name = extract_base_name
         parts = parse_parts(base_name)
         result = {}

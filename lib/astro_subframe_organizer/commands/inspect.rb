@@ -83,7 +83,6 @@ module AstroSubframeOrganizer
         when true    then 'T'
         when false   then 'F'
         when Float   then format('%-20.10G', value)
-        when Integer then value.to_s
         when String  then value
         else              value.to_s
         end

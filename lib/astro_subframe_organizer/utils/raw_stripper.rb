@@ -5,6 +5,9 @@ require 'exiftool_vendored'
 
 module AstroSubframeOrganizer
   module Utils
+    # Strips RAW files down to their metadata by creating a MIE (Metadata Information Extraction) file using exiftool.
+    # This is useful for users who want to keep metadata but remove large image data from their RAW files, for example
+    # to generate test fixtures where metadata is important, but image data is not needed.
     class RawStripper
       def initialize(input_path, output_path)
         @input = input_path
@@ -19,7 +22,7 @@ module AstroSubframeOrganizer
         File.size(@output) < 1_048_576
       end
 
-      def strip
+      def strip # rubocop:disable Naming/PredicateMethod
         # We use exiftool to create a Metadata Information Extraction (MIE) file.
         # This contains all metadata but zero image data.
         # We then save it with the original extension so the parsers recognize it.

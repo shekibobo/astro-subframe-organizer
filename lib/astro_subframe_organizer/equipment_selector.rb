@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module AstroSubframeOrganizer
+  # Handles interactive selection of equipment based on configuration and FITS header detection.
   class EquipmentSelector
     include Equipment
     include Logging
@@ -30,7 +31,8 @@ module AstroSubframeOrganizer
       end
 
       if detected
-        suggestion = "If '#{detected}' is a mount name, consider adding it to 'telescope_ignore_patterns' in your config."
+        suggestion = "If '#{detected}' is a mount name, consider adding it to 'telescope_ignore_patterns' " \
+                     'in your config.'
       end
       generic_choose_or_confirm(telescope, @telescopes, 'telescope', 'TELESCOP', detected, suggestion: suggestion)
     end
@@ -63,10 +65,17 @@ module AstroSubframeOrganizer
       else
         prompt_text = custom_prompt || "What #{label} is used with this set?"
         choose(prompt_text, collection)
-      end.tap { |it| logger.info("Selected #{label.capitalize}: #{it}") }
+      end.tap { |chosen| logger.info("Selected #{label.capitalize}: #{chosen}") }
     end
 
-    def generic_choose_or_confirm(current_value, collection, label, header_name, detected, suggestion: nil)
+    def generic_choose_or_confirm(
+      current_value,
+      collection,
+      label,
+      header_name,
+      detected,
+      suggestion: nil
+    )
       if current_value
         logger.warn "Using #{label} #{current_value}, but detected #{detected}" if detected && current_value != detected
         return current_value
@@ -80,7 +89,7 @@ module AstroSubframeOrganizer
         choose(
           "#{header_name} is '#{detected}' — select the actual #{label} or confirm:",
           [detected] + collection,
-        ).tap { |it| logger.info("Selected #{label.capitalize}: #{it}") }
+        ).tap { |chosen| logger.info("Selected #{label.capitalize}: #{chosen}") }
       else
         logger.warn "#{label.capitalize} auto-detect failed."
         send("choose_#{label}")

@@ -4,6 +4,8 @@ require 'tempfile'
 require 'fileutils'
 require 'tmpdir'
 
+FIXTURE_ROOT = File.expand_path('../fixtures', __dir__)
+
 # Fixtures in spec/fixtures/fits/ are header-only FITS files stripped with
 # bin/strip_fits. One representative file from each set is used per frame type.
 #
@@ -17,9 +19,6 @@ require 'tmpdir'
 # flat-blanks:  Flat frames, rotation 293deg, 5s, Bin1, 183MC, gain 111,
 #               captured across three sessions: 2025-12-24, 2026-01-13,
 #               2026-02-18. Some files have -9.5C or -10.5C temp variations.
-
-FIXTURE_ROOT = File.expand_path('../fixtures', __dir__)
-
 module FilesHelper
   def test_dir
     @test_dir

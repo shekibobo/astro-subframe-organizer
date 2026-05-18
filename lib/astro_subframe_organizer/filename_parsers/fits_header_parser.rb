@@ -4,6 +4,7 @@ require 'fits_parser'
 
 module AstroSubframeOrganizer
   module FilenameParsers
+    # Parser to generate FileMetadata based on FITS headers and filename patterns.
     class FitsHeaderParser < FilenameParser
       include Logging
       include AstroSubframeOrganizer::Utils::ExposureFormat
@@ -16,7 +17,7 @@ module AstroSubframeOrganizer
         headers[key]
       end
 
-      def parse
+      def parse # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
         result = {
           file_format: :fits,
           path: @path,

@@ -2,6 +2,7 @@
 
 module AstroSubframeOrganizer
   module PathBuilders
+    # rubocop:disable Layout/LineLength
     # Builds folder paths for light (science) frames.
     #
     # Light frames are organized by the following keywords, which allow WBPP to
@@ -14,7 +15,7 @@ module AstroSubframeOrganizer
     # - Target: Object being imaged (e.g., M42, NGC1977)
     # - PANE: Mosaic pane identifier (e.g., 1-1, 1-2) - optional
     # - FLATSET: Date-based grouping matching the flats/darks captured for this light set
-    # - ROTATION: Normalized rotation angle (module 180 to ignore meridian flip, only present if rotation is recorded in FITS)
+    # - ROTATION: Normalized rotation angle (module 180 to ignore meridian flip, only present if rotation is in FITS)
     # - ISO/GAIN: Camera ISO or GAIN setting (must match darks and flats)
     # - EXP: Exposure time (must match darks and flats)
     # - Bin: Binning mode (must match darks and flats)
@@ -27,6 +28,7 @@ module AstroSubframeOrganizer
     # flats, and biases for each light frame during the calibration and integration process.
     #
     # See README.md for details on WBPP_Integration process icon and keyword matching.
+    # rubocop:enable Layout/LineLength
     class LightPathBuilder < BasePathBuilder
       # @return [String] The folder path for this light frame
       def build

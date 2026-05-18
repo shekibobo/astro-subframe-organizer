@@ -8,10 +8,12 @@ module AstroSubframeOrganizer
 
         desc 'Move all FITS and CR2 files from subdirectories back into the target directory'
 
+        # rubocop:disable Layout/LineLength
         example [
           '# Default, move all .fit and .cr2 files to the current directory and delete empty subdirectories',
-          '--path ~/astrophotography/organized # Move all organized .fit and .cr2 files into ~/astrophotography/organized and delete the empty subdirectories',
+          '--path ~/astrophotography/organized # Move organized files into ~/astrophotography/organized and clean up empty directories',
         ]
+        # rubocop:enable Layout/LineLength
 
         def call(config: nil, verbose: false, dry_run: false, path: Dir.pwd, **)
           setup(config: config, verbose: verbose)

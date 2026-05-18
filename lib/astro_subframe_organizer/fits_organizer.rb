@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module AstroSubframeOrganizer
+  # Main class responsible for interactively organizing FITS files based on their headers and user input.
   class FitsOrganizer
     include Logging
 
@@ -100,8 +101,8 @@ module AstroSubframeOrganizer
       renamer.rename(type: type, target: target, dry_run: is_dry_run?)
     end
 
-    def is_dry_run?
-      dry_run&.then { |it| it } || prompt.yes?('Is this a dry run?', default: 'y')
+    def is_dry_run? # rubocop:disable Naming/PredicatePrefix
+      dry_run.nil? ? prompt.yes?('Is this a dry run?', default: 'y') : dry_run
     end
 
     def rename_to_img

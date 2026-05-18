@@ -11,7 +11,7 @@ module AstroSubframeOrganizer
     #
     # **Keyword meanings:**
     # - FLATSET: Date-based grouping (typically the morning after lights were captured)
-    # - ROTATION: Normalized rotation angle (module 180 to ignore meridian flip, only present if rotation is recorded in FITS)
+    # - ROTATION: Normalized rotation angle (module 180 to ignore meridian flip, only present if rotation is in FITS)
     # - ISO: Camera ISO setting (if ISO is recorded, mutually exclusive with GAIN)
     # - GAIN: Camera gain setting (if gain is recorded, mutually exclusive with ISO)
     # - EXP: Exposure time (note: WBPP requires matching EXP on flats to lights in WBPP_Integration)

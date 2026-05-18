@@ -16,7 +16,7 @@ module AstroSubframeOrganizer
                 :mosaic_pane,
                 :rotation
 
-    def initialize(
+    def initialize( # rubocop:disable Metrics/ParameterLists
       type:, path:, filename:, file_format:, exposure: nil, bin: nil, camera: nil,
       iso: nil, gain: nil, created_at: nil, ccd_temp: nil, image_index: nil,
       target: nil, telescope: nil, filter: nil, dark_flat: false, mosaic_pane: nil,

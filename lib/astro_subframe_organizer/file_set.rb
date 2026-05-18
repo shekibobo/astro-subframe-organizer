@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module AstroSubframeOrganizer
+  # Value object representing a set of files that belong together based on type and metadata.
   class FileSet
     include Enumerable
 
@@ -10,18 +11,21 @@ module AstroSubframeOrganizer
       @files = files
     end
 
+    # Factory method to create list of FileSet instances from a list of FileMetadata objects,
+    # grouping them by type and relevant metadata.
     def self.from_files(files, type:)
       files.select { |file| file.type == type }
            # Normalize path for sorting: unified separators and consistent case (for Windows)
            .sort_by { |file| [File.dirname(file.path).tr('\\', '/').downcase, file.filename.downcase] }
-           .slice_when do |a, b|
-             a.image_index.to_i > b.image_index.to_i ||
-               a.camera != b.camera ||
-               a.telescope != b.telescope ||
-               a.filter != b.filter
-           end
+           .slice_when { |a, b| new_group?(a, b) }
            .map { |group| new(group) }
-           .then { |it| FileSet.new(it) }
+    end
+
+    def self.new_group?(first, second)
+      first.image_index.to_i > second.image_index.to_i ||
+        first.camera != second.camera ||
+        first.telescope != second.telescope ||
+        first.filter != second.filter
     end
 
     def name

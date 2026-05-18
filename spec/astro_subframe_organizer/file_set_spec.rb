@@ -74,7 +74,7 @@ module AstroSubframeOrganizer
     it 'marks all files in the set as dark flats' do
       files = Dir.glob(['fits/dark-blanks/**/Darks_1.0s_*.fit'], base: FIXTURE_ROOT)
                  .map { |filepath| fixture_photo(filepath) }
-      set = FileSet.from_files(files, type: Astrophoto::DARK)
+      set = FileSet.new(files)
 
       expect(set.files.map(&:dark_flat?)).to all(eq(false))
       set.mark_dark_flat!
