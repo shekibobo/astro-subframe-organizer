@@ -26,7 +26,11 @@ module AstroSubframeOrganizer
 
         def call(dry_run: false, path: Dir.pwd, pattern: THUMBNAIL_PATTERN, **options)
           setup(**options.slice(:config, :verbose, :skip_confirm))
-          AstroSubframeOrganizer::Utils::ThumbnailCleaner.new(path).cleanup(pattern: pattern, dry_run: dry_run, verbose: options[:verbose])
+          AstroSubframeOrganizer::Utils::ThumbnailCleaner.new(path).cleanup(
+            pattern: pattern,
+            dry_run: dry_run,
+            verbose: options[:verbose],
+          )
         end
       end
     end

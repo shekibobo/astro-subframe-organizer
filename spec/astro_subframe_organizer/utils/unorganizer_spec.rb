@@ -32,7 +32,12 @@ module AstroSubframeOrganizer
 
           it 'moves the file to the root directory' do
             unorganizer.unorganize
-            expect(File).to exist(File.join(test_dir, 'Light_M42_300.0s_Bin1_183MC_gain111_20220508-120000_-10.0C_0001.fit'))
+            expect(File).to exist(
+              File.join(
+                test_dir,
+                'Light_M42_300.0s_Bin1_183MC_gain111_20220508-120000_-10.0C_0001.fit',
+              ),
+            )
           end
 
           it 'removes the file from the subdirectory' do

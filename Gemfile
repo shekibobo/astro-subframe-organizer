@@ -10,6 +10,9 @@ gem 'rake', '~> 13.0'
 gem 'simplecov', require: false, group: :test
 
 group :development do
+  gem 'aruba', '~> 2.3'
+  gem 'bundler', '~> 2.0'
+  gem 'rspec', '~> 3.1'
   gem 'rspec-fuubar'
   gem 'rubocop', require: false
   gem 'ruby-lsp-rspec', require: false

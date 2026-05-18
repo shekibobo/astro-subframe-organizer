@@ -7,7 +7,9 @@ module AstroSubframeOrganizer
     describe LightPathBuilder, :files do
       describe 'fits files' do
         context 'without rotation headers' do
-          let(:path) { fixture('fits/light-blanks/Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit') }
+          let(:path) do
+            fixture('fits/light-blanks/Light_IC 63_600.0s_Bin1_183MC_gain111_20251113-192818_-10.0C_0001.fit')
+          end
 
           it 'builds a target directory path including matching keywords for Light frames' do
             photo = FilenameParser.for_file(path).parse
@@ -22,7 +24,9 @@ module AstroSubframeOrganizer
         end
 
         context 'with rotation headers' do
-          let(:path) { fixture('fits/light-blanks/Light_NGC 2264_113deg_600.0s_Bin1_183MC_gain111_20260112-202400_-10.0C_0006.fit') }
+          let(:path) do
+            fixture('fits/light-blanks/Light_NGC 2264_113deg_600.0s_Bin1_183MC_gain111_20260112-202400_-10.0C_0006.fit')
+          end
 
           it 'builds a target directory path including matching keywords for Light frames' do
             photo = FilenameParser.for_file(path).parse
@@ -51,7 +55,9 @@ module AstroSubframeOrganizer
       end
 
       describe 'mosaics' do
-        let(:path) { fixture('fits/mosaic-blanks/Light_M16_1-1_300.0s_Bin1_183MC_gain0_20240713-022314_-10.0C_0003.fit') }
+        let(:path) do
+          fixture('fits/mosaic-blanks/Light_M16_1-1_300.0s_Bin1_183MC_gain0_20240713-022314_-10.0C_0003.fit')
+        end
 
         it 'builds a target directory path including matching keywords for Light frames and pane keyword' do
           parser = FilenameParsers::FitsHeaderParser.new(path)

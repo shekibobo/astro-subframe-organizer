@@ -21,7 +21,9 @@ describe 'astro-subframe-organizer cleanup empty-directories', type: :aruba do
   context 'with empty directories' do
     let!(:empty_dir) { create_dir('empty') }
 
-    before { run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm" }
+    before do
+      run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm"
+    end
 
     it 'exits successfully' do
       expect(last_command_started.exit_status).to eq(0)
@@ -35,7 +37,9 @@ describe 'astro-subframe-organizer cleanup empty-directories', type: :aruba do
   context 'with a directory containing only .DS_Store' do
     let!(:ds_store) { create_file('ds_store_only', '.DS_Store') }
 
-    before { run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm" }
+    before do
+      run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm"
+    end
 
     it 'removes the directory and .DS_Store' do
       expect(File).not_to exist(File.dirname(ds_store))
@@ -45,7 +49,9 @@ describe 'astro-subframe-organizer cleanup empty-directories', type: :aruba do
   context 'with populated directories' do
     let!(:fit_file) { create_file('subdir', 'image.fit') }
 
-    before { run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm" }
+    before do
+      run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --skip-confirm"
+    end
 
     it 'does not remove populated directories' do
       expect(File).to exist(File.dirname(fit_file))
@@ -55,7 +61,9 @@ describe 'astro-subframe-organizer cleanup empty-directories', type: :aruba do
   context 'with --dry-run' do
     let!(:empty_dir) { create_dir('empty') }
 
-    before { run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --dry-run --skip-confirm" }
+    before do
+      run_command_and_stop "astro-subframe-organizer cleanup empty-directories --path #{test_path} --dry-run --skip-confirm"
+    end
 
     it 'exits successfully' do
       expect(last_command_started.exit_status).to eq(0)

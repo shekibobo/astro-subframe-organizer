@@ -11,7 +11,7 @@ module AstroSubframeOrganizer
     it 'groups files by image index' do
       # We use fixtures from different directories to ensure they sort and group correctly
       files = Dir.glob(['fits/dark-blanks/**/*.fit', 'fits/light-blanks/**/*.fit'], base: FIXTURE_ROOT)
-                 .map { |it| fixture_photo(it) }
+                 .map { |filepath| fixture_photo(filepath) }
 
       # from_files filters by type. Bias should be ignored.
       sets = FileSet.from_files(files, type: Astrophoto::DARK)
@@ -22,8 +22,28 @@ module AstroSubframeOrganizer
 
     it 'splits sets when equipment changes' do
       files = [
-        instance_double(Astrophoto, type: 'Dark', path: 'a.fit', filename: 'a.fit', image_index: '1', camera: 'Cam A', telescope: 'Scope A', filter: 'Filter A', current_dir: '.'),
-        instance_double(Astrophoto, type: 'Dark', path: 'b.fit', filename: 'b.fit', image_index: '2', camera: 'Cam B', telescope: 'Scope A', filter: 'Filter A', current_dir: '.'),
+        instance_double(
+          Astrophoto,
+          type: 'Dark',
+          path: 'a.fit',
+          filename: 'a.fit',
+          image_index: '1',
+          camera: 'Cam A',
+          telescope: 'Scope A',
+          filter: 'Filter A',
+          current_dir: '.',
+        ),
+        instance_double(
+          Astrophoto,
+          type: 'Dark',
+          path: 'b.fit',
+          filename: 'b.fit',
+          image_index: '2',
+          camera: 'Cam B',
+          telescope: 'Scope A',
+          filter: 'Filter A',
+          current_dir: '.',
+        ),
       ]
       allow(files[0]).to receive(:already_moved?).and_return(false)
       allow(files[1]).to receive(:already_moved?).and_return(false)
@@ -53,7 +73,7 @@ module AstroSubframeOrganizer
 
     it 'marks all files in the set as dark flats' do
       files = Dir.glob(['fits/dark-blanks/**/Darks_1.0s_*.fit'], base: FIXTURE_ROOT)
-                 .map { |it| fixture_photo(it) }
+                 .map { |filepath| fixture_photo(filepath) }
       set = FileSet.from_files(files, type: Astrophoto::DARK)
 
       expect(set.files.map(&:dark_flat?)).to all(eq(false))

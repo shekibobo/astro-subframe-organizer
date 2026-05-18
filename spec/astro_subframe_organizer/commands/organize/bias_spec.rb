@@ -16,7 +16,7 @@ describe 'astro-subframe-organizer bias', type: :aruba do
               when :iso  then File.join(FIXTURE_ROOT, 'fits/bias-blanks', 'Bias_250.0us_*.fit')
               when :gain then File.join(FIXTURE_ROOT, 'fits/bias-blanks', 'Bias_32.0us_*.fit')
               end
-    Dir.glob(pattern).sort.first(count).each do |f|
+    Dir.glob(pattern).first(count).each do |f|
       FileUtils.cp(f, File.join(test_path, File.basename(f)))
     end
   end

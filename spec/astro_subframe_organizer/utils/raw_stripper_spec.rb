@@ -26,7 +26,7 @@ describe AstroSubframeOrganizer::Utils::RawStripper, :files do
 
     it 'returns false if output file is large' do
       # Create a file larger than 1MB to simulate an unstripped RAW
-      File.open(output_path, 'wb') { |f| f.write('0' * (1024 * 1024 + 1)) }
+      File.binwrite(output_path, '0' * ((1024 * 1024) + 1))
       expect(stripper.already_stripped?).to be false
     end
   end

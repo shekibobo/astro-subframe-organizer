@@ -31,7 +31,10 @@ module AstroSubframeOrganizer
         end
 
         e = Exiftool.new(cr2_files)
-        bar = TTY::ProgressBar.new('Renameing files from EXIF data [:bar] :current/:total (:percent) :eta', total: e.files_with_results.size)
+        bar = TTY::ProgressBar.new(
+          'Renameing files from EXIF data [:bar] :current/:total (:percent) :eta',
+          total: e.files_with_results.size,
+        )
 
         e.files_with_results.each do |cr2|
           exif = e.result_for(cr2)

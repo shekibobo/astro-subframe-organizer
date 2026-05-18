@@ -25,7 +25,7 @@ module AstroSubframeOrganizer
 
           unless dry_run
             ds_store = File.join(full_path, '.DS_Store')
-            FileUtils.rm(ds_store, verbose: verbose) if File.exist?(ds_store)
+            FileUtils.rm_f(ds_store, verbose: verbose)
             FileUtils.rmdir(full_path, verbose: verbose)
           end
           logger.debug "rmdir #{full_path}"

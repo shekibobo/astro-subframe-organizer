@@ -386,11 +386,21 @@ module AstroSubframeOrganizer
       it 'identifies short-exposure darks as potential flat darks' do
         short_path = create_fit(
           'Dark_5.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit',
-          headers: { 'IMAGETYP' => 'Dark', 'EXPOSURE' => 5.0, 'INSTRUME' => 'T7', 'DATE-OBS' => '2022-05-08T12:00:00.000000' },
+          headers: {
+            'IMAGETYP' => 'Dark',
+            'EXPOSURE' => 5.0,
+            'INSTRUME' => 'T7',
+            'DATE-OBS' => '2022-05-08T12:00:00.000000',
+          },
         )
         long_path = create_fit(
           'Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0002.fit',
-          headers: { 'IMAGETYP' => 'Dark', 'EXPOSURE' => 30.0, 'INSTRUME' => 'T7', 'DATE-OBS' => '2022-05-08T12:00:00.000000' },
+          headers: {
+            'IMAGETYP' => 'Dark',
+            'EXPOSURE' => 30.0,
+            'INSTRUME' => 'T7',
+            'DATE-OBS' => '2022-05-08T12:00:00.000000',
+          },
         )
 
         short_photo = Astrophoto.new(short_path)

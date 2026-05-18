@@ -25,7 +25,9 @@ describe 'astro-subframe-organizer raw revert', type: :aruba do
   end
 
   context 'with a file in a subdirectory' do
-    let(:subdir_name) { 'Light_Aurora_FLATSET_20210418_ISO_6400_EXP_4.0s_Bin_1_TELESCOPE_RedCat51_FILTER_NoFilter_CAMERA_T7' }
+    let(:subdir_name) do
+      'Light_Aurora_FLATSET_20210418_ISO_6400_EXP_4.0s_Bin_1_TELESCOPE_RedCat51_FILTER_NoFilter_CAMERA_T7'
+    end
     let(:subdir_path) { expand_path(subdir_name) }
 
     before do

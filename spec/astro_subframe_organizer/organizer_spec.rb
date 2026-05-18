@@ -417,7 +417,12 @@ module AstroSubframeOrganizer
           expect(prompt).to have_received(:yes?)
           expect(equipment_selector).not_to have_received(:telescope)
           expect(equipment_selector).not_to have_received(:filter)
-          expect(File).to exist(File.join(test_dir, 'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit'))
+          expect(File).to exist(
+            File.join(
+              test_dir,
+              'Light_C 1_300.0s_Bin1_183MC_gain111_20260410-230651_288deg_-10.0C_0001.fit',
+            ),
+          )
         end
       end
     end

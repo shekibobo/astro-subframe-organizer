@@ -13,7 +13,7 @@ describe 'astro-subframe-organizer light (mosaic)', type: :aruba do
 
   def copy_mosaic_fixtures(date_prefix:, count: 3)
     pattern = File.join(FIXTURE_ROOT, 'fits/mosaic-blanks', "Light_M16_1-1_300.0s_Bin1_183MC_gain0_#{date_prefix}*.fit")
-    Dir.glob(pattern).sort.first(count).each do |f|
+    Dir.glob(pattern).first(count).each do |f|
       FileUtils.cp(f, File.join(test_path, File.basename(f)))
     end
   end

@@ -48,7 +48,7 @@ module AstroSubframeOrganizer
       FLAT = 'Flat',
       LIGHT = 'Light',
       BIAS = 'Bias',
-    ]
+    ].freeze
 
     def initialize(path)
       @file_parser = FilenameParser.for_file(path)

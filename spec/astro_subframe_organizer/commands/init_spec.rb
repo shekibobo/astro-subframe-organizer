@@ -203,7 +203,9 @@ describe 'astro-subframe-organizer init', type: :aruba do
     end
 
     context 'with specific equipment' do
-      let(:command) { "astro-subframe-organizer init --config #{custom_config_path} --telescope ZhumellZ130 --filter BaaderMoon --camera 183MC" }
+      let(:command) do
+        "astro-subframe-organizer init --config #{custom_config_path} --telescope ZhumellZ130 --filter BaaderMoon --camera 183MC"
+      end
 
       before { run_command_and_stop command }
 

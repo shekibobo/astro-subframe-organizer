@@ -1,36 +1,36 @@
 # frozen_string_literal: true
 
-require "astro_subframe_organizer/version"
+require 'astro_subframe_organizer/version'
 require 'astro_subframe_organizer/utils/file_utils'
-require "astro_subframe_organizer/logging"
-require "astro_subframe_organizer/utils/exposure_format"
+require 'astro_subframe_organizer/logging'
+require 'astro_subframe_organizer/utils/exposure_format'
 
-require "astro_subframe_organizer/commands"
+require 'astro_subframe_organizer/commands'
 
-require "astro_subframe_organizer/config"
-require "astro_subframe_organizer/equipment/camera"
-require "astro_subframe_organizer/equipment/filter"
-require "astro_subframe_organizer/equipment/telescope"
+require 'astro_subframe_organizer/config'
+require 'astro_subframe_organizer/equipment/camera'
+require 'astro_subframe_organizer/equipment/filter'
+require 'astro_subframe_organizer/equipment/telescope'
 
-require "astro_subframe_organizer/filename_parser"
-require "astro_subframe_organizer/filename_parsers/cr2_filename_parser"
-require "astro_subframe_organizer/filename_parsers/fits_filename_parser"
-require "astro_subframe_organizer/filename_parsers/fits_header_parser"
+require 'astro_subframe_organizer/filename_parser'
+require 'astro_subframe_organizer/filename_parsers/cr2_filename_parser'
+require 'astro_subframe_organizer/filename_parsers/fits_filename_parser'
+require 'astro_subframe_organizer/filename_parsers/fits_header_parser'
 
-require "astro_subframe_organizer/path_builders/base_path_builder"
-require "astro_subframe_organizer/path_builders/bias_path_builder"
-require "astro_subframe_organizer/path_builders/dark_path_builder"
-require "astro_subframe_organizer/path_builders/flat_path_builder"
-require "astro_subframe_organizer/path_builders/light_path_builder"
-require "astro_subframe_organizer/path_builder"
+require 'astro_subframe_organizer/path_builders/base_path_builder'
+require 'astro_subframe_organizer/path_builders/bias_path_builder'
+require 'astro_subframe_organizer/path_builders/dark_path_builder'
+require 'astro_subframe_organizer/path_builders/flat_path_builder'
+require 'astro_subframe_organizer/path_builders/light_path_builder'
+require 'astro_subframe_organizer/path_builder'
 
-require "astro_subframe_organizer/astrophoto"
+require 'astro_subframe_organizer/astrophoto'
 require 'astro_subframe_organizer/file_metadata'
-require "astro_subframe_organizer/file_set"
+require 'astro_subframe_organizer/file_set'
 
-require "astro_subframe_organizer/equipment_selector"
-require "astro_subframe_organizer/organizer"
-require "astro_subframe_organizer/fits_organizer"
+require 'astro_subframe_organizer/equipment_selector'
+require 'astro_subframe_organizer/organizer'
+require 'astro_subframe_organizer/fits_organizer'
 
 require 'astro_subframe_organizer/utils/thumbnail_cleaner'
 require 'astro_subframe_organizer/utils/empty_directory_cleaner'
@@ -62,9 +62,9 @@ module AstroSubframeOrganizer
       logger.level = Logger::INFO
       logger.formatter = proc do |severity, _datetime, _progname, msg|
         case severity
-        when "ERROR", "FATAL" then "✗ #{msg}\n"
-        when "WARN"           then "⚠ #{msg}\n"
-        when "DEBUG"          then "[debug] #{msg}\n"
+        when 'ERROR', 'FATAL' then "✗ #{msg}\n"
+        when 'WARN'           then "⚠ #{msg}\n"
+        when 'DEBUG'          then "[debug] #{msg}\n"
         else                       "#{msg}\n" # INFO → plain output
         end
       end

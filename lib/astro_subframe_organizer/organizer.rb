@@ -31,7 +31,9 @@ module AstroSubframeOrganizer
     end
 
     def organize(dry_run: false)
-      logger.info "Preparing to move #{file_sets.sum { |set| set.files.size }} #{type} files from #{file_sets.size} groups..."
+      logger.info "Preparing to move #{file_sets.sum do |set|
+        set.files.size
+      end} #{type} files from #{file_sets.size} groups..."
       @file_sets.each do |fileset|
         next if fileset.already_moved?
 

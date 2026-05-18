@@ -22,7 +22,7 @@ module AstroSubframeOrganizer
       def call(force: false, **options)
         setup(**options.slice(:config, :verbose, :skip_confirm))
 
-        config_file = options[:config] || File.join(ENV['HOME'], 'astro-subframe-organizer-config.yml')
+        config_file = options[:config] || File.join(Dir.home, 'astro-subframe-organizer-config.yml')
 
         if File.exist?(config_file) && !force
           puts "Config file #{config_file} already exists. Use --force to overwrite anyway."

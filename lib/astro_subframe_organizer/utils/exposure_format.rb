@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AstroSubframeOrganizer
   module Utils
     module ExposureFormat

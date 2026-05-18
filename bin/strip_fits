@@ -27,7 +27,7 @@ OptionParser.new do |opts|
     Examples:
 
       Copy and strip fresh fits files:
-        bundle exec bin/strip_fits -o spec/fixtures/fits/light-blanks/ /Volumes/Sirius/staging/Plan/Light/NGC\ 2264/**/*.fit
+        bundle exec bin/strip_fits -o spec/fixtures/fits/light-blanks/ /Volumes/Sirius/staging/Plan/Light/NGC 2264/**/*.fit
 
       Re-strip fixture files in place:
         bundle exec bin/strip_fits --in-place --force spec/fixtures/fits/**/*.fit

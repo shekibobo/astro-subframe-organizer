@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.email         = ['kovach.jc@gmail.com']
 
   spec.summary       = 'Organize astrophotography FITS and CR2 files for PixInsight WBPP'
-  spec.description   = "A command-line tool to sort and rename astrophotography data based on metadata, facilitating use with PixInsight's WeightedBatchPreProcessing."
+  spec.description   = 'A command-line tool to sort and rename astrophotography data based on metadata, ' \
+                       "facilitating use with PixInsight's WeightedBatchPreProcessing."
   spec.homepage      = 'https://github.com/shekibobo/astro-subframe-organizer'
   spec.license       = 'MIT'
   spec.required_ruby_version = Gem::Requirement.new('>= 3.2.0')
@@ -19,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/shekibobo/astro-subframe-organizer'
   spec.metadata['changelog_uri'] = 'https://github.com/shekibobo/astro-subframe-organizer/blob/main/CHANGELOG.md'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   # Specify which files should be added to the gem when it is released.
   spec.files = Dir['lib/**/*.rb'] + ['exe/astro-subframe-organizer', 'README.md', 'LICENSE']
@@ -27,18 +29,12 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Runtime dependencies
-  spec.add_runtime_dependency 'dry-cli', '~> 1.1'
-  spec.add_runtime_dependency 'exiftool_vendored', '~> 13.58'
-  spec.add_runtime_dependency 'fits_parser', '~> 0.1'
-  spec.add_runtime_dependency 'tty-progressbar', '~> 0.18'
-  spec.add_runtime_dependency 'tty-prompt', '~> 0.23'
+  spec.add_dependency 'dry-cli', '~> 1.1'
+  spec.add_dependency 'exiftool_vendored', '~> 13.58'
+  spec.add_dependency 'fits_parser', '~> 0.1'
+  spec.add_dependency 'tty-progressbar', '~> 0.18'
+  spec.add_dependency 'tty-prompt', '~> 0.23'
 
   # Check for windows platform
-  spec.add_runtime_dependency 'fiddle'
-
-  # Development dependencies
-  spec.add_development_dependency 'aruba', '~> 2.3'
-  spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec', '~> 3.1'
+  spec.add_dependency 'fiddle'
 end

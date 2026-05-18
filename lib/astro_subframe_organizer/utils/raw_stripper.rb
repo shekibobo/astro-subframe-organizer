@@ -35,7 +35,7 @@ module AstroSubframeOrganizer
           FileUtils.mv(tmp_mie, @output, force: true)
           true
         else
-          FileUtils.rm_f(tmp_mie) if File.exist?(tmp_mie)
+          FileUtils.rm_f(tmp_mie)
           false
         end
       end

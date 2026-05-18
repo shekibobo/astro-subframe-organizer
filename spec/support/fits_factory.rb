@@ -50,26 +50,26 @@ module FitsFactory
     merged = DEFAULTS
              .merge(type_defaults(type))
              .merge(headers)
-             .reject { |_, v| v.nil? }
+             .compact
 
     File.binwrite(path, build(merged))
     path
   end
 
-  def self.light(path, target: '68 Cygni', **kwargs)
-    create(path, headers: { 'IMAGETYP' => 'Light', 'OBJECT' => target }, **kwargs)
+  def self.light(path, target: '68 Cygni', **)
+    create(path, headers: { 'IMAGETYP' => 'Light', 'OBJECT' => target }, **)
   end
 
-  def self.dark(path, **kwargs)
-    create(path, headers: { 'IMAGETYP' => 'Dark' }, **kwargs)
+  def self.dark(path, **)
+    create(path, headers: { 'IMAGETYP' => 'Dark' }, **)
   end
 
-  def self.flat(path, filter: nil, **kwargs)
-    create(path, headers: { 'IMAGETYP' => 'Flat', 'FILTER' => filter }.compact, **kwargs)
+  def self.flat(path, filter: nil, **)
+    create(path, headers: { 'IMAGETYP' => 'Flat', 'FILTER' => filter }.compact, **)
   end
 
-  def self.bias(path, **kwargs)
-    create(path, headers: { 'IMAGETYP' => 'Bias', 'EXPOSURE' => 0.0 }, **kwargs)
+  def self.bias(path, **)
+    create(path, headers: { 'IMAGETYP' => 'Bias', 'EXPOSURE' => 0.0 }, **)
   end
 
   private_class_method def self.type_defaults(type)

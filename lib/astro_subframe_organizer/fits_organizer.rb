@@ -80,9 +80,6 @@ module AstroSubframeOrganizer
       ).organize(dry_run: is_dry_run?)
     end
 
-    # TODO: Add menu to select for barlow/flatteners
-    private def select_accessories; end
-
     # Checks for empty directories. Run this option after performing a move of previously
     # organized data.
     def remove_empty_directories
@@ -147,5 +144,10 @@ module AstroSubframeOrganizer
       organizer = FitsOrganizer.new
       organizer.organize
     end
+
+    private
+
+    # TODO: Add menu to select for barlow/flatteners
+    def select_accessories; end
   end
 end

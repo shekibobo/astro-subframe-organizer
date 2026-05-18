@@ -69,7 +69,7 @@ module AstroSubframeOrganizer
         puts '─' * 60
 
         exif = Exiftool.new(path).to_display_hash
-        exif.reject { |_, v| v.nil? }
+        exif.compact
             .sort_by { |k, _| k }
             .each do |key, value|
               formatted_key   = key.ljust(30)

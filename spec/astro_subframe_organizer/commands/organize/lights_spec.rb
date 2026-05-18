@@ -13,7 +13,6 @@ describe 'astro-subframe-organizer light', type: :aruba do
 
   def copy_light_fixtures(count: 3, start: 1)
     Dir.glob(File.join(FIXTURE_ROOT, 'fits/light-blanks', '*.fit'))
-       .sort
        .first(count)
        .drop(start - 1)
        .each { |f| FileUtils.cp(f, File.join(test_path, File.basename(f))) }

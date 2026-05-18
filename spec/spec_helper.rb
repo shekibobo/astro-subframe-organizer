@@ -115,7 +115,7 @@ end
 # Configures the AstroSubframeOrganizer logger for test isolation.
 # Aruba tests use real STDOUT, while others use a StringIO buffer.
 def setup_test_logger(example)
-  show_logs = example.metadata[:type] == :aruba || ENV['DEBUG_LOGS']
+  show_logs = example.metadata[:type] == :aruba || ENV.fetch('DEBUG_LOGS', nil)
 
   if show_logs
     AstroSubframeOrganizer.logger = AstroSubframeOrganizer.default_logger

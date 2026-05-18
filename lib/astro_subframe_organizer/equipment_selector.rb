@@ -7,7 +7,12 @@ module AstroSubframeOrganizer
 
     attr_accessor :telescope, :camera, :filter
 
-    def initialize(prompt = AstroSubframeOrganizer.prompt, telescopes: Telescope.all, cameras: Camera.all, filters: Filter.all)
+    def initialize(
+      prompt = AstroSubframeOrganizer.prompt,
+      telescopes: Telescope.all,
+      cameras: Camera.all,
+      filters: Filter.all
+    )
       @telescopes = telescopes
       @cameras = cameras
       @filters = filters
@@ -24,7 +29,9 @@ module AstroSubframeOrganizer
         detected = nil
       end
 
-      suggestion = "If '#{detected}' is a mount name, consider adding it to 'telescope_ignore_patterns' in your config." if detected
+      if detected
+        suggestion = "If '#{detected}' is a mount name, consider adding it to 'telescope_ignore_patterns' in your config."
+      end
       generic_choose_or_confirm(telescope, @telescopes, 'telescope', 'TELESCOP', detected, suggestion: suggestion)
     end
 

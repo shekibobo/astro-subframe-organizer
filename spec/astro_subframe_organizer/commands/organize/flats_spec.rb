@@ -13,7 +13,7 @@ describe 'astro-subframe-organizer flat', type: :aruba do
 
   def copy_flat_fixtures(date_prefix:, count: 3)
     pattern = File.join(FIXTURE_ROOT, 'fits/flat-blanks', "Flat_293deg_5.0s_Bin1_183MC_gain111_#{date_prefix}*.fit")
-    Dir.glob(pattern).sort.first(count).each do |f|
+    Dir.glob(pattern).first(count).each do |f|
       FileUtils.cp(f, File.join(test_path, File.basename(f)))
     end
   end
@@ -98,7 +98,12 @@ describe 'astro-subframe-organizer flat', type: :aruba do
 
   context 'with a flat with temperature variation (-9.5C)' do
     before do
-      path = File.join(FIXTURE_ROOT, 'fits', 'flat-blanks', 'Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111528_-9.5C_0005.fit')
+      path = File.join(
+        FIXTURE_ROOT,
+        'fits',
+        'flat-blanks',
+        'Flat_293deg_5.0s_Bin1_183MC_gain111_20251224-111528_-9.5C_0005.fit',
+      )
       FileUtils.cp(path, File.join(test_path, File.basename(path)))
       run_command_and_stop(
         "astro-subframe-organizer flat --path #{test_path} " \

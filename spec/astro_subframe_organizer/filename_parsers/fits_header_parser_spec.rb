@@ -5,48 +5,48 @@ require 'astro_subframe_organizer/filename_parsers/fits_header_parser'
 
 module AstroSubframeOrganizer
   module FilenameParsers
-    describe FitsHeaderParser do
-      # Sample headers derived from a real ZWO ASI183MC Pro light frame captured
-      # with ASIAIR Plus. FILTER is absent because this is an OSC camera.
-      # TELESCOP contains the mount name rather than the OTA.
-      SAMPLE_HEADERS = {
-        'SIMPLE' => true,
-        'BITPIX' => 16,
-        'NAXIS' => 2,
-        'NAXIS1' => 5496,
-        'NAXIS2' => 3672,
-        'EXTEND' => true,
-        'BZERO' => 32_768,
-        'BSCALE' => 1,
-        'CREATOR' => 'ZWO ASIAIR Plus',
-        'OFFSET' => 10,
-        'FOCALLEN' => 247,
-        'SET-TEMP' => -10,
-        'EGAIN' => 1.00857579708099,
-        'XBINNING' => 1,
-        'YBINNING' => 1,
-        'CCDXBIN' => 1,
-        'CCDYBIN' => 1,
-        'XPIXSZ' => 2.40000009536743,
-        'YPIXSZ' => 2.40000009536743,
-        'IMAGETYP' => 'Light',
-        'EXPOSURE' => 300.0,
-        'EXPTIME' => 300.0,
-        'CCD-TEMP' => -10.0,
-        'RA' => 319.739055,
-        'DEC' => 43.852758,
-        'DATE-OBS' => '2025-09-08T02:46:15.614262',
-        'INSTRUME' => 'ZWO ASI183MC Pro',
-        'GUIDECAM' => 'ZWO ASI120MM Mini',
-        'BAYERPAT' => 'RGGB',
-        'GAIN' => 111,
-        'FOCUSPOS' => 669,
-        'TELESCOP' => 'EQMod Mount',
-        'OBJECT' => '68 Cygni',
-        'IMAGEW' => 5496,
-        'IMAGEH' => 3672,
-      }.freeze
+    # Sample headers derived from a real ZWO ASI183MC Pro light frame captured
+    # with ASIAIR Plus. FILTER is absent because this is an OSC camera.
+    # TELESCOP contains the mount name rather than the OTA.
+    SAMPLE_HEADERS = {
+      'SIMPLE' => true,
+      'BITPIX' => 16,
+      'NAXIS' => 2,
+      'NAXIS1' => 5496,
+      'NAXIS2' => 3672,
+      'EXTEND' => true,
+      'BZERO' => 32_768,
+      'BSCALE' => 1,
+      'CREATOR' => 'ZWO ASIAIR Plus',
+      'OFFSET' => 10,
+      'FOCALLEN' => 247,
+      'SET-TEMP' => -10,
+      'EGAIN' => 1.00857579708099,
+      'XBINNING' => 1,
+      'YBINNING' => 1,
+      'CCDXBIN' => 1,
+      'CCDYBIN' => 1,
+      'XPIXSZ' => 2.40000009536743,
+      'YPIXSZ' => 2.40000009536743,
+      'IMAGETYP' => 'Light',
+      'EXPOSURE' => 300.0,
+      'EXPTIME' => 300.0,
+      'CCD-TEMP' => -10.0,
+      'RA' => 319.739055,
+      'DEC' => 43.852758,
+      'DATE-OBS' => '2025-09-08T02:46:15.614262',
+      'INSTRUME' => 'ZWO ASI183MC Pro',
+      'GUIDECAM' => 'ZWO ASI120MM Mini',
+      'BAYERPAT' => 'RGGB',
+      'GAIN' => 111,
+      'FOCUSPOS' => 669,
+      'TELESCOP' => 'EQMod Mount',
+      'OBJECT' => '68 Cygni',
+      'IMAGEW' => 5496,
+      'IMAGEH' => 3672,
+    }.freeze
 
+    describe FitsHeaderParser do
       subject(:parser) { described_class.new('/path/to/light_68cygni_0001.fit') }
 
       before do

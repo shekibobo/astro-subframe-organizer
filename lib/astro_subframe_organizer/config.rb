@@ -63,7 +63,7 @@ module AstroSubframeOrganizer
     }.freeze
 
     def self.custom_config_file
-      ENV['ASTRO_SUBFRAME_ORGANIZER_CONFIG']
+      ENV.fetch('ASTRO_SUBFRAME_ORGANIZER_CONFIG', nil)
     end
 
     # Returns the expanded path to the configuration file.

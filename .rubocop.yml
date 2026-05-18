@@ -1,12 +1,16 @@
 inherit_from: .rubocop_todo.yml
+AllCops:
+  NewCops: enable
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*'
+Layout/LineLength:
+  Exclude:
+    - 'spec/**/*'
 Layout/MultilineMethodArgumentLineBreaks:
-  EnforcedStyle: trailing_comma
   Enabled: true
 Layout/FirstMethodArgumentLineBreak:
   Enabled: true

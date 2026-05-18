@@ -28,8 +28,8 @@ module AstroSubframeOrganizer
       "#{type} set #{files.first.filename}..#{files.last.filename}"
     end
 
-    def each(&block)
-      @files.each(&block)
+    def each(&)
+      @files.each(&)
     end
 
     def size
