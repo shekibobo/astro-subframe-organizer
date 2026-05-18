@@ -8,6 +8,58 @@ AstroSubframeOrganizer has been adapted from a standalone [Ruby Script](https://
 
 This version of the gem was written to organize or reorganize the data collected to match my current workflow.
 
+## Table of Contents
+
+- [Organize Astrophotography Data](#organize-astrophotography-data)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Getting Started](#getting-started)
+    - [Initialize your equipment set](#initialize-your-equipment-set)
+    - [Configuration](#configuration)
+      - [Creating a Config File](#creating-a-config-file)
+    - [Advanced Configuration](#advanced-configuration)
+      - [Temperature Tolerance](#temperature-tolerance)
+      - [Telescope Ignore Patterns](#telescope-ignore-patterns)
+      - [Custom Metadata Mappings](#custom-metadata-mappings)
+      - [Custom File Extensions](#custom-file-extensions)
+      - [Using a Custom Config File](#using-a-custom-config-file)
+  - [Organization Tools](#organization-tools)
+    - [Interactive Menu](#interactive-menu)
+    - [Global Options](#global-options)
+    - [Equipment Options](#equipment-options)
+    - [Command Mode](#command-mode)
+      - [Darks](#darks)
+        - [Flat Darks](#flat-darks)
+      - [Flats](#flats)
+        - [FlatSet](#flatset)
+      - [Lights](#lights)
+      - [Biases](#biases)
+      - [Unorganize](#unorganize)
+    - [Raw Tools](#raw-tools)
+      - [Rename From EXIF](#rename-from-exif)
+      - [Revert Rename](#revert-rename)
+    - [Cleanup Tools](#cleanup-tools)
+      - [Delete Thumbnails](#delete-thumbnails)
+      - [Delete Empty Directories](#delete-empty-directories)
+    - [Utils](#utils)
+  - [Organized Directory Structure](#organized-directory-structure)
+    - [Light Frames](#light-frames)
+    - [Flat Frames](#flat-frames)
+    - [Dark Frames](#dark-frames)
+    - [Bias Frames](#bias-frames)
+    - [Flat Darks (DarkFlats)](#flat-darks-darkflats)
+  - [PixInsight - Saved WBPP Process Icons](#pixinsight---saved-wbpp-process-icons)
+    - [WBPP\_Darks](#wbpp_darks)
+    - [WBPP\_Flats](#wbpp_flats)
+    - [WBPP\_Integration](#wbpp_integration)
+  - [Historical Development Notes](#historical-development-notes)
+    - [Pre-ASIAir Image Data](#pre-asiair-image-data)
+      - [Exposure Time](#exposure-time)
+      - [Renaming Previously Renamed Files](#renaming-previously-renamed-files)
+  - [Contributing](#contributing)
+    - [Get Started Coding](#get-started-coding)
+  - [Disclaimer](#disclaimer)
+
 ## Installation
 
 Install the gem:
@@ -118,11 +170,35 @@ Note: if you have an automatic filter wheel and your software records the filter
 
 ### Advanced Configuration
 
-You can further customize how metadata is extracted and how equipment is identified by adding these optional sections to your configuration file.
+You can further customize how metadata is extracted and how equipment is identified and grouped by adding these optional sections to your configuration file.
+
+#### Temperature Tolerance
+
+By default, all image types that get grouped by `CCD-TEMP` will be grouped together with the temperature rounded to the nearest 5°C. See the following example table for rounding ranges:
+
+| Actual Temp | Rounded Temp | Notes |
+| --- | --- | --- |
+| -10.0C | -10. | exactly on boundary |
+| -9.5C | -10. | 0.5 below boundary, rounds to -10 |
+| -10.5C | -10. | 0.5 above boundary, rounds to -10 |
+| -7.5C | -10. | equidistant between -5 and -10, rounds toward -10 |
+| -12.5C | -15. | equidistant between -10 and -15, rounds toward -15 |
+| -13.0C | -15. | closer to -15 |
+| -8.0C | -10. | closer to -10 |
+| 0.0C | 0. | zero |
+| 36.0C | 35. | warm DSLR, rounds to 35 |
+| 37.0C | 35. | closer to 35 |
+| 38.0C | 40. | closer to 40 |
+| -20.0C | -20. | colder target, exactly on boundary |
+| -18.0C | -20. | closer to -20 |
+
+Override `temperature_tolerance` in your config files to change the rounding.
+
+This is especially useful if you're using CMOS/DSLR or otherwise uncooled cameras, and will help you build a Darks library when you can't control the temperature.
 
 #### Telescope Ignore Patterns
 
-ASIAir and other software often populate the TELESCOP header with the name of your mount rather than your telescope. You can define case-insensitive partial match strings to ignore these values and force a manual selection or use a CLI override.
+ASIAir and other software often populate the `TELESCOP` header with the name of your mount rather than your telescope. You can define partial match strings to ignore these values. These patterns are **case-insensitive** and will force a manual selection or use a CLI override if matched.
 
 ```yaml
 telescope_ignore_patterns:
@@ -130,24 +206,25 @@ telescope_ignore_patterns:
   - EQMod
   - AM5
   - AM3
-  - $ST-135
+  - RST-135
 ```
 
 #### Custom Metadata Mappings
 
-If your capture software uses non-standard FITS headers or your DSLR uses unusual EXIF tags, you can map them to the fields the organizer expects. The tool will check tags in the order they are listed.
+If your capture software uses non-standard FITS headers or your DSLR uses unusual EXIF tags, you can map them to the fields the organizer expects. The tool uses a fallback mechanism: it checks the tags in the order they are listed and uses the first one that contains a value.
 
 ```yaml
-temperature:
-  - CCD-TEMP
-  - SET-TEMP
-  - SENSOR-TEMP
-exposure:
-  - EXPOSURE
-  - EXPTIME
-target:
-  - OBJECT
-  - TARGET
+fits_header_mappings:
+  temperature:
+    - CCD-TEMP
+    - SET-TEMP
+    - SENSOR-TEMP
+  exposure:
+    - EXPOSURE
+    - EXPTIME
+  target:
+    - OBJECT
+    - TARGET
 exif_tag_mappings:
   temperature:
     - camera_temperature
@@ -185,49 +262,6 @@ astro-subframe-organizer run --config ~/galaxy-season.yml # All interactive menu
 ## Organization Tools
 
 There are several ways to use `astro-subframe-organizer`.
-
-- [Organize Astrophotography Data](#organize-astrophotography-data)
-  - [Installation](#installation)
-  - [Getting Started](#getting-started)
-    - [Initialize your equipment set](#initialize-your-equipment-set)
-    - [Configuration](#configuration)
-      - [Creating a Config File](#creating-a-config-file)
-    - [Advanced Configuration](#advanced-configuration)
-      - [Telescope Ignore Patterns](#telescope-ignore-patterns)
-      - [Custom Metadata Mappings](#custom-metadata-mappings)
-      - [Custom File Extensions](#custom-file-extensions)
-      - [Using a Custom Config File](#using-a-custom-config-file)
-  - [Organization Tools](#organization-tools)
-    - [Interactive Menu](#interactive-menu)
-    - [Global Options](#global-options)
-    - [Equipment Options](#equipment-options)
-    - [Command Mode](#command-mode)
-      - [Darks](#darks)
-        - [Flat Darks](#flat-darks)
-      - [Flats](#flats)
-        - [FlatSet](#flatset)
-      - [Lights](#lights)
-      - [Biases](#biases)
-      - [Unorganize](#unorganize)
-    - [Raw Tools](#raw-tools)
-      - [Rename From EXIF](#rename-from-exif)
-      - [Revert Rename](#revert-rename)
-    - [Cleanup Tools](#cleanup-tools)
-      - [Delete Thumbnails](#delete-thumbnails)
-      - [Delete Empty Directories](#delete-empty-directories)
-    - [Utils](#utils)
-  - [Historical Notes / Workflow](#historical-notes--workflow)
-    - [Camera](#camera)
-    - [Pre-ASIAir Image Data](#pre-asiair-image-data)
-      - [Exposure Time](#exposure-time)
-      - [Renaming Previously Renamed Files](#renaming-previously-renamed-files)
-    - [PixInsight - WBPP](#pixinsight---wbpp)
-      - [WBPP\_Darks](#wbpp_darks)
-      - [WBPP\_Flats](#wbpp_flats)
-      - [WBPP\_Integration](#wbpp_integration)
-  - [Contributing](#contributing)
-    - [Get Started Coding](#get-started-coding)
-  - [Disclaimer](#disclaimer)
 
 ### Interactive Menu
 
@@ -376,28 +410,6 @@ Automatically sets the filter field for any command that uses it. When using `--
 ### Command Mode
 
 If you want to skip the interactive menu, or you know what you're doing without it, you can directly call each of the available commands (and a few more) using the commands directly.
-
-> [!NOTE]
->
-> By default, all image types that get grouped by `CCD-TEMP` will be grouped together with the temperature rounded to the nearest 5°C. See the following example table for rounding ranges:
->
-> | Actual Temp | Rounded Temp | Notes |
-> | --- | --- | --- |
-> | -10.0C | -10. | exactly on boundary |
-> | -9.5C | -10. | 0.5 below boundary, rounds to -10 |
-> | -10.5C | -10. | 0.5 above boundary, rounds to -10 |
-> | -7.5C | -10. | equidistant between -5 and -10, rounds toward -10 |
-> | -12.5C | -15. | equidistant between -10 and -15, rounds toward -15 |
-> | -13.0C | -15. | closer to -15 |
-> | -8.0C | -10. | closer to -10 |
-> | 0.0C | 0. | zero |
-> | 36.0C | 35. | warm DSLR, rounds to 35 |
-> | 37.0C | 35. | closer to 35 |
-> | 38.0C | 40. | closer to 40 |
-> | -20.0C | -20. | colder target, exactly on boundary |
-> | -18.0C | -20. | closer to -20 |
->
-> Override `temperature_tolerance` in your config files to change the rounding.
 
 #### Darks
 
@@ -575,49 +587,103 @@ astro-subframe-organizer inspect dark/IMG_0001.CR2
 
 This will print out all the metadata on your RAW images, or all the FITS headers on a `.fit` image.
 
-## Historical Notes / Workflow
+## Organized Directory Structure
 
-### Camera
+The organizer moves files into specific directory structures based on the image type. These structures are designed to be compatible with PixInsight's `WeightedBatchPreProcessing` (WBPP) script by using standard keywords.
 
-I used to use a Canon EOS 1500 (T7) DSLR for astrophotography, and attach it to one of my telescopes. Data capture is performed using the ASIAir Plus. In the ASIAir app, my camera's settings are configured to include ISO, Date, and Temp in the customized file name.
+### Light Frames
 
-> Note: If you are using a different camera, the parameters included in your file name will likely be different, and you will need to change the `FitsFile#initialize` method to correctly match your file's properties based on the order they appear. You may also want to update your target directories to include those parameters, in whatever order you feel is appropriate for your workflow.
+Organized to match with flats from a specific session and darks of the same exposure/gain/temp.
+`Light_<target>_FLATSET_<date>_GAIN_<gain>_EXP_<exp>_Bin_<bin>_CCD-TEMP_<temp>_TELESCOPE_<tel>_FILTER_<fil>_CAMERA_<cam>`
 
-With the above settings, the files I generally capture are formatted as follows:
+### Flat Frames
 
-- Lights: `Light_M51_300.0s_Bin1_ISO800_20220309-024714_6.0C_0040.fit`
-  - Target: M51
-  - Exposure: 300.0s
-  - Binning: 1
-  - ISO: 800
-  - DateTime: 20220309-024714
-  - CCD-TEMP: 6.0C
-  - Image index: 0040
-- Lights: `Light_10 Lacertae_1-1_150.0s_Bin1_ISO800_20220913-223831_22.0C_0006.fit`
-  - Target: 10 Lacerta
-  - Pane: 1-1
-  - Exposure: 150.0s
-  - Binning: 1
-  - ISO: 800
-  - DateTime: 20220913-223831
-  - CCD-TEMP: 22.0C
-  - Image index: 0006
-- Darks: `Dark_300.0s_Bin1_ISO800_20220517-152626_51.0C_0070.fit`
-  - Exposure: 300.0s
-  - Binning: 1
-  - ISO: 800
-  - DateTime: 20220517-152626
-  - CCD-TEMP: 51.0C
-  - Image index: 0070
-- Flats: `Flat_2.3s_Bin1_ISO800_20220603-052827_14.0C_0006.fit`
-  - Exposure: 2.3s
-  - Binning: 1
-  - ISO: 800
-  - DateTime: 20220603-052827
-  - CCD-TEMP: 14.0C
-  - Image index: 0006
+Organized to match with Light frames from the same session.
+`Flat_FLATSET_<date>_GAIN_<gain>_EXP_<exp>_Bin_<bin>_TELESCOPE_<tel>_FILTER_<fil>_CAMERA_<cam>`
 
-The goal of this script is to group these files in a way that works well with WBPP in a multi-step process, and to facilitate this file organization rather than taking all the time to do it manually.
+### Dark Frames
+
+Organized to facilitate a library of master darks.
+`Dark_ISO_<iso>_EXP_<exp>_CCD-TEMP_<temp>_CAMERA_<cam>_MONTH_<month>`
+
+### Bias Frames
+
+`Bias_GAIN_<gain>_EXP_<exp>_Bin_<bin>_CAMERA_<cam>_MONTH_<month>`
+
+### Flat Darks (DarkFlats)
+
+Used specifically to calibrate flats when bias frames aren't used. These are especially useful if you are using an uncooled camera, and you take your flat darks at the same time as your flats.
+`DarkFlat_FLATSET_<date>_ISO_<iso>_EXP_<exp>_Bin_<bin>_CAMERA_<cam>`
+
+## PixInsight - Saved WBPP Process Icons
+
+All of this organization is to facilitate a standardized workflow in PixInsight using WBPP with predefined process icons for generating each of master darks, master flats, and the master lights.
+
+> [!TIP]
+> By including `MONTH` in Dark and Bias paths, you can maintain a rolling library of calibration frames, allowing you to easily identify and use the most recent masters for your current data.
+
+### WBPP_Darks
+
+This process icon is preloaded with appropriate master biases, uses the following grouping keywords on the Calibration tab:
+
+| Keyword  | Pre | Post |
+| -------- | --- | ---- |
+| CCD-TEMP | x   | x    |
+| GAIN     | x   | x    |
+| ISO      | x   | x    |
+| EXP      | x   | x    |
+| MONTH    | x   | x    |
+| CAMERA   | x   | x    |
+
+The generated darks are then able to be used in the `WBPP_Integration` process icon.
+
+### WBPP_Flats
+
+This process icon is also preloaded with appropriate master biases, and uses the following grouping keywords on the Calibration tab:
+
+| Keyword  | Pre | Post | Notes |
+| -------- | --- | ---- | ----- |
+| FLATSET  | x   | x    |       |
+| ROTATION | x   | x    |       |
+| ISO      | x   | x    |       |
+| GAIN     | x   | x    |       |
+| CAMERA   | x   | x    |       |
+| BIN      | x   | x    |       |
+| EXP      | x   |      | Match for Darks, but not for Lights |
+| CCD-TEMP | x   |      | Match for Darks, but not for Lights |
+
+Since my flats and darkflats are together in the same directory, I can load them into WBPP using the `Directory` button in one step, and then click the run button.
+
+> [!IMPORTANT]
+> Manually remove the `EXP_*` segment from the new master flat's file name if present. Flats should ignore exposure time when matching to lights.
+>
+> If you don't do this, the next step, `WBPP_Integration` will not automatically match your flats to your lights, since `EXP` is a required grouping keyword in that step to automatically match darks to lights. **If the property exists on the filename, they must match.** If keywords on one file don't exist on another, they are ignored in keyword grouping in WBPP.
+
+### WBPP_Integration
+
+This process icon is preloaded with appropriate biases, but shouldn't be necessary at this point if you followed the process described so far. This step uses the following grouping keywords on the Calibration tab:
+
+| Keyword  | Pre | Post | Notes |
+| -------- | --- | ---- | ----- |
+| PANE     | x   | x    |       |
+| FLATSET  | x   |      |       |
+| ROTATION | x   | x    |       |
+| BIN      | x   | x    |       |
+| EXP      | x   |      |       |
+| CCD-TEMP | x   |      |       |
+| ISO      | x   | x    |       |
+| GAIN     | x   | x    |       |
+| TELESCOPE| x   | x    |       |
+| FILTER   | x   | x    |       |
+| CAMERA   | x   | x    |       |
+
+If you are working on multiple targets, you'll want to make sure you choose the `Registration Reference Image -> Mode -> auto by LIGHT (or PANE)` setting under the Calibration tab.
+
+This final step is relatively easy. Simply load your master darks (not darkflats), your master flats, and all your lights. The script should automatically detect and group all the files for calibration. You may have to manually select a few of the darks and flats for calibration if you reuse the same FLATSET for multiple nights. Other than that, just check your other settings and output directory for this run and you should be good to go.
+
+## Historical Development Notes
+
+This was based on a script written a long time ago, so here's some historical information that may be relevant for new astrophotographers.
 
 ### Pre-ASIAir Image Data
 
@@ -625,7 +691,8 @@ With the Canon T7 data captured before I started using an ASIAir Plus, the image
 
 To rename your older `IMG_XXXX.CR2` files, you can use the `Rename files with EXIF data` option. You will then be prompted to choose which type of file you are organizing. If you are organizing a `Light` file, you'll also be prompted to enter the target name.
 
-**IMPORTANT** you must have `exiftool` installed and in your system path in order to run this renaming process.
+> [!IMPORTANT]
+> You must have `exiftool` installed and in your system path in order to run this renaming process.
 
 #### Exposure Time
 
@@ -636,55 +703,6 @@ When the EXIF data includes `ExposureTime` less than 1 second, the value is form
 This operation also lets you rename files that you renamed with an older naming format and convert it automatically to use the consistent naming pattern. If the script finds files that are not named `IMG_XXXX.CR2`, it will prompt you to choose whether to skip or rename them. It will then rename them all to `IMG_XXXX.CR2`, where `XXXX` is the last 4 characters of the filename (usually the sequence number). It will then run the script as normal on the now normallized files.
 
 Once all of the files are renamed, they can then be organized into folders just as we do with the FITS files that we get from the ASIAir.
-
-### PixInsight - WBPP
-
-All of this organization is to facilitate a standardized workflow in PixInsight using WBPP with predefined process icons for generating each of master darks, master flats, and the master lights.
-
-#### WBPP_Darks
-
-This process icon is preloaded with appropriate master biases, uses the following grouping keywords on the Calibration tab:
-
-| Keyword  | Pre | Post |
-| -------- | --- | ---- |
-| CCD-TEMP | x   | x    |
-| ISO      | x   | x    |
-| EXP      | x   | x    |
-| MONTH    | x   | x    |
-
-The generated darks are then able to be used in the `WBPP_Integration` process icon.
-
-#### WBPP_Flats
-
-This process icon is also preloaded with appropriate master biases, and uses the following grouping keywords on the Calibration tab:
-
-| Keyword  | Pre | Post |
-| -------- | --- | ---- |
-| FLATSET  | x   | x    |
-| BIN      | x   | x    |
-| EXP      | x   |      |
-| CCD-TEMP |     |      |
-| ISO      | x   | x    |
-
-Since my flats and darkflats are together in the same directory, I can load them into WBPP using the `Directory` button in one step, and then click the run button. One important manual step after this is to remove the `EXP_*` segment from the new master flat's file name. If you don't do this, the next step, `WBPP_Integration` will not automatically match your flats to your lights, since `EXP` is a required grouping keyword in that step to automatically match darks to lights. If the property exists on the filename, they must match. If keywors on one file don't exist on another, they are ignored in keyword grouping in WBPP.
-
-#### WBPP_Integration
-
-This process icon is preloaded with appropriate biases, but shouldn't be necessary at this point if you followed the process described so far. This step uses the following grouping keywords on the Calibration tab:
-
-| Keyword  | Pre | Post |
-| -------- | --- | ---- |
-| FLATSET  | x   |      |
-| BIN      | x   | x    |
-| EXP      | x   |      |
-| CCD-TEMP | x   |      |
-| ISO      | x   | x    |
-| LIGHT    |     | x    |
-| PANE     | x   | x    |
-
-Note that the `LIGHT` and `PANE` keywords are optional, but are important if you are working with multiple targets at the same time, e.g. for a multi-panel mosaic with each target named differently, or if using the new ASIAir mosaic helper in your plans. If you are working on multiple targets, you'll want to make sure you choose the `Registration Reference Image -> Mode -> auto by LIGHT (or PANE)` setting under the Calibration tab.
-
-This final step is relatively easy. Simply load your master darks (not darkflats), your master flats, and all your lights. The script should automatically detect and group all the files for calibration. You may have to manually select a few of the darks and flats for calibration if you don't have the right temperature of darks for some lights, or if you reuse the same FLATSET for multiple nights. Other than that, just check your other settings and output directory for this run and you should be good to go.
 
 ## Contributing
 
@@ -714,6 +732,6 @@ bundle exec bin/strip_fits -o spec/fixtures/fits/your-set/ your_file.fit
 
 ## Disclaimer
 
-I make no claims about the reliability of this script under your circumstances. Please test and verify the code and the conditions you will run this script through before running it on your data. Dry runs are your friend. If you are modifying the script to work for your data, you can use `puts file.inspect` to get a good look at how the script parsed your file names. **I am not responsible for lost or corrupted data or damaged devices resulting from the use of this script**, although under my specific conditions it has been working very well. Just be careful, make backups, test things out before you rely on this fully.
+I make no claims about the reliability of Astro Subframe Organizer under your circumstances. Please test and verify the code and the conditions you will run this script through before running it on your data. Dry runs are your friend. While Astro Subframe Organizer is relatively well tested, it may behave unexpectedly if your data capture is significantly different from mine. **I am not responsible for lost or corrupted data or damaged devices resulting from the use of this Astro Subframe Organizer**. Just be careful, **make backups**, test things out before you fully rely on any part of this tool. If you find an issue while using this tool, please report it on the [issue tracker](https://github.com/shekibobo/astro-subframe-organizer/issues).
 
 Clear skies!
