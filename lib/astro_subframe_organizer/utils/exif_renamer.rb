@@ -71,7 +71,8 @@ module AstroSubframeOrganizer
       private
 
       def rename_file(cr2, exif, type:, target:, dry_run:, bar: nil)
-        target_file = File.join(File.dirname(cr2), build_filename(exif, type: type, target: target))
+        filename = build_filename(exif, type: type, target: target)
+        target_file = File.join(File.dirname(cr2), filename)
 
         if File.exist?(target_file)
           msg = "Skipping #{cr2}, target #{target_file} already exists."
@@ -82,18 +83,26 @@ module AstroSubframeOrganizer
         FileUtils.mv(cr2, target_file, verbose: dry_run, noop: dry_run)
       end
 
+      def get_exif_value(exif, mapping_key)
+        tags = Config.exif_tag_mappings[mapping_key] || []
+        tags.each do |tag|
+          return exif[tag] if exif[tag]
+        end
+        nil
+      end
+
       def derive_sequence_number_from_filename(path)
         File.basename(path, '.*').split(/[_-]/).last.to_i
       end
 
       def build_filename(exif, type:, target:)
-        exp_str    = format_exposure(exif[:exposure_time])
+        exp_str    = format_exposure(get_exif_value(exif, 'exposure'))
         created_at = resolve_time(exif).strftime(FILENAME_DT_FORMAT)
-        ccd_temp   = format('%.1fC', exif[:camera_temperature].to_f)
+        ccd_temp   = format('%.1fC', get_exif_value(exif, 'temperature').to_f)
         seq_num    = derive_sequence_number_from_filename(exif.source_file).to_s.rjust(4, '0')
-        camera     = resolve_camera(exif[:model])
+        camera     = resolve_camera(get_exif_value(exif, 'model'))
 
-        [type, target, exp_str, 'Bin1', camera, "ISO#{exif[:iso]}", created_at, ccd_temp, seq_num]
+        [type, target, exp_str, 'Bin1', camera, "ISO#{get_exif_value(exif, 'iso')}", created_at, ccd_temp, seq_num]
           .compact
           .join('_') + '.CR2'
       end
@@ -109,7 +118,7 @@ module AstroSubframeOrganizer
       end
 
       def resolve_time(exif)
-        dt = exif[:date_time_original]
+        dt = get_exif_value(exif, 'timestamp')
         tz = exif[:time_zone] || '+00:00'
         Time.strptime("#{dt}#{tz}", EXIF_DT_FORMAT)
       rescue ArgumentError

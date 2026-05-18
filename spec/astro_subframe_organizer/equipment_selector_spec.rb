@@ -16,6 +16,7 @@ module AstroSubframeOrganizer
     before do
       allow(prompt).to receive(:enum_select).and_return(telescopes.first)
       allow(AstroSubframeOrganizer.logger).to receive(:info)
+      allow(AstroSubframeOrganizer.logger).to receive(:warn)
     end
 
     it 'chooses telescope using configured options' do
@@ -55,26 +56,45 @@ module AstroSubframeOrganizer
         end
       end
 
-      context 'when detected telescope is a mount name not in the configured list' do
+      context 'when detected telescope matches an ignore pattern (e.g. ASIAir Mount name)' do
         before do
           allow(prompt).to receive(:enum_select).and_return('RedCat51')
         end
 
-        it 'prompts with the mount name and configured telescopes' do
+        it 'ignores the mount name and prompts for a known telescope' do
           selector.choose_telescope_or_confirm(detected: 'EQMod Mount')
           expect(prompt).to have_received(:enum_select).with(
-            a_string_including('EQMod Mount'),
-            ['EQMod Mount', 'RedCat51', 'ZhumellZ130'],
+            'What telescope is this set for?',
+            telescopes,
           )
         end
 
-        it 'returns the selected telescope' do
-          expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('RedCat51')
+        it 'logs that the mount name was ignored and that auto-detect failed' do
+          selector.choose_telescope_or_confirm(detected: 'EQMod Mount')
+          expect(AstroSubframeOrganizer.logger).to have_received(:info).with(/Ignoring detected mount name: 'EQMod Mount'/)
+          expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Telescope auto-detect failed/)
+        end
+      end
+
+      context 'when detected telescope is unknown (not ignored, but not in config)' do
+        before do
+          allow(prompt).to receive(:enum_select).and_return('RedCat51')
         end
 
-        it 'allows accepting the mount name as-is' do
-          allow(prompt).to receive(:enum_select).and_return('EQMod Mount')
-          expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('EQMod Mount')
+        it 'logs a mismatch warning and a suggestion, then prompts to confirm the detected value or select' do
+          selector.choose_telescope_or_confirm(detected: 'Strange Scope')
+
+          expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/TELESCOP header 'Strange Scope' is not in the configured telescope list/)
+          expect(AstroSubframeOrganizer.logger).to have_received(:info).with(/consider adding it to 'telescope_ignore_patterns'/)
+          expect(prompt).to have_received(:enum_select).with(
+            a_string_including("TELESCOP is 'Strange Scope'"),
+            ['Strange Scope', 'RedCat51', 'ZhumellZ130'],
+          )
+        end
+
+        it 'allows accepting the unknown telescope as-is' do
+          allow(prompt).to receive(:enum_select).and_return('Strange Scope')
+          expect(selector.choose_telescope_or_confirm(detected: 'Strange Scope')).to eq('Strange Scope')
         end
       end
 
@@ -109,24 +129,16 @@ module AstroSubframeOrganizer
           end
         end
 
-        context 'when TELESCOP header is a mount name not in the configured list' do
-          before { allow(prompt).to receive(:enum_select).and_return('RedCat51') }
-
-          it 'prompts with the mount name and the single configured telescope' do
-            selector.choose_telescope_or_confirm(detected: 'EQMod Mount')
-            expect(prompt).to have_received(:enum_select).with(
-              a_string_including('EQMod Mount'),
-              ['EQMod Mount', 'RedCat51'],
-            )
-          end
-
-          it 'returns the selected telescope' do
+        context 'when TELESCOP header is a mount name (ignored) and not in the configured list' do
+          it 'returns the only configured telescope without prompting' do
+            expect(prompt).not_to receive(:enum_select)
             expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('RedCat51')
           end
 
-          it 'allows accepting the mount name as-is' do
-            allow(prompt).to receive(:enum_select).and_return('EQMod Mount')
-            expect(selector.choose_telescope_or_confirm(detected: 'EQMod Mount')).to eq('EQMod Mount')
+          it 'logs that the mount was ignored and auto-detect failed' do
+            selector.choose_telescope_or_confirm(detected: 'EQMod Mount')
+            expect(AstroSubframeOrganizer.logger).to have_received(:info).with(/Ignoring detected mount name/)
+            expect(AstroSubframeOrganizer.logger).to have_received(:warn).with(/Telescope auto-detect failed/)
           end
         end
       end

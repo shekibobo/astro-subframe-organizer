@@ -50,9 +50,8 @@ module AstroSubframeOrganizer
       subject(:parser) { described_class.new('/path/to/light_68cygni_0001.fit') }
 
       before do
-        allow(FitsParser).to receive(:new).and_return(fits_parser_double)
+        allow(FitsParser).to receive(:open).and_yield(fits_parser_double)
         allow(fits_parser_double).to receive(:parse_hdus).and_return([{ header: headers }])
-        allow(fits_parser_double).to receive(:close)
       end
 
       let(:fits_parser_double) { instance_double(FitsParser) }
@@ -197,6 +196,17 @@ module AstroSubframeOrganizer
           it 'reads CCD-TEMP from headers' do
             expect(metadata.rounded_ccd_temp).to eq('-10.')
           end
+
+          context 'when CCD-TEMP is missing but SET-TEMP is present' do
+            before do
+              headers.delete('CCD-TEMP')
+              headers['SET-TEMP'] = -20.0
+            end
+
+            it 'uses SET-TEMP from config mapping' do
+              expect(metadata.rounded_ccd_temp).to eq('-20.')
+            end
+          end
         end
 
         describe 'dark_flat' do
@@ -285,20 +295,12 @@ module AstroSubframeOrganizer
         end
 
         context 'when no rotation headers are present' do
-          before { FitsHeaderParser::ROTATION_HEADERS.each { |key| headers.delete(key) } }
+          before { Config.fits_header_mappings['rotation'].each { |key| headers.delete(key) } }
 
           it 'returns nil' do
             expect(parser.rotation_angle).to be_nil
           end
         end
-      end
-
-      it 'closes the parser after reading' do
-        # The critical part:
-        expect(fits_parser_double).to receive(:close)
-
-        # Trigger the code
-        parser.parse
       end
     end
   end

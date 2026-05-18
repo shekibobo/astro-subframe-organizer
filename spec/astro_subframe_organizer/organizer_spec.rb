@@ -50,6 +50,8 @@ module AstroSubframeOrganizer
     before do
       skip_confirm
       stub_equipment
+      # Allow the "unprocessed raw images" warning which can trigger depending on test environment
+      allow(AstroSubframeOrganizer.logger).to receive(:warn).with(/Unprocessed raw images detected/)
     end
 
     after do

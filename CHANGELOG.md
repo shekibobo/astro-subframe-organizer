@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Multi-manufacturer RAW support: Added default support for `.cr3`, `.nef`, `.arw`, `.orf`, `.raf`, and `.dng` files.
+- Flexible Metadata Mapping: Added `fits_header_mappings` and `exif_tag_mappings` to configuration, allowing support for various capture software (N.I.N.A., SGP, etc.) and different DSLR manufacturers.
 - Configurable file extensions: Added `fits_extensions` and `raw_extensions` to the configuration file, allowing users to define which file types the tool should process.
 
 ### Changed

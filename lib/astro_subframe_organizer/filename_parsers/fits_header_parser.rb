@@ -8,22 +8,6 @@ module AstroSubframeOrganizer
       include Logging
       include AstroSubframeOrganizer::Utils::ExposureFormat
 
-      HEADER_MAP = {
-        telescope: 'TELESCOP',
-        filter: 'FILTER',
-        type: 'IMAGETYP',
-        target: 'OBJECT',
-        exposure: 'EXPOSURE',
-        binning: 'XBINNING',
-        camera: 'INSTRUME',
-        gain: 'GAIN',
-        iso: 'ISO',
-        date_obs: 'DATE-OBS',
-      }.freeze
-
-      ROTATION_HEADERS = %w[ROTATANG ANGLE POSANGLE ROTATOR ROTAT OBJCTROT CCDROTSA].freeze
-      TEMP_HEADERS = %w[CCD-TEMP SENSOR-TEMP].freeze
-
       def headers
         @headers ||= load_headers(path)
       end
@@ -67,7 +51,7 @@ module AstroSubframeOrganizer
       end
 
       def target
-        headers[HEADER_MAP[:target]] || parsed_from_filename[:target]
+        header(:target) || parsed_from_filename[:target]
       end
 
       def mosaic_pane
@@ -85,15 +69,16 @@ module AstroSubframeOrganizer
       end
 
       def header(key)
-        headers[HEADER_MAP[key]]
+        keys = Config.fits_header_mappings[key.to_s] || []
+        keys.lazy.filter_map { |k| headers[k] }.first
       end
 
       def rotation_angle
-        ROTATION_HEADERS.lazy.filter_map { |key| headers[key] }.first
+        header(:rotation)
       end
 
       def ccd_temperature
-        TEMP_HEADERS.lazy.filter_map { |key| headers[key] }.first
+        header(:temperature)
       end
 
       private

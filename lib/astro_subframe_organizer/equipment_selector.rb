@@ -19,7 +19,13 @@ module AstroSubframeOrganizer
     end
 
     def choose_telescope_or_confirm(detected:)
-      generic_choose_or_confirm(telescope, @telescopes, 'telescope', 'TELESCOP', detected)
+      if detected && Config.telescope_ignore_patterns.any? { |p| detected.match?(p) }
+        logger.info "Ignoring detected mount name: '#{detected}'"
+        detected = nil
+      end
+
+      suggestion = "If '#{detected}' is a mount name, consider adding it to 'telescope_ignore_patterns' in your config." if detected
+      generic_choose_or_confirm(telescope, @telescopes, 'telescope', 'TELESCOP', detected, suggestion: suggestion)
     end
 
     def choose_camera(index = nil)
@@ -53,7 +59,7 @@ module AstroSubframeOrganizer
       end.tap { |it| logger.info("Selected #{label.capitalize}: #{it}") }
     end
 
-    def generic_choose_or_confirm(current_value, collection, label, header_name, detected)
+    def generic_choose_or_confirm(current_value, collection, label, header_name, detected, suggestion: nil)
       if current_value
         logger.warn "Using #{label} #{current_value}, but detected #{detected}" if detected && current_value != detected
         return current_value
@@ -63,6 +69,7 @@ module AstroSubframeOrganizer
         detected
       elsif detected
         logger.warn "#{header_name} header '#{detected}' is not in the configured #{label} list."
+        logger.info suggestion if suggestion
         choose(
           "#{header_name} is '#{detected}' — select the actual #{label} or confirm:",
           [detected] + collection,

@@ -31,6 +31,35 @@ module AstroSubframeOrganizer
       'temperature_tolerance' => 5.0,
       'fits_extensions' => %w[.fit .fits .fts],
       'raw_extensions' => %w[.cr2 .cr3 .nef .arw .orf .raf .dng],
+      'exif_tag_mappings' => {
+        'temperature' => %i[camera_temperature sensor_temperature ambient_temperature],
+        'iso' => %i[iso base_iso],
+        'exposure' => %i[exposure_time],
+        'model' => %i[model],
+        'timestamp' => %i[date_time_original],
+      },
+      'fits_header_mappings' => {
+        'temperature' => %w[CCD-TEMP SET-TEMP TEMP],
+        'gain' => %w[GAIN GAINVAL],
+        'exposure' => %w[EXPOSURE EXPTIME],
+        'filter' => %w[FILTER FILTERNAME],
+        'telescope' => %w[TELESCOP],
+        'target' => %w[OBJECT TARGET],
+        'camera' => %w[INSTRUME],
+        'binning' => %w[XBINNING CCDXBIN BINNING],
+        'type' => %w[IMAGETYP FRAME],
+        'date_obs' => %w[DATE-OBS DATE],
+        'rotation' => %w[ROTATANG ANGLE POSANGLE ROTATOR ROTAT OBJCTROT CCDROTSA],
+        'iso' => %w[ISO],
+      },
+      'telescope_ignore_patterns' => [
+        'Mount',
+        'EQMod',
+        'AM5',
+        'AM3',
+        'RST-135',
+        'Star Adventurer',
+      ],
     }.freeze
 
     def self.custom_config_file
@@ -82,6 +111,19 @@ module AstroSubframeOrganizer
 
     def self.raw_extensions
       load['raw_extensions'] || DEFAULT_CONFIG['raw_extensions']
+    end
+
+    def self.exif_tag_mappings
+      load['exif_tag_mappings'] || DEFAULT_CONFIG['exif_tag_mappings']
+    end
+
+    def self.fits_header_mappings
+      load['fits_header_mappings'] || DEFAULT_CONFIG['fits_header_mappings']
+    end
+
+    def self.telescope_ignore_patterns
+      patterns = load['telescope_ignore_patterns'] || DEFAULT_CONFIG['telescope_ignore_patterns']
+      patterns.map { |p| Regexp.new(Regexp.escape(p), Regexp::IGNORECASE) }
     end
 
     def self.create_default_config
