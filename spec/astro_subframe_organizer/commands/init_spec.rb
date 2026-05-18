@@ -150,6 +150,7 @@ describe 'astro-subframe-organizer init', type: :aruba do
         File.write(custom_config_path, simple_config.to_yaml)
         run_command_and_stop command
       end
+
       it 'exits successfully' do
         expect(last_command_started.exit_status).to eq(0)
       end

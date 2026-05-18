@@ -10,7 +10,7 @@ module AstroSubframeOrganizer
       # TODO: Fix sub-second exposure parsing on header parser
       it 'builds a target directory path including matching keywords for Bias frames' do
         metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
-        builder = BiasPathBuilder.new(metadata)
+        builder = described_class.new(metadata)
 
         target_dir = builder.build
 

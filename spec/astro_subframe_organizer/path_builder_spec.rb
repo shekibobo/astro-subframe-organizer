@@ -11,7 +11,7 @@ module AstroSubframeOrganizer
       )
       photo = FilenameParser.for_file(path).parse
 
-      target_dir = PathBuilder.build_for(photo)
+      target_dir = described_class.build_for(photo)
 
       expect(target_dir).to eq('Dark_GAIN_111_EXP_30.0s_CCD-TEMP_-10._CAMERA_ZWO ASI183MC Pro_MONTH_2026-04')
     end
@@ -25,7 +25,7 @@ module AstroSubframeOrganizer
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
-      target_dir = PathBuilder.build_for(photo)
+      target_dir = described_class.build_for(photo)
 
       expect(target_dir).to match(/^Flat_FLATSET_/)
       expect(target_dir).to match(/TELESCOPE_RedCat51/)
@@ -40,7 +40,7 @@ module AstroSubframeOrganizer
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
-      target_dir = PathBuilder.build_for(photo)
+      target_dir = described_class.build_for(photo)
 
       expect(target_dir).to match(/^Light_C 1_/)
     end
@@ -52,7 +52,7 @@ module AstroSubframeOrganizer
       )
       photo = FilenameParser.for_file(path).parse
 
-      target_dir = PathBuilder.build_for(photo)
+      target_dir = described_class.build_for(photo)
 
       expect(target_dir).to eq('Bias_GAIN_111_EXP_32.0us_Bin_1_CAMERA_ZWO ASI183MC Pro_MONTH_2022-12')
     end
@@ -66,7 +66,7 @@ module AstroSubframeOrganizer
       photo.telescope = 'RedCat51'
       photo.filter = 'BaaderMoon'
 
-      target_path = PathBuilder.target_path_for(photo)
+      target_path = described_class.target_path_for(photo)
 
       expect(target_path).to eq('Light_C 1_FLATSET_20260411_ROTATION_108deg_GAIN_111_EXP_300.0s_Bin_1_CCD-TEMP_-10._TELESCOPE_RedCat51_FILTER_BaaderMoon_CAMERA_ZWO ASI183MC Pro/Light_C 1_300.0s_Bin1_183MC_gain111_20260410-233511_288deg_-10.0C_0006.fit')
     end
@@ -79,7 +79,7 @@ module AstroSubframeOrganizer
       photo = FilenameParser.for_file(path).parse
       photo.type = 'Unknown'
 
-      expect { PathBuilder.build_for(photo) }.to raise_error(ArgumentError)
+      expect { described_class.build_for(photo) }.to raise_error(ArgumentError)
     end
 
     it 'builds correct path for flat dark frames' do
@@ -90,7 +90,7 @@ module AstroSubframeOrganizer
       photo = FilenameParser.for_file(path).parse
       photo.dark_flat = true
 
-      target_dir = PathBuilder.target_path_for(photo)
+      target_dir = described_class.target_path_for(photo)
 
       expect(target_dir).to eq('DarkFlat_FLATSET_20260411_GAIN_111_EXP_1.0s_Bin_1_CAMERA_ZWO ASI183MC Pro/Dark_1.0s_Bin1_183MC_gain111_20260411-130000_-10.0C_0001.fit')
     end

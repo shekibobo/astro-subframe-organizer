@@ -107,7 +107,7 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
-  config.before(:each) do |example|
+  config.before do |example|
     setup_test_logger(example)
   end
 end

@@ -45,7 +45,7 @@ RSpec.configure  do |config|
   config.include FilesHelper, files: true
   config.include FilesHelper, type: :aruba
 
-  config.around(:each, files: true) do |example|
+  config.around(:each, :files) do |example|
     Dir.mktmpdir do |dir|
       @test_dir = dir
       example.run

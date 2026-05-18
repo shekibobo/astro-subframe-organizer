@@ -6,7 +6,7 @@ module AstroSubframeOrganizer
   module Equipment
     describe Camera do
       it 'loads all the default camera items' do
-        expect(Camera.all).to contain_exactly(
+        expect(described_class.all).to contain_exactly(
           '183MC',
           'Canon EOS 1500D',
           'T7',

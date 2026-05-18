@@ -147,6 +147,7 @@ module AstroSubframeOrganizer
     describe '#choose_camera_or_confirm' do
       context 'when camera is already set' do
         before { selector.camera = 'T7' }
+
         it 'returns the preset camera' do
           expect(selector.choose_camera_or_confirm(detected: 'ASI183')).to eq('T7')
         end
@@ -181,6 +182,7 @@ module AstroSubframeOrganizer
     describe '#choose_filter_or_confirm' do
       context 'when filter is already set' do
         before { selector.filter = 'NBZ' }
+
         it 'returns the preset filter' do
           expect(selector.choose_filter_or_confirm(detected: 'L-Pro')).to eq('NBZ')
         end

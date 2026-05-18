@@ -12,7 +12,7 @@ module AstroSubframeOrganizer
           metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
           metadata.telescope = 'RedCat51'
           metadata.filter = 'BaaderMoon'
-          builder = FlatPathBuilder.new(metadata)
+          builder = described_class.new(metadata)
 
           target_dir = builder.build
 
@@ -27,7 +27,7 @@ module AstroSubframeOrganizer
           metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
           metadata.telescope = 'RedCat51'
           metadata.filter = 'BaaderMoon'
-          builder = FlatPathBuilder.new(metadata)
+          builder = described_class.new(metadata)
 
           target_dir = builder.build
 

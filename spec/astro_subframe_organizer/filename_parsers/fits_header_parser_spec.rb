@@ -242,6 +242,7 @@ module AstroSubframeOrganizer
           end
         end
       end
+
       describe '#rotation_angle' do
         context 'when ROTATANG is present' do
           before { headers['ROTATANG'] = 45.0 }

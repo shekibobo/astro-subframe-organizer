@@ -38,7 +38,7 @@ module AstroSubframeOrganizer
           dest_path: dest_path,
         )
 
-        photo = Astrophoto.new(path)
+        photo = described_class.new(path)
 
         expect(photo.telescope).to eq('RedCat51')
         expect(photo.filter).to eq('BaaderMoon')
@@ -58,7 +58,7 @@ module AstroSubframeOrganizer
           },
         )
 
-        expect(Astrophoto.new(path).current_dir).to eq(test_dir)
+        expect(described_class.new(path).current_dir).to eq(test_dir)
       end
     end
 
@@ -85,7 +85,7 @@ module AstroSubframeOrganizer
         )
       end
 
-      subject(:photo) { Astrophoto.new(light_path) }
+      subject(:photo) { described_class.new(light_path) }
 
       it 'parses all attributes correctly' do
         expect(photo).to have_attributes(
@@ -119,7 +119,7 @@ module AstroSubframeOrganizer
           },
         )
 
-        expect(Astrophoto.new(path).mosaic_pane).to eq('1-2')
+        expect(described_class.new(path).mosaic_pane).to eq('1-2')
       end
 
       it 'parses gain-based camera correctly' do
@@ -135,7 +135,7 @@ module AstroSubframeOrganizer
           },
         )
 
-        photo = Astrophoto.new(path)
+        photo = described_class.new(path)
 
         expect(photo.camera).to eq('183MC')
         expect(photo.iso).to be_nil
@@ -155,7 +155,7 @@ module AstroSubframeOrganizer
             },
           )
 
-          expect(Astrophoto.new(path).flatset_id).to eq('20220508')
+          expect(described_class.new(path).flatset_id).to eq('20220508')
         end
 
         it 'uses next day for lights taken after noon' do
@@ -170,7 +170,7 @@ module AstroSubframeOrganizer
             },
           )
 
-          expect(Astrophoto.new(path).flatset_id).to eq('20220509')
+          expect(described_class.new(path).flatset_id).to eq('20220509')
         end
       end
 
@@ -189,7 +189,7 @@ module AstroSubframeOrganizer
               'CCD-TEMP' => -10.0,
             },
           )
-          photo = Astrophoto.new(path)
+          photo = described_class.new(path)
           photo.telescope = 'RedCat51'
           photo.filter    = 'BaaderMoon'
 
@@ -229,8 +229,8 @@ module AstroSubframeOrganizer
             },
           )
 
-          photo_a = Astrophoto.new(path_a)
-          photo_b = Astrophoto.new(path_b)
+          photo_a = described_class.new(path_a)
+          photo_b = described_class.new(path_b)
           [photo_a, photo_b].each do |p|
             p.telescope = 'RedCat51'
             p.filter = 'BaaderMoon'
@@ -245,8 +245,8 @@ module AstroSubframeOrganizer
           path_b = File.join(test_dir, 'Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.5C_0002.cr2')
           [path_a, path_b].each { |p| FileUtils.touch(p) }
 
-          photo_a = Astrophoto.new(path_a)
-          photo_b = Astrophoto.new(path_b)
+          photo_a = described_class.new(path_a)
+          photo_b = described_class.new(path_b)
           [photo_a, photo_b].each do |p|
             p.telescope = 'RedCat51'
             p.filter = 'BaaderMoon'
@@ -292,8 +292,8 @@ module AstroSubframeOrganizer
               },
             )
 
-            photo_a = Astrophoto.new(path_a)
-            photo_b = Astrophoto.new(path_b)
+            photo_a = described_class.new(path_a)
+            photo_b = described_class.new(path_b)
             [photo_a, photo_b].each do |p|
               p.telescope = 'RedCat51'
               p.filter = 'BaaderMoon'
@@ -322,7 +322,7 @@ module AstroSubframeOrganizer
               'CCD-TEMP' => -10.0,
             },
           )
-          photo = Astrophoto.new(path)
+          photo = described_class.new(path)
           photo.telescope = 'RedCat51'
           photo.filter    = 'BaaderMoon'
 
@@ -358,7 +358,7 @@ module AstroSubframeOrganizer
       end
 
       it 'parses dark frame attributes correctly' do
-        photo = Astrophoto.new(dark_path)
+        photo = described_class.new(dark_path)
 
         expect(photo.type).to        eq('Dark')
         expect(photo.target).to      be_nil
@@ -376,11 +376,11 @@ module AstroSubframeOrganizer
             'DATE-OBS' => '2022-05-08T12:00:00.000000',
           },
         )
-        photo = Astrophoto.new(path)
+        photo = described_class.new(path)
 
-        expect(photo.dark_flat?).to eq(false)
+        expect(photo.dark_flat?).to be(false)
         photo.dark_flat = true
-        expect(photo.dark_flat?).to eq(true)
+        expect(photo.dark_flat?).to be(true)
       end
 
       it 'identifies short-exposure darks as potential flat darks' do
@@ -403,19 +403,19 @@ module AstroSubframeOrganizer
           },
         )
 
-        short_photo = Astrophoto.new(short_path)
-        long_photo  = Astrophoto.new(long_path)
+        short_photo = described_class.new(short_path)
+        long_photo  = described_class.new(long_path)
 
-        expect(short_photo.maybe_flat_dark?).to eq(true)
-        expect(long_photo.maybe_flat_dark?).to  eq(false)
+        expect(short_photo.maybe_flat_dark?).to be(true)
+        expect(long_photo.maybe_flat_dark?).to  be(false)
 
         short_photo.dark_flat = true
-        expect(short_photo.maybe_flat_dark?).to eq(false)
+        expect(short_photo.maybe_flat_dark?).to be(false)
       end
 
       describe 'target_dir' do
         it 'builds target dir with dark keywords' do
-          photo = Astrophoto.new(dark_path)
+          photo = described_class.new(dark_path)
 
           expect(photo.target_dir).to eq(
             File.join(test_dir, 'Dark_ISO_100_EXP_30.0s_CCD-TEMP_-10._CAMERA_T7_MONTH_2022-05'),
@@ -435,7 +435,7 @@ module AstroSubframeOrganizer
               'CCD-TEMP' => -10.0,
             },
           )
-          photo = Astrophoto.new(path)
+          photo = described_class.new(path)
           photo.dark_flat = true
 
           expect(photo.target_dir).to eq(
@@ -446,7 +446,7 @@ module AstroSubframeOrganizer
 
       describe 'target_path' do
         it 'moves the file without renaming it' do
-          photo = Astrophoto.new(dark_path)
+          photo = described_class.new(dark_path)
 
           expect(photo.target_path).to eq(
             File.join(
@@ -461,40 +461,40 @@ module AstroSubframeOrganizer
       describe 'temperature grouping in target_dir' do
         context 'with default tolerance of 5 degrees' do
           it 'groups -9.5C into the -10.0C directory' do
-            photo = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
             expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'groups -10.5C into the -10.0C directory' do
-            photo = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.5))
+            photo = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.5))
             expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'groups -10.0C into the -10.0C directory' do
-            photo = Astrophoto.new(create_dark('dark_c.fit', ccd_temp: -10.0))
+            photo = described_class.new(create_dark('dark_c.fit', ccd_temp: -10.0))
             expect(photo.target_dir).to include('CCD-TEMP_-10.')
           end
 
           it 'produces the same target_dir for -9.5C and -10.0C' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.0))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.0))
             expect(File.basename(photo_a.target_dir)).to eq(File.basename(photo_b.target_dir))
           end
 
           it 'produces the same target_dir for -10.0C and -10.5C' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -10.0))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.5))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -10.0))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.5))
             expect(File.basename(photo_a.target_dir)).to eq(File.basename(photo_b.target_dir))
           end
 
           it 'produces different target_dirs for -10.0C and -15.0C' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -10.0))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -15.0))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -10.0))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -15.0))
             expect(File.basename(photo_a.target_dir)).not_to eq(File.basename(photo_b.target_dir))
           end
 
           it 'does not include the raw temperature in target_dir' do
-            photo = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
             expect(photo.target_dir).not_to include('CCD-TEMP_-9.5')
           end
         end
@@ -503,20 +503,20 @@ module AstroSubframeOrganizer
           before { allow(Config).to receive(:temperature_tolerance).and_return(1.0) }
 
           it 'keeps -9.5C and -10.5C in separate directories' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.5))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.5))
             expect(File.basename(photo_a.target_dir)).not_to eq(File.basename(photo_b.target_dir))
           end
 
           it 'groups -9.5C with -10.0C' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.0))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.0))
             expect(File.basename(photo_a.target_dir)).to eq(File.basename(photo_b.target_dir))
           end
 
           it 'keeps -10.5C separate from -10.0C' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -10.5))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -10.0))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -10.5))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -10.0))
             expect(File.basename(photo_a.target_dir)).not_to eq(File.basename(photo_b.target_dir))
           end
         end
@@ -525,14 +525,14 @@ module AstroSubframeOrganizer
           before { allow(Config).to receive(:temperature_tolerance).and_return(10.0) }
 
           it 'groups -9.5C and -14.9C into the same directory' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -9.5))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -14.9))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -9.5))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -14.9))
             expect(File.basename(photo_a.target_dir)).to eq(File.basename(photo_b.target_dir))
           end
 
           it 'does not group -10.0C and -20.0C together' do
-            photo_a = Astrophoto.new(create_dark('dark_a.fit', ccd_temp: -10.0))
-            photo_b = Astrophoto.new(create_dark('dark_b.fit', ccd_temp: -20.0))
+            photo_a = described_class.new(create_dark('dark_a.fit', ccd_temp: -10.0))
+            photo_b = described_class.new(create_dark('dark_b.fit', ccd_temp: -20.0))
             expect(File.basename(photo_a.target_dir)).not_to eq(File.basename(photo_b.target_dir))
           end
         end
@@ -560,7 +560,7 @@ module AstroSubframeOrganizer
       end
 
       it 'parses flat frame type correctly' do
-        expect(Astrophoto.new(flat_path).type).to eq('Flat')
+        expect(described_class.new(flat_path).type).to eq('Flat')
       end
 
       describe 'flatset_id' do
@@ -575,13 +575,13 @@ module AstroSubframeOrganizer
             },
           )
 
-          expect(Astrophoto.new(path).flatset_id).to eq('20220508')
+          expect(described_class.new(path).flatset_id).to eq('20220508')
         end
       end
 
       describe 'target_dir' do
         it 'builds target dir with flat keywords' do
-          photo = Astrophoto.new(flat_path)
+          photo = described_class.new(flat_path)
           photo.telescope = 'RedCat51'
           photo.filter    = 'BaaderMoon'
 
@@ -596,7 +596,7 @@ module AstroSubframeOrganizer
 
       describe 'target_path' do
         it 'moves the file without renaming it' do
-          photo = Astrophoto.new(flat_path)
+          photo = described_class.new(flat_path)
           photo.telescope = 'RedCat51'
           photo.filter    = 'BaaderMoon'
 
@@ -632,12 +632,12 @@ module AstroSubframeOrganizer
       end
 
       it 'parses bias frame type correctly' do
-        expect(Astrophoto.new(bias_path).type).to eq('Bias')
+        expect(described_class.new(bias_path).type).to eq('Bias')
       end
 
       describe 'target_dir' do
         it 'builds target dir with bias keywords' do
-          expect(Astrophoto.new(bias_path).target_dir).to eq(
+          expect(described_class.new(bias_path).target_dir).to eq(
             File.join(test_dir, 'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05'),
           )
         end
@@ -645,7 +645,7 @@ module AstroSubframeOrganizer
 
       describe 'target_path' do
         it 'moves the file without renaming it' do
-          expect(Astrophoto.new(bias_path).target_path).to eq(
+          expect(described_class.new(bias_path).target_path).to eq(
             File.join(
               test_dir,
               'Bias_GAIN_111_EXP_250.0us_Bin_1_CAMERA_T7_MONTH_2022-05/' \
@@ -678,19 +678,19 @@ module AstroSubframeOrganizer
       end
 
       it 'reports already_moved? correctly' do
-        photo = Astrophoto.new(move_path)
+        photo = described_class.new(move_path)
         photo.telescope = 'RedCat51'
         photo.filter    = 'BaaderMoon'
 
-        expect(photo.already_moved?).to eq(false)
+        expect(photo.already_moved?).to be(false)
 
         photo.move(false)
 
-        expect(photo.already_moved?).to eq(true)
+        expect(photo.already_moved?).to be(true)
       end
 
       it 'performs a dry run without moving the file' do
-        photo = Astrophoto.new(move_path)
+        photo = described_class.new(move_path)
         photo.telescope = 'RedCat51'
         photo.filter    = 'BaaderMoon'
 
@@ -714,7 +714,7 @@ module AstroSubframeOrganizer
             'CCD-TEMP' => -10.0,
           },
         )
-        photo = Astrophoto.new(path)
+        photo = described_class.new(path)
         photo.telescope = 'RedCat51'
         photo.filter    = 'BaaderMoon'
 

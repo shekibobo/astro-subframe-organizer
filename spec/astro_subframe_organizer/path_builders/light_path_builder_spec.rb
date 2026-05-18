@@ -15,7 +15,7 @@ module AstroSubframeOrganizer
             photo = FilenameParser.for_file(path).parse
             photo.telescope = 'RedCat51'
             photo.filter = 'NBZ'
-            builder = LightPathBuilder.new(photo)
+            builder = described_class.new(photo)
 
             target_dir = builder.build
 
@@ -32,7 +32,7 @@ module AstroSubframeOrganizer
             photo = FilenameParser.for_file(path).parse
             photo.telescope = 'RedCat51'
             photo.filter = 'BaaderMoon'
-            builder = LightPathBuilder.new(photo)
+            builder = described_class.new(photo)
 
             target_dir = builder.build
 
@@ -46,7 +46,7 @@ module AstroSubframeOrganizer
           photo = FilenameParser.for_file('/fake/Light_M42_1.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.cr2').parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
-          builder = LightPathBuilder.new(photo)
+          builder = described_class.new(photo)
 
           target_dir = builder.build
 
@@ -64,7 +64,7 @@ module AstroSubframeOrganizer
           photo = parser.parse
           photo.telescope = 'RedCat51'
           photo.filter = 'BaaderMoon'
-          builder = LightPathBuilder.new(photo)
+          builder = described_class.new(photo)
 
           target_dir = builder.build
 

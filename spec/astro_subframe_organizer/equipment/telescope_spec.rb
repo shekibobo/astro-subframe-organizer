@@ -6,7 +6,7 @@ module AstroSubframeOrganizer
   module Equipment
     describe Telescope do
       it 'loads all the default telescope items' do
-        expect(Telescope.all).to contain_exactly(
+        expect(described_class.all).to contain_exactly(
           'RedCat51',
           'ZhumellZ130',
           'AperturaAD8',

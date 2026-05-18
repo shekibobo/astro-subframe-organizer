@@ -6,7 +6,7 @@ require 'astro_subframe_organizer/utils/thumbnail_cleaner'
 module AstroSubframeOrganizer
   module Utils
     describe ThumbnailCleaner, :files do
-      subject(:cleaner) { ThumbnailCleaner.new(test_dir) }
+      subject(:cleaner) { described_class.new(test_dir) }
 
       def create_file(*path_parts)
         path = File.join(test_dir, *path_parts)

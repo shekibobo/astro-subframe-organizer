@@ -37,7 +37,7 @@ module AstroSubframeOrganizer
       describe 'darks' do
         it 'parses metadata from dark fits files' do
           path = '/fake/path/Dark_30.0s_Bin1_T7_ISO100_20220508-120000_-10.0C_0001.fit'
-          parser = FitsFilenameParser.for_file(path, use_headers: false)
+          parser = described_class.for_file(path, use_headers: false)
           result = parser.parse
 
           expect(result).to have_attributes(

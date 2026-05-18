@@ -28,19 +28,17 @@ module AstroSubframeOrganizer
     end
 
     def stub_equipment(telescope: nil, camera: 'ZWO ASI183MC Pro', filter: nil)
-      allow(equipment_selector).to receive(:telescope).and_return(telescope)
-      allow(equipment_selector).to receive(:camera).and_return(camera)
-      allow(equipment_selector).to receive(:filter).and_return(filter)
-
-      # Allow the confirmation methods to return the stubbed values by default
-      allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return(telescope)
-      allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return(camera)
-      allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return(filter)
-
-      # Allow the direct choose methods (used for ambiguity) to return the stubbed values
-      allow(equipment_selector).to receive(:choose_telescope).and_return(telescope)
-      allow(equipment_selector).to receive(:choose_camera).and_return(camera)
-      allow(equipment_selector).to receive(:choose_filter).and_return(filter)
+      allow(equipment_selector).to receive_messages(
+        telescope: telescope,
+        camera: camera,
+        filter: filter,
+        choose_telescope_or_confirm: telescope,
+        choose_camera_or_confirm: camera,
+        choose_filter_or_confirm: filter,
+        choose_telescope: telescope,
+        choose_camera: camera,
+        choose_filter: filter,
+      )
     end
 
     def skip_confirm
@@ -237,8 +235,7 @@ module AstroSubframeOrganizer
               },
             )
           end
-          allow(equipment_selector).to receive(:camera).and_return(nil)
-          allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return('ZWO ASI183MC Pro')
+          allow(equipment_selector).to receive_messages(camera: nil, choose_camera_or_confirm: 'ZWO ASI183MC Pro')
         end
 
         it 'automatically identifies the camera for each set' do
@@ -713,13 +710,17 @@ module AstroSubframeOrganizer
         allow(mock_fileset).to receive(:apply_filter!)
 
         # Default detection stubs
-        allow(mock_fileset).to receive(:telescope_candidates).and_return(['Scope1'])
-        allow(mock_fileset).to receive(:camera_candidates).and_return(['Cam1'])
-        allow(mock_fileset).to receive(:filter_candidates).and_return(['Filter1'])
+        allow(mock_fileset).to receive_messages(
+          telescope_candidates: ['Scope1'],
+          camera_candidates: ['Cam1'],
+          filter_candidates: ['Filter1'],
+        )
 
-        allow(equipment_selector).to receive(:choose_telescope_or_confirm).and_return('Scope1')
-        allow(equipment_selector).to receive(:choose_camera_or_confirm).and_return('Cam1')
-        allow(equipment_selector).to receive(:choose_filter_or_confirm).and_return('Filter1')
+        allow(equipment_selector).to receive_messages(
+          choose_telescope_or_confirm: 'Scope1',
+          choose_camera_or_confirm: 'Cam1',
+          choose_filter_or_confirm: 'Filter1',
+        )
       end
 
       it 'logs a warning when multiple cameras are detected' do

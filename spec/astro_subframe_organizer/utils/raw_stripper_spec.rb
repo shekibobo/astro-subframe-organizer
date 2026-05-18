@@ -5,10 +5,10 @@ require 'exiftool_vendored'
 require 'astro_subframe_organizer/utils/raw_stripper'
 
 describe AstroSubframeOrganizer::Utils::RawStripper, :files do
+  subject(:stripper) { described_class.new(input_path, output_path) }
+
   let(:input_path) { File.join(test_dir, 'IMG_0001.CR2') }
   let(:output_path) { File.join(test_dir, 'test_stripped.CR2') }
-
-  subject(:stripper) { described_class.new(input_path, output_path) }
 
   before do
     install_fixture('cr2/unstripped/IMG_0001.CR2', test_dir, dest_path: 'IMG_0001.CR2')

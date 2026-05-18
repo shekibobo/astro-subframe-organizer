@@ -27,7 +27,7 @@ module AstroSubframeOrganizer
 
         it 'builds a target directory path including matching keywords for Dark frames' do
           metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
-          builder = DarkPathBuilder.new(metadata)
+          builder = described_class.new(metadata)
 
           target_dir = builder.build
 
@@ -41,7 +41,7 @@ module AstroSubframeOrganizer
         it 'builds a target directory path including matching keywords for Flat-Dark frames' do
           metadata = AstroSubframeOrganizer::FilenameParsers::FitsHeaderParser.new(path).parse
           metadata.dark_flat = true
-          builder = DarkPathBuilder.new(metadata)
+          builder = described_class.new(metadata)
 
           target_dir = builder.build
 
